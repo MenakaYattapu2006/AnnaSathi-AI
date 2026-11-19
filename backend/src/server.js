@@ -3,7 +3,7 @@ import { Server } from 'socket.io';
 import app from './app.js';
 import { config } from './config/index.js';
 import { initSockets } from './sockets/index.js';
-import { pool } from './config/db.js';
+import { pool, initDbPool } from './config/db.js';
 
 const server = http.createServer(app);
 

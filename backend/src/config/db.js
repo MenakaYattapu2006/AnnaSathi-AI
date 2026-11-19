@@ -25,6 +25,22 @@ if (config.databaseUrl) {
   console.warn('⚠️  DATABASE_URL is not configured. Database queries will fall back to local in-memory storage for development.');
 }
 
+/**
+ * Pre-warms the database connection pool so first user queries are instantaneous.
+ */
+export async function initDbPool() {
+  if (pool) {
+    try {
+      const client = await pool.connect();
+      await client.query('SELECT 1');
+      client.release();
+      console.log('⚡ PostgreSQL pool pre-warmed and ready.');
+    } catch (err) {
+      console.warn('⚠️ Note: Initial DB pool warm-up:', err.message);
+    }
+  }
+}
+
 // In-Memory Fallback Store (for zero-setup local dev & unit tests without an active PostgreSQL instance)
 export const memoryStore = {
   users: new Map(),
