@@ -3,1155 +3,1429 @@ import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowRight,
   ShieldCheck,
-  Radio,
+  CheckCircle2,
   Clock,
   Sparkles,
-  CheckCircle2,
+  MapPin,
+  Truck,
   HeartHandshake,
   Building2,
-  Truck,
-  Leaf,
+  User,
   Users,
-  AlertTriangle,
-  ChevronRight,
+  Radio,
   FileCheck,
-  TrendingUp,
-  MapPin,
-  ExternalLink,
+  ChevronRight,
+  Lock,
+  Leaf,
+  Activity,
+  Layers,
+  Phone,
+  Mail,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { DeliveryMap } from '../components/common/DeliveryMap';
-
-type CityFilter = 'all' | 'hyderabad' | 'bengaluru' | 'mumbai' | 'delhi';
-type EcoTab = 'donors' | 'ngos' | 'volunteers';
-
-interface RescueRecord {
-  id: string;
-  source: string;
-  city: CityFilter;
-  badgeText: string;
-  badgeVariant: 'active' | 'completed' | 'urgent';
-  portions: string;
-  foodType: string;
-  destination: string;
-  timeAgo: string;
-  temperature: string;
-  aiConfidence: string;
-  courierId: string;
-  pickupCoord: { latitude: number; longitude: number; label: string };
-  volunteerCoord: { latitude: number; longitude: number; label: string };
-  deliveryCoord: { latitude: number; longitude: number; label: string };
-}
-
-const cityCoordinates: Record<CityFilter, { lat: number; lng: number; zoom: number }> = {
-  all: { lat: 17.4485, lng: 78.3908, zoom: 13 },
-  hyderabad: { lat: 17.4485, lng: 78.3908, zoom: 13 },
-  bengaluru: { lat: 12.9750, lng: 77.6350, zoom: 13 },
-  mumbai: { lat: 19.0600, lng: 72.8650, zoom: 13 },
-  delhi: { lat: 28.5950, lng: 77.1800, zoom: 13 },
-};
-
-const liveRescuesData: RescueRecord[] = [
-  {
-    id: 'res-hyd-1',
-    source: 'The Grand Orchid Ballroom',
-    city: 'hyderabad',
-    badgeText: 'In Transit • 7m ETA',
-    badgeVariant: 'active',
-    portions: '140 Portions',
-    foodType: 'Fresh Dal Makhani, Steamed Rice, Butter Roti (100% Pure Veg)',
-    destination: 'Karuna Seva Orphanage & Shelter (Gachibowli)',
-    timeAgo: '8 mins ago',
-    temperature: '68.4°C Safe (Insulated)',
-    aiConfidence: '99.4%',
-    courierId: 'Rider #402',
-    pickupCoord: { latitude: 17.448294, longitude: 78.391485, label: 'Grand Orchid Kitchen (Madhapur)' },
-    volunteerCoord: { latitude: 17.441294, longitude: 78.385485, label: 'Courier #402 (In Transit)' },
-    deliveryCoord: { latitude: 17.432294, longitude: 78.378485, label: 'Karuna Seva Shelter (Gachibowli)' },
-  },
-  {
-    id: 'res-blr-1',
-    source: 'Marriott Convention Center',
-    city: 'bengaluru',
-    badgeText: 'AI Matched • En Route Pickup',
-    badgeVariant: 'urgent',
-    portions: '210 Portions',
-    foodType: 'Catered Buffet Platters, Paneer Curry, Pulao',
-    destination: 'Sneha Sadan Senior Community Dining',
-    timeAgo: '3 mins ago',
-    temperature: '64.0°C Insulated',
-    aiConfidence: '98.8%',
-    courierId: 'Rider #214',
-    pickupCoord: { latitude: 12.978, longitude: 77.6408, label: 'Marriott Kitchen (Indiranagar)' },
-    volunteerCoord: { latitude: 12.973, longitude: 77.632, label: 'Rider #214 (En Route)' },
-    deliveryCoord: { latitude: 12.965, longitude: 77.625, label: 'Sneha Sadan Dining Hall' },
-  },
-  {
-    id: 'res-mum-1',
-    source: 'FreshBakery Logistics Hub',
-    city: 'mumbai',
-    badgeText: 'Delivered & 80G Certified',
-    badgeVariant: 'completed',
-    portions: '320 Packs',
-    foodType: 'Whole Wheat Loaves, Protein Rolls, Baked Snacks',
-    destination: 'Bal Sahyog Children Home (Bandra East)',
-    timeAgo: '22 mins ago',
-    temperature: 'Ambient Insulated',
-    aiConfidence: '99.9%',
-    courierId: 'Rider #108',
-    pickupCoord: { latitude: 19.065, longitude: 72.868, label: 'FreshBakery Hub (BKC)' },
-    volunteerCoord: { latitude: 19.058, longitude: 72.86, label: 'Rider #108 (Delivered)' },
-    deliveryCoord: { latitude: 19.049, longitude: 72.852, label: 'Bal Sahyog Children Home' },
-  },
-  {
-    id: 'res-del-1',
-    source: 'ITC Maurya Kitchens',
-    city: 'delhi',
-    badgeText: 'In Transit • 12m ETA',
-    badgeVariant: 'active',
-    portions: '185 Portions',
-    foodType: 'Packed Dinner Meals, Subzi, Jeera Rice, Parathas',
-    destination: 'Rain Basera Community Shelter (Chanakyapuri)',
-    timeAgo: '14 mins ago',
-    temperature: '66.2°C Safe',
-    aiConfidence: '99.1%',
-    courierId: 'Rider #305',
-    pickupCoord: { latitude: 28.598, longitude: 77.175, label: 'ITC Maurya Diplomatic Enclave' },
-    volunteerCoord: { latitude: 28.591, longitude: 77.182, label: 'Rider #305 (In Transit)' },
-    deliveryCoord: { latitude: 28.583, longitude: 77.19, label: 'Rain Basera Shelter' },
-  },
-];
 
 export const Landing: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
 
-  const [activeCity, setActiveCity] = useState<CityFilter>('all');
-  const [activeEcoTab, setActiveEcoTab] = useState<EcoTab>('donors');
-  const [selectedRescueId, setSelectedRescueId] = useState<string>('res-hyd-1');
-
-  // Quick Donation Intake Simulation
-  const [quickEntity, setQuickEntity] = useState('');
-  const [quickPortions, setQuickPortions] = useState('');
-  const [quickPhone, setQuickPhone] = useState('');
-  const [quickLocation, setQuickLocation] = useState('');
-  const [quickSuccess, setQuickSuccess] = useState<string | null>(null);
-
-  const filteredRescues =
-    activeCity === 'all'
-      ? liveRescuesData
-      : liveRescuesData.filter((r) => r.city === activeCity);
-
-  const activeSelectedRescue =
-    liveRescuesData.find((r) => r.id === selectedRescueId) || liveRescuesData[0];
-
-  const handleQuickSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!quickEntity || !quickPortions || !quickPhone || !quickLocation) {
-      alert('Please fill out the donation details.');
-      return;
-    }
-    setQuickSuccess(
-      `✓ Surplus donation registered for ${quickEntity}! Immediate rescue courier #402 dispatched to ${quickLocation}. Real-time tracking link sent to ${quickPhone}.`
-    );
-    setTimeout(() => {
-      if (isAuthenticated && user?.role === 'donor') {
-        navigate('/donor/create-donation');
-      } else {
-        navigate('/login');
-      }
-    }, 2500);
-  };
+  const [activeTab, setActiveTab] = useState<'home' | 'about' | 'how-it-works' | 'features' | 'mission' | 'contact'>('home');
+  const [showLiveMap, setShowLiveMap] = useState<boolean>(false);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans antialiased relative selection:bg-brand-900 selection:text-white">
-      {/* Background Grid Pattern */}
-      <div className="fixed inset-0 grid-bg-pattern pointer-events-none z-0 opacity-80" />
+    <div className="bg-[#fafaf9] font-sans text-slate-800 antialiased selection:bg-emerald-100 selection:text-emerald-900 min-h-screen">
+      {/* =========================================================================
+          TOP NAVIGATION HEADER
+      ========================================================================== */}
+      <header className="fixed top-0 left-0 right-0 w-full z-50 bg-white/90 backdrop-blur-xl border-b border-slate-200/80 shadow-[0_1px_8px_rgba(15,23,42,0.03)]">
+        <div className="h-20 max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 flex items-center justify-between">
+          {/* Logo & Brand Emblem */}
+          <div className="flex items-center gap-3">
+            <Link to="/" className="flex items-center gap-3 group no-underline">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-900 via-emerald-800 to-teal-700 flex items-center justify-center text-white shadow-sm ring-1 ring-emerald-900/10 transition-transform group-hover:scale-105">
+                <svg
+                  className="w-5 h-5 text-emerald-300"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path
+                    d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"
+                    fill="currentColor"
+                    fillOpacity="0.25"
+                  />
+                  <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+                </svg>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xl font-bold tracking-tight text-[#0f392b]">
+                  AnnaSathi AI
+                </span>
+                <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60 text-xs font-semibold shadow-xs">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  AI Network
+                </span>
+              </div>
+            </Link>
+          </div>
 
-      {/* Top Ambient Glow */}
-      <div className="absolute -top-[300px] left-1/2 -translate-x-1/2 w-[900px] h-[550px] bg-emerald-500/10 blur-[140px] rounded-full pointer-events-none" />
-
-      {/* ─────────────────────────────────────────────────────────────────────────────
-          1. NAVIGATION HEADER (Spacious, balanced, wide)
-      ────────────────────────────────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/80 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 h-20 flex items-center justify-between gap-6">
-          {/* Brand Logo & Emblem */}
-          <Link to="/" className="flex items-center gap-3 no-underline group flex-shrink-0">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-900 via-emerald-800 to-teal-700 flex items-center justify-center text-white shadow-sm ring-1 ring-emerald-900/10 transition-transform group-hover:scale-105">
-              <svg
-                className="w-5 h-5 text-emerald-300"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path
-                  d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"
-                  fill="currentColor"
-                  fillOpacity="0.25"
-                />
-                <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
-              </svg>
-            </div>
-            <span className="text-xl font-bold tracking-tight text-slate-900">
-              AnnaSathi AI
-            </span>
-          </Link>
-
-          {/* Centered Navigation Links with Generous Spacing */}
-          <nav className="hidden md:flex items-center gap-8 lg:gap-10 text-sm font-semibold text-slate-600">
+          {/* Centered Navigation Pill */}
+          <nav className="hidden lg:flex items-center gap-1 xl:gap-2 px-3 py-1.5 rounded-full bg-slate-100/80 border border-slate-200/60 text-xs font-semibold text-slate-600">
+            <a
+              href="#hero"
+              onClick={() => setActiveTab('home')}
+              className={`px-3 py-1.5 transition-all rounded-lg ${
+                activeTab === 'home'
+                  ? 'bg-white text-[#0f392b] font-bold shadow-sm'
+                  : 'hover:text-slate-900 hover:bg-slate-200/60'
+              }`}
+            >
+              Home
+            </a>
+            <a
+              href="#about"
+              onClick={() => setActiveTab('about')}
+              className={`px-3 py-1.5 transition-all rounded-lg ${
+                activeTab === 'about'
+                  ? 'bg-white text-[#0f392b] font-bold shadow-sm'
+                  : 'hover:text-slate-900 hover:bg-slate-200/60'
+              }`}
+            >
+              About Us
+            </a>
             <a
               href="#how-it-works"
-              className="hover:text-emerald-800 transition-colors py-1 hover:border-b-2 hover:border-emerald-700"
+              onClick={() => setActiveTab('how-it-works')}
+              className={`px-3 py-1.5 transition-all rounded-lg ${
+                activeTab === 'how-it-works'
+                  ? 'bg-white text-[#0f392b] font-bold shadow-sm'
+                  : 'hover:text-slate-900 hover:bg-slate-200/60'
+              }`}
             >
               How It Works
             </a>
             <a
-              href="#live-radar"
-              className="hover:text-emerald-800 transition-colors py-1 hover:border-b-2 hover:border-emerald-700"
+              href="#ai-features"
+              onClick={() => setActiveTab('features')}
+              className={`px-3 py-1.5 transition-all rounded-lg ${
+                activeTab === 'features'
+                  ? 'bg-white text-[#0f392b] font-bold shadow-sm'
+                  : 'hover:text-slate-900 hover:bg-slate-200/60'
+              }`}
             >
-              Live Radar &amp; Map
+              Our Features
             </a>
             <a
-              href="#network-ecosystem"
-              className="hover:text-emerald-800 transition-colors py-1 hover:border-b-2 hover:border-emerald-700"
+              href="#mission"
+              onClick={() => setActiveTab('mission')}
+              className={`px-3 py-1.5 transition-all rounded-lg ${
+                activeTab === 'mission'
+                  ? 'bg-white text-[#0f392b] font-bold shadow-sm'
+                  : 'hover:text-slate-900 hover:bg-slate-200/60'
+              }`}
             >
-              Ecosystem
+              Our Mission
             </a>
             <a
-              href="#about-us"
-              className="hover:text-emerald-800 transition-colors py-1 hover:border-b-2 hover:border-emerald-700"
+              href="#contact"
+              onClick={() => setActiveTab('contact')}
+              className={`px-3 py-1.5 transition-all rounded-lg ${
+                activeTab === 'contact'
+                  ? 'bg-white text-[#0f392b] font-bold shadow-sm'
+                  : 'hover:text-slate-900 hover:bg-slate-200/60'
+              }`}
             >
-              About Project
+              Contact
             </a>
           </nav>
 
-          {/* Right Action CTAs */}
-          <div className="flex items-center gap-4 flex-shrink-0">
+          {/* Action CTAs */}
+          <div className="flex items-center gap-3">
             {isAuthenticated && user ? (
               <Link
                 to={`/${user.role}/dashboard`}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-900 hover:bg-[#134E3F] text-white text-sm font-semibold shadow-sm transition-all"
+                className="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2.5 rounded-lg text-xs sm:text-sm font-semibold bg-[#15803d] hover:bg-[#0f392b] text-white transition-all shadow-sm"
               >
-                <span>Go to Dashboard</span>
+                <span>Dashboard</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
             ) : (
-              <div className="flex items-center gap-3">
+              <>
                 <Link
                   to="/login"
-                  className="px-4 py-2 text-sm font-semibold text-slate-700 hover:text-brand-900 transition-colors"
+                  className="hidden sm:inline-flex items-center justify-center px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-100 hover:text-[#0f392b] transition-all"
                 >
-                  Sign In
+                  Login
                 </Link>
                 <Link
                   to="/register"
-                  className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-brand-900 hover:bg-[#134E3F] text-white text-sm font-semibold shadow-sm transition-all"
+                  className="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2.5 rounded-lg text-xs sm:text-sm font-semibold bg-[#15803d] hover:bg-[#0f392b] text-white transition-all shadow-sm"
                 >
                   <span>Get Started</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
-              </div>
+              </>
             )}
+
+            <div className="w-8 h-8 rounded-full bg-[#0f392b] flex items-center justify-center text-white">
+              <User className="w-4 h-4" />
+            </div>
           </div>
         </div>
       </header>
 
-      {/* ─────────────────────────────────────────────────────────────────────────────
-          2. HERO SECTION (Wide, spaced, clear, with Leaflet Map Preview)
-      ────────────────────────────────────────────────────────────────────────────── */}
-      <section className="relative z-10 py-16 sm:py-20 lg:py-24 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-            {/* Left Content Column (7 cols) */}
-            <div className="lg:col-span-7 space-y-6 sm:space-y-8">
-              {/* Live Status Pill */}
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/80 shadow-xs text-xs font-semibold text-emerald-900">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600" />
-                </span>
-                <span>AI-Powered Surplus Food Rescue Network</span>
-                <span className="text-slate-300">|</span>
-                <span className="text-emerald-700 font-medium">Real-Time Dispatch Active</span>
-              </div>
+      {/* Main Container */}
+      <main className="w-full pt-20 bg-[#fafaf9]">
+        <div className="flex flex-col w-full">
+          {/* =========================================================================
+              1. HERO SECTION (#hero)
+          ========================================================================== */}
+          <section className="relative overflow-hidden pt-8 pb-20 lg:pt-14 lg:pb-28 bg-[#fafaf9]" id="hero">
+            {/* Ambient glowing backdrop blurs */}
+            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[700px] h-[360px] bg-emerald-100/50 blur-[130px] pointer-events-none rounded-full -z-10" />
+            <div className="absolute top-1/3 -right-20 w-[420px] h-[420px] bg-slate-100/60 blur-[110px] pointer-events-none rounded-full -z-10" />
 
-              {/* Main Headline */}
-              <div className="space-y-2">
-                <span className="text-xs font-bold uppercase tracking-widest text-emerald-800">
-                  Zero-Waste Culinary Intelligence
-                </span>
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 leading-[1.12]">
-                  Feed the Hungry,{' '}
-                  <span className="text-emerald-800 block mt-1">Not the Bin.</span>
-                </h1>
-              </div>
-
-              {/* Subtitle */}
-              <p className="text-base sm:text-lg text-slate-600 max-w-xl leading-relaxed">
-                AnnaSathi AI connects surplus food donors—hotels, banquet halls, restaurants, and caterers—with verified shelters and agile couriers within the golden hour, using Google Gemini and NVIDIA NIM AI for strict food safety and zero landfill waste.
-              </p>
-
-              {/* Primary Call to Action Buttons */}
-              <div className="flex flex-wrap items-center gap-4 pt-2">
-                <Link
-                  to={isAuthenticated && user?.role === 'donor' ? '/donor/create-donation' : '/login'}
-                  className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-brand-900 hover:bg-[#134E3F] text-white font-semibold text-sm sm:text-base shadow-sm transition-all transform hover:-translate-y-0.5"
-                >
-                  <Leaf className="w-5 h-5 text-emerald-300" />
-                  <span>Donate Surplus Food</span>
-                </Link>
-
-                <a
-                  href="#live-radar"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 font-semibold text-sm sm:text-base shadow-xs transition-colors"
-                >
-                  <Radio className="w-4 h-4 text-emerald-700" />
-                  <span>Explore Live Radar</span>
-                </a>
-
-                <Link
-                  to="/register"
-                  className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl text-slate-700 hover:text-emerald-800 font-semibold text-sm transition-colors"
-                >
-                  <span>Register as NGO / Volunteer</span>
-                  <ChevronRight className="w-4 h-4" />
-                </Link>
-              </div>
-
-              {/* Value Badges */}
-              <div className="pt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 border-t border-slate-200/80">
-                <div className="flex items-center gap-2.5 text-xs text-slate-600 font-medium">
-                  <Clock className="w-4 h-4 text-emerald-700 flex-shrink-0" />
-                  <span>Average Match: 4.2 Mins</span>
-                </div>
-                <div className="flex items-center gap-2.5 text-xs text-slate-600 font-medium">
-                  <ShieldCheck className="w-4 h-4 text-emerald-700 flex-shrink-0" />
-                  <span>100% Thermal &amp; FSSAI Safe</span>
-                </div>
-                <div className="flex items-center gap-2.5 text-xs text-slate-600 font-medium">
-                  <FileCheck className="w-4 h-4 text-emerald-700 flex-shrink-0" />
-                  <span>Auto 80G Tax Certificates</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Column: Live Interactive Leaflet Map Showcase (5 cols) */}
-            <div className="lg:col-span-5">
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-premium p-6 relative overflow-hidden">
-                {/* Accent Trim Gradient */}
-                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-brand-900 via-emerald-600 to-teal-500" />
-
-                {/* Broadcast Header */}
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                      Active Rescue Broadcast
+            <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-center">
+                {/* Hero Text Content (6 cols) */}
+                <div className="lg:col-span-6 flex flex-col items-start">
+                  {/* AI Pill Badge */}
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-slate-200/80 shadow-sm mb-6">
+                    <span className="w-2 h-2 rounded-full bg-[#15803d] animate-pulse shadow-[0_0_8px_#22c55e]" />
+                    <span className="text-xs font-semibold tracking-wide text-slate-800">
+                      AI-Powered Hunger Prevention &amp; Food Rescue Network
                     </span>
                   </div>
-                  <span className="px-2.5 py-1 rounded-md bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-semibold">
-                    Golden Hour: 45m left
-                  </span>
-                </div>
 
-                {/* Donor & Food Description */}
-                <div className="py-4 space-y-1">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-bold text-slate-900 text-base">The Grand Orchid Ballroom</h3>
-                    <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
-                      5-Star Kitchen
+                  {/* Main Heading */}
+                  <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#0f392b] tracking-tight leading-[1.15] mb-6">
+                    Bridging the Gap Between{' '}
+                    <span className="bg-gradient-to-r from-[#15803d] to-[#0f392b] bg-clip-text text-transparent">
+                      Food Waste
+                    </span>{' '}
+                    and{' '}
+                    <span className="bg-gradient-to-r from-emerald-600 to-amber-700 bg-clip-text text-transparent">
+                      Hunger
                     </span>
-                  </div>
-                  <p className="text-xs text-slate-500">
-                    Sector 29, Cyber Hub • 140 Portions • Pure Veg
+                    .
+                  </h1>
+
+                  {/* Supporting Description */}
+                  <p className="text-base sm:text-lg text-slate-600 mb-8 max-w-xl leading-relaxed">
+                    Every meal matters. AnnaSathi AI connects surplus food with people who need it through verified NGOs, dedicated volunteers, and intelligent AI-powered food rescue.
                   </p>
-                </div>
 
-                {/* Leaflet Live Map Component */}
-                <div className="rounded-xl overflow-hidden border border-slate-200 shadow-inner relative z-0">
-                  <DeliveryMap
-                    pickupLocation={{
-                      latitude: 17.448294,
-                      longitude: 78.391485,
-                      label: 'Grand Orchid Kitchen (Madhapur)',
-                      type: 'pickup',
-                    }}
-                    deliveryLocation={{
-                      latitude: 17.432294,
-                      longitude: 78.378485,
-                      label: 'Karuna Seva Shelter (Gachibowli)',
-                      type: 'delivery',
-                    }}
-                    volunteerLocation={{
-                      latitude: 17.441294,
-                      longitude: 78.385485,
-                      label: 'Courier #402 (In Transit)',
-                      type: 'volunteer',
-                    }}
-                    height="210px"
-                    showRoute={true}
-                  />
-                </div>
+                  {/* CTA Buttons */}
+                  <div className="flex flex-wrap items-center gap-4 mb-6">
+                    <Link
+                      to={isAuthenticated && user?.role === 'donor' ? '/donor/create-donation' : '/login'}
+                      className="inline-flex items-center gap-2 px-6 py-3.5 rounded-lg bg-[#15803d] text-white font-semibold text-sm hover:bg-[#0f392b] transition-all duration-200 shadow-sm hover:shadow-md"
+                    >
+                      <span>Donate Food</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+                    <Link
+                      to="/register"
+                      className="inline-flex items-center gap-2 px-6 py-3.5 rounded-lg bg-white border border-slate-200 text-[#0f392b] font-semibold text-sm hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 shadow-sm"
+                    >
+                      <HeartHandshake className="w-4 h-4 text-[#15803d]" />
+                      <span>Join as Volunteer</span>
+                    </Link>
+                  </div>
 
-                {/* Telemetry Indicator Strip */}
-                <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-3 gap-2 text-center">
-                  <div className="bg-slate-50 p-2 rounded-lg border border-slate-100">
-                    <span className="block text-[10px] text-slate-400 uppercase font-semibold">
-                      Thermal Probe
+                  {/* Trust Subtext */}
+                  <div className="flex items-center gap-2.5 text-slate-600 pt-2">
+                    <Leaf className="w-4 h-4 text-[#15803d]" />
+                    <span className="text-sm font-medium">
+                      Together, let's build a world where no meal goes to waste.
                     </span>
-                    <span className="font-bold text-xs text-emerald-800">68.4°C Safe</span>
-                  </div>
-                  <div className="bg-slate-50 p-2 rounded-lg border border-slate-100">
-                    <span className="block text-[10px] text-slate-400 uppercase font-semibold">
-                      AI Accuracy
-                    </span>
-                    <span className="font-bold text-xs text-emerald-800">99.4% Match</span>
-                  </div>
-                  <div className="bg-slate-50 p-2 rounded-lg border border-slate-100">
-                    <span className="block text-[10px] text-slate-400 uppercase font-semibold">
-                      Courier
-                    </span>
-                    <span className="font-bold text-xs text-slate-800">Rider #402</span>
                   </div>
                 </div>
 
-                <div className="mt-4">
-                  <a
-                    href="#live-radar"
-                    className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-brand-900 hover:bg-[#134E3F] text-white text-xs font-semibold transition-colors"
-                  >
-                    <span>View Interactive Telemetry Map</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+                {/* Hero Visual Area (6 cols) */}
+                <div className="lg:col-span-6 relative">
+                  {/* Toggle between Graphic Showcase & Live Leaflet Map */}
+                  <div className="mb-2 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => setShowLiveMap(!showLiveMap)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-slate-200 text-xs font-semibold text-emerald-800 hover:bg-emerald-50 transition-colors shadow-xs"
+                    >
+                      <MapPin className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>{showLiveMap ? 'View Photo Showcase' : 'View Live Leaflet GPS'}</span>
+                    </button>
+                  </div>
 
-      {/* ─────────────────────────────────────────────────────────────────────────────
-          3. KEY IMPACT NUMBERS RIBBON (Full-Width, High Impact)
-      ────────────────────────────────────────────────────────────────────────────── */}
-      <section className="w-full bg-brand-900 text-white py-14 relative z-10 shadow-md">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-emerald-800/60">
-            <div className="pt-4 md:pt-0">
-              <p className="text-3xl sm:text-4xl font-extrabold text-emerald-300">18,500+</p>
-              <p className="text-sm font-medium text-emerald-100/90 mt-1">Surplus Meals Rescued</p>
-            </div>
-            <div className="pt-4 md:pt-0 md:pl-6">
-              <p className="text-3xl sm:text-4xl font-extrabold text-emerald-300">120+</p>
-              <p className="text-sm font-medium text-emerald-100/90 mt-1">Verified Shelters &amp; NGOs</p>
-            </div>
-            <div className="pt-4 md:pt-0 md:pl-6">
-              <p className="text-3xl sm:text-4xl font-extrabold text-emerald-300">&lt; 4.5 Mins</p>
-              <p className="text-sm font-medium text-emerald-100/90 mt-1">AI Match Speed</p>
-            </div>
-            <div className="pt-4 md:pt-0 md:pl-6">
-              <p className="text-3xl sm:text-4xl font-extrabold text-emerald-300">42.8 Tons</p>
-              <p className="text-sm font-medium text-emerald-100/90 mt-1">CO₂ Landfill Emissions Saved</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────────────────────
-          4. HOW IT WORKS (Spacious, Step-by-Step Architecture)
-      ────────────────────────────────────────────────────────────────────────────── */}
-      <section id="how-it-works" className="py-20 lg:py-28 bg-white relative z-10 border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-          {/* Section Header */}
-          <div className="text-center max-w-3xl mx-auto space-y-3 mb-16">
-            <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-              Zero-Waste Protocol
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-              How AnnaSathi AI Works
-            </h2>
-            <p className="text-base text-slate-600">
-              From commercial kitchen surplus to hungry bellies in under 60 minutes through four streamlined, AI-orchestrated stages.
-            </p>
-          </div>
-
-          {/* 4 Steps Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {/* Step 1 */}
-            <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200/90 hover:border-emerald-300 hover:shadow-subtle-card transition-all duration-200 relative group">
-              <div className="w-12 h-12 rounded-xl bg-brand-50 border border-emerald-100 text-brand-900 flex items-center justify-center font-extrabold text-lg mb-5 shadow-xs group-hover:scale-105 transition-transform">
-                01
-              </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Surplus Ingestion</h3>
-              <p className="text-sm text-slate-600 leading-relaxed">
-                Commercial kitchen staff list surplus portions, preparation timestamp, and dietary tags (Veg, Non-Veg, Jain) in under 60 seconds.
-              </p>
-              <div className="mt-4 pt-3 border-t border-slate-200/60 flex items-center text-xs font-semibold text-emerald-800">
-                <span>Instant Photo &amp; Tagging</span>
-              </div>
-            </div>
-
-            {/* Step 2 */}
-            <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200/90 hover:border-emerald-300 hover:shadow-subtle-card transition-all duration-200 relative group">
-              <div className="w-12 h-12 rounded-xl bg-brand-50 border border-emerald-100 text-brand-900 flex items-center justify-center font-extrabold text-lg mb-5 shadow-xs group-hover:scale-105 transition-transform">
-                02
-              </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">AI Matchmaking</h3>
-              <p className="text-sm text-slate-600 leading-relaxed">
-                Gemini &amp; NVIDIA NIM algorithms evaluate nearby verified NGOs based on head-count needs, dietary affinity, and travel proximity.
-              </p>
-              <div className="mt-4 pt-3 border-t border-slate-200/60 flex items-center text-xs font-semibold text-emerald-800">
-                <span>&lt; 5 Min Automated Match</span>
-              </div>
-            </div>
-
-            {/* Step 3 */}
-            <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200/90 hover:border-emerald-300 hover:shadow-subtle-card transition-all duration-200 relative group">
-              <div className="w-12 h-12 rounded-xl bg-brand-50 border border-emerald-100 text-brand-900 flex items-center justify-center font-extrabold text-lg mb-5 shadow-xs group-hover:scale-105 transition-transform">
-                03
-              </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Golden-Hour Dispatch</h3>
-              <p className="text-sm text-slate-600 leading-relaxed">
-                Volunteer couriers receive turn-by-turn routing with thermal bag handling instructions to deliver hot, hygienic food safely.
-              </p>
-              <div className="mt-4 pt-3 border-t border-slate-200/60 flex items-center text-xs font-semibold text-emerald-800">
-                <span>Real-Time GPS Tracking</span>
-              </div>
-            </div>
-
-            {/* Step 4 */}
-            <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200/90 hover:border-emerald-300 hover:shadow-subtle-card transition-all duration-200 relative group">
-              <div className="w-12 h-12 rounded-xl bg-brand-50 border border-emerald-100 text-brand-900 flex items-center justify-center font-extrabold text-lg mb-5 shadow-xs group-hover:scale-105 transition-transform">
-                04
-              </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Audit &amp; 80G Receipt</h3>
-              <p className="text-sm text-slate-600 leading-relaxed">
-                The receiving shelter confirms handoff with a secure OTP. An automated digital 80G tax certificate and ESG impact report are generated.
-              </p>
-              <div className="mt-4 pt-3 border-t border-slate-200/60 flex items-center text-xs font-semibold text-emerald-800">
-                <span>Tax &amp; ESG Compliant</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────────────────────
-          5. LIVE RESCUE RADAR & INTERACTIVE LEAFLET MAP (Spacious Split View)
-      ────────────────────────────────────────────────────────────────────────────── */}
-      <section id="live-radar" className="py-20 lg:py-28 bg-slate-50 relative z-10 border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 space-y-10">
-          {/* Section Header & City Filters */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div className="space-y-2 max-w-2xl">
-              <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-800">
-                <Radio className="w-4 h-4 text-emerald-700 animate-pulse" />
-                <span>Live Distribution Telemetry</span>
-              </div>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-                Urban Food Rescue Radar
-              </h2>
-              <p className="text-sm text-slate-600">
-                Select a city to inspect live food rescue coordinates, active courier runs, and distribution destinations on the interactive Leaflet map.
-              </p>
-            </div>
-
-            {/* City Filter Pills */}
-            <div className="flex flex-wrap gap-2">
-              {(
-                [
-                  { id: 'all', label: 'All Metros' },
-                  { id: 'hyderabad', label: 'Hyderabad' },
-                  { id: 'bengaluru', label: 'Bengaluru' },
-                  { id: 'mumbai', label: 'Mumbai' },
-                  { id: 'delhi', label: 'Delhi NCR' },
-                ] as { id: CityFilter; label: string }[]
-              ).map((c) => (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() => {
-                    setActiveCity(c.id);
-                    const match = liveRescuesData.find(
-                      (r) => c.id === 'all' || r.city === c.id
-                    );
-                    if (match) setSelectedRescueId(match.id);
-                  }}
-                  className={`px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-150 cursor-pointer ${
-                    activeCity === c.id
-                      ? 'bg-brand-900 text-white shadow-sm'
-                      : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
-                  }`}
-                >
-                  {c.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Map + Cards Split Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            {/* Interactive Leaflet Map Box (7 cols) */}
-            <div className="lg:col-span-7 bg-white rounded-2xl border border-slate-200 shadow-premium p-4 sm:p-5">
-              <div className="flex items-center justify-between mb-3 px-1">
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-emerald-700" />
-                  <span className="font-bold text-sm text-slate-900">
-                    Live Route:{' '}
-                    <span className="text-emerald-800 font-semibold">
-                      {activeSelectedRescue.source} → {activeSelectedRescue.destination}
-                    </span>
-                  </span>
-                </div>
-                <span className="text-xs font-medium text-slate-500 capitalize">
-                  {activeSelectedRescue.city}
-                </span>
-              </div>
-
-              {/* Leaflet Map Frame */}
-              <div className="rounded-xl overflow-hidden border border-slate-200 shadow-inner">
-                <DeliveryMap
-                  pickupLocation={activeSelectedRescue.pickupCoord}
-                  deliveryLocation={activeSelectedRescue.deliveryCoord}
-                  volunteerLocation={activeSelectedRescue.volunteerCoord}
-                  height="420px"
-                  showRoute={true}
-                />
-              </div>
-
-              <div className="mt-3 px-2 flex flex-wrap items-center justify-between text-xs text-slate-500 gap-2">
-                <div className="flex items-center gap-3">
-                  <span className="inline-flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                    <span>Pickup (Donor)</span>
-                  </span>
-                  <span className="inline-flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-sky-500" />
-                    <span>Courier In-Transit</span>
-                  </span>
-                  <span className="inline-flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-                    <span>Delivery (Shelter)</span>
-                  </span>
-                </div>
-                <span className="text-[11px] font-mono text-slate-400">
-                  OpenStreetMap • 100% Verified Telemetry
-                </span>
-              </div>
-            </div>
-
-            {/* Live Rescue Cards Feed (5 cols) */}
-            <div className="lg:col-span-5 space-y-4">
-              {filteredRescues.map((rescue) => {
-                const isSelected = rescue.id === activeSelectedRescue.id;
-                return (
-                  <div
-                    key={rescue.id}
-                    onClick={() => setSelectedRescueId(rescue.id)}
-                    className={`p-5 rounded-2xl border transition-all duration-200 cursor-pointer ${
-                      isSelected
-                        ? 'bg-white border-brand-900 shadow-md ring-1 ring-brand-900/10'
-                        : 'bg-white/80 border-slate-200 hover:bg-white hover:border-slate-300 shadow-xs'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-2 mb-2">
-                      <span className="font-bold text-slate-900 text-sm">
-                        {rescue.source}
-                      </span>
-                      <span
-                        className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${
-                          rescue.badgeVariant === 'active'
-                            ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                            : rescue.badgeVariant === 'urgent'
-                            ? 'bg-amber-50 text-amber-800 border border-amber-200'
-                            : 'bg-slate-100 text-slate-700'
-                        }`}
-                      >
-                        {rescue.badgeText}
-                      </span>
+                  {showLiveMap ? (
+                    <div className="rounded-2xl overflow-hidden shadow-xl border border-slate-200 bg-white p-3 aspect-[16/11]">
+                      <DeliveryMap
+                        pickupLocation={{
+                          latitude: 17.448294,
+                          longitude: 78.391485,
+                          label: 'Grand Kitchen (Madhapur)',
+                          type: 'pickup',
+                        }}
+                        deliveryLocation={{
+                          latitude: 17.432294,
+                          longitude: 78.378485,
+                          label: 'Seva Shelter (Gachibowli)',
+                          type: 'delivery',
+                        }}
+                        volunteerLocation={{
+                          latitude: 17.441294,
+                          longitude: 78.385485,
+                          label: 'Courier #402 (In Transit)',
+                          type: 'volunteer',
+                        }}
+                        height="100%"
+                        showRoute={true}
+                      />
                     </div>
+                  ) : (
+                    /* Main Hero Image Frame */
+                    <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200/60 bg-slate-100 aspect-[16/11]">
+                      <img
+                        alt="Community volunteers packing nutritious meal boxes"
+                        className="w-full h-full object-cover"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbhUOwTkI6A8fbbOJ7TaGfYbNJcdQCjQqRJEIeCVLZiaroSFD_DRffMH6tm5kzlTw_9ad26RqoPPv_M5F4iXJQp6mZR4WejDJNcSnT8rv-j46oh9AY6AXPS9c-rCaoLPFSayKvZFDCBCMZhFSv9Loi8R1Y-MLGPmN2IQlmgP_LJ_rtWs8fxEfTvAtdsmQCjhv7SjxW65lSnAydcCpbP99KEhKIIOKoZMasRWt0x4k"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0f392b]/60 via-transparent to-transparent" />
+                    </div>
+                  )}
 
-                    <p className="text-xs text-slate-600 line-clamp-2 mb-3">
-                      {rescue.foodType}
-                    </p>
-
-                    <div className="flex items-center justify-between pt-3 border-t border-slate-100 text-xs text-slate-500">
-                      <span>Dest: {rescue.destination.split('(')[0]}</span>
-                      <span className="font-semibold text-emerald-800">
-                        {rescue.portions}
-                      </span>
+                  {/* Floating Card 1: Top Right (AI Match Verified) */}
+                  <div className="absolute -top-6 -right-2 sm:right-4 bg-white/95 border border-slate-200/80 backdrop-blur-md px-4 py-3 rounded-xl shadow-lg flex items-center gap-3.5 z-20 max-w-xs">
+                    <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0">
+                      <CheckCircle2 className="w-6 h-6 text-[#15803d]" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-sm text-[#0f392b] font-bold">AI Match Verified</span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#15803d]" />
+                      </div>
+                      <p className="text-xs text-slate-500 truncate">Hope Kitchen (1.8 km) • 12m ETA</p>
                     </div>
                   </div>
-                );
-              })}
+
+                  {/* Floating Card 2: Bottom Left (Urgency Score) */}
+                  <div className="absolute -bottom-6 -left-2 sm:left-4 bg-white/95 border border-slate-200/80 backdrop-blur-md px-4 py-3 rounded-xl shadow-lg flex items-center gap-3.5 z-20 max-w-xs">
+                    <div className="w-10 h-10 rounded-lg bg-amber-50 border border-amber-100 flex items-center justify-center shrink-0">
+                      <Clock className="w-6 h-6 text-amber-700" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-[#0f392b] font-bold">Urgency Score: High</span>
+                        <span className="px-1.5 py-0.5 rounded bg-rose-100 text-rose-800 text-[11px] font-mono font-semibold">
+                          4h left
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-500 font-mono">Temp: 63°C • Hot Consumable</p>
+                    </div>
+                  </div>
+
+                  {/* Floating Pill 3: Bottom Right (Surplus Rescued) */}
+                  <div className="hidden sm:flex absolute bottom-5 right-5 bg-[#0f392b]/95 text-white px-3.5 py-2 rounded-full items-center gap-2 shadow-md z-10 backdrop-blur-sm border border-emerald-900/40">
+                    <Leaf className="w-4 h-4 text-emerald-400" />
+                    <span className="text-xs font-semibold tracking-wide">
+                      Surplus Rescued: Fresh Meals &amp; Produce
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      </section>
+          </section>
 
-      {/* ─────────────────────────────────────────────────────────────────────────────
-          6. ROLE-BASED ECOSYSTEM (Donors, NGOs, Volunteers)
-      ────────────────────────────────────────────────────────────────────────────── */}
-      <section id="network-ecosystem" className="py-20 lg:py-28 bg-white relative z-10 border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 space-y-12">
-          {/* Section Header */}
-          <div className="text-center max-w-3xl mx-auto space-y-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-              Stakeholder Benefits
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-              An Ecosystem Built for Everyone
-            </h2>
-            <p className="text-base text-slate-600">
-              Whether you produce surplus food, operate a community dining hall, or have an hour to deliver meals, AnnaSathi AI empowers your contribution.
-            </p>
-          </div>
+          {/* =========================================================================
+              2. IMPACT / PLATFORM INTRODUCTION (#impact)
+          ========================================================================== */}
+          <section className="py-16 lg:py-24 bg-slate-50 border-y border-slate-200/70 relative" id="impact">
+            <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+              {/* Section Header */}
+              <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-14">
+                <span className="text-xs text-[#15803d] tracking-widest uppercase mb-2 font-bold font-mono">
+                  IMPACT OVERVIEW
+                </span>
+                <h2 className="text-3xl sm:text-4xl font-bold text-[#0f392b] tracking-tight mb-4">
+                  Small Actions. Bigger Impact.
+                </h2>
+                <p className="text-base text-slate-600 leading-relaxed">
+                  One donation can make a difference. AnnaSathi AI brings donors, NGOs, and volunteers together to transform surplus food into meaningful support for communities.
+                </p>
+              </div>
 
-          {/* Role Tabs */}
-          <div className="flex justify-center">
-            <div className="inline-flex p-1.5 rounded-xl bg-slate-100 border border-slate-200 gap-1.5">
-              <button
-                type="button"
-                onClick={() => setActiveEcoTab('donors')}
-                className={`px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-150 cursor-pointer ${
-                  activeEcoTab === 'donors'
-                    ? 'bg-brand-900 text-white shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                Food Donors
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveEcoTab('ngos')}
-                className={`px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-150 cursor-pointer ${
-                  activeEcoTab === 'ngos'
-                    ? 'bg-brand-900 text-white shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                NGOs &amp; Shelters
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveEcoTab('volunteers')}
-                className={`px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-150 cursor-pointer ${
-                  activeEcoTab === 'volunteers'
-                    ? 'bg-brand-900 text-white shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                Volunteer Couriers
-              </button>
-            </div>
-          </div>
-
-          {/* Tab Content Cards */}
-          <div className="max-w-4xl mx-auto bg-slate-50 rounded-2xl border border-slate-200 p-8 sm:p-10 shadow-sm">
-            {activeEcoTab === 'donors' && (
-              <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-brand-50 border border-emerald-100 text-brand-900 flex items-center justify-center">
-                    <Building2 className="w-6 h-6 text-brand-900" />
+              {/* 4 Stat / Telemetry Metric Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {/* Stat Card 1 */}
+                <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between transition-transform duration-300 hover:-translate-y-1 hover:shadow-md">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-[#0f392b]">
+                      <Building2 className="w-6 h-6" />
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-xs text-[#15803d] bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full font-bold font-mono">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#15803d]" /> 100%
+                    </span>
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-slate-900">
-                      Commercial Kitchens, Hotels &amp; Banquet Facilities
-                    </h3>
-                    <p className="text-sm text-slate-500">
-                      Transform surplus preparation into CSR credit, 80G tax deductions, and verified ESG metrics.
+                    <div className="text-2xl font-bold text-[#0f392b] tracking-tight mb-1">
+                      Active Donors
+                    </div>
+                    <p className="text-xs text-slate-600 mb-3">
+                      Continuous Inflow verified with restaurants, college canteens &amp; banquet partners.
                     </p>
                   </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                  <div className="flex items-start gap-3 p-4 bg-white rounded-xl border border-slate-200">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-700 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <h4 className="font-bold text-sm text-slate-900">Instant Listing &lt; 60 Sec</h4>
-                      <p className="text-xs text-slate-500 mt-0.5">
-                        No paperwork. Enter food type and portions; our AI handles the rest.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 p-4 bg-white rounded-xl border border-slate-200">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-700 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <h4 className="font-bold text-sm text-slate-900">Good Samaritan Protection</h4>
-                      <p className="text-xs text-slate-500 mt-0.5">
-                        Compliant with FSSAI Surplus Food Regulations and liability safeguards.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 p-4 bg-white rounded-xl border border-slate-200">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-700 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <h4 className="font-bold text-sm text-slate-900">Instant 80G Certificates</h4>
-                      <p className="text-xs text-slate-500 mt-0.5">
-                        Receive digitally signed income tax certificates for every verified handover.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 p-4 bg-white rounded-xl border border-slate-200">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-700 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <h4 className="font-bold text-sm text-slate-900">ESG &amp; Carbon Telemetry</h4>
-                      <p className="text-xs text-slate-500 mt-0.5">
-                        Track landfill greenhouse emissions averted for your corporate sustainability reports.
-                      </p>
-                    </div>
+                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-slate-500 text-xs font-mono">
+                    <span>Strict KYC Onboarding</span>
+                    <CheckCircle2 className="w-4 h-4 text-[#15803d]" />
                   </div>
                 </div>
 
-                <div className="pt-4 flex items-center justify-between border-t border-slate-200">
-                  <span className="text-xs text-slate-500">
-                    Ready to partner your kitchen?
-                  </span>
+                {/* Stat Card 2 */}
+                <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between transition-transform duration-300 hover:-translate-y-1 hover:shadow-md">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-[#0f392b]">
+                      <HeartHandshake className="w-6 h-6" />
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-xs text-[#15803d] bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full font-bold font-mono">
+                      Geo-Routed
+                    </span>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-[#0f392b] tracking-tight mb-1">
+                      Verified NGOs
+                    </div>
+                    <p className="text-xs text-slate-600 mb-3">
+                      Vetted distribution partners with capacity-checked shelters and community kitchens.
+                    </p>
+                  </div>
+                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-slate-500 text-xs font-mono">
+                    <span>Demand-Matched Daily</span>
+                    <MapPin className="w-4 h-4 text-[#15803d]" />
+                  </div>
+                </div>
+
+                {/* Stat Card 3 */}
+                <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between transition-transform duration-300 hover:-translate-y-1 hover:shadow-md">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-[#0f392b]">
+                      <Truck className="w-6 h-6" />
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-xs text-[#15803d] bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full font-bold font-mono">
+                      Real-Time
+                    </span>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-[#0f392b] tracking-tight mb-1">
+                      Dedicated Squads
+                    </div>
+                    <p className="text-xs text-slate-600 mb-3">
+                      Community-driven volunteers dispatched instantly for rapid food pickup and handover.
+                    </p>
+                  </div>
+                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-slate-500 text-xs font-mono">
+                    <span>Avg. 18 Min Dispatch</span>
+                    <Activity className="w-4 h-4 text-[#15803d]" />
+                  </div>
+                </div>
+
+                {/* Stat Card 4 */}
+                <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between transition-transform duration-300 hover:-translate-y-1 hover:shadow-md">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-[#0f392b]">
+                      <ShieldCheck className="w-6 h-6" />
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-xs text-[#15803d] bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full font-bold font-mono">
+                      Audit Trail
+                    </span>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-[#0f392b] tracking-tight mb-1">
+                      Deliveries Tracked
+                    </div>
+                    <p className="text-xs text-slate-600 mb-3">
+                      Zero-waste goal with end-to-end digital timestamps, temperature logs, and delivery receipts.
+                    </p>
+                  </div>
+                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-slate-500 text-xs font-mono">
+                    <span>Full Lifecycle Safety</span>
+                    <FileCheck className="w-4 h-4 text-[#15803d]" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* =========================================================================
+              3. ABOUT ANNASATHI AI (#about)
+          ========================================================================== */}
+          <section className="py-20 lg:py-28 bg-[#fafaf9] relative" id="about">
+            <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+              <div className="max-w-3xl mb-14">
+                <span className="text-xs text-[#15803d] tracking-widest uppercase mb-2 font-bold font-mono block">
+                  THE CRISIS &amp; OUR SOLUTION
+                </span>
+                <h2 className="text-3xl sm:text-4xl font-bold text-[#0f392b] tracking-tight">
+                  Technology with a Purpose. Food with a Future.
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-center">
+                {/* Left: Crisis Points + Solution Statement */}
+                <div className="lg:col-span-6 flex flex-col gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="p-5 rounded-xl bg-white border border-slate-200/80 shadow-sm flex flex-col gap-3">
+                      <span className="w-8 h-8 rounded-lg bg-slate-100 text-[#0f392b] flex items-center justify-center">
+                        <Leaf className="w-4 h-4" />
+                      </span>
+                      <p className="text-xs sm:text-sm text-slate-700 leading-snug">
+                        Large quantities of surplus food are wasted every day across banquets, hotels, and college canteens.
+                      </p>
+                    </div>
+
+                    <div className="p-5 rounded-xl bg-white border border-slate-200/80 shadow-sm flex flex-col gap-3">
+                      <span className="w-8 h-8 rounded-lg bg-slate-100 text-[#0f392b] flex items-center justify-center">
+                        <HeartHandshake className="w-4 h-4" />
+                      </span>
+                      <p className="text-xs sm:text-sm text-slate-700 leading-snug">
+                        Many communities and shelter residents still struggle to access fresh, balanced, nutritious meals daily.
+                      </p>
+                    </div>
+
+                    <div className="p-5 rounded-xl bg-white border border-slate-200/80 shadow-sm flex flex-col gap-3">
+                      <span className="w-8 h-8 rounded-lg bg-slate-100 text-[#0f392b] flex items-center justify-center">
+                        <Radio className="w-4 h-4" />
+                      </span>
+                      <p className="text-xs sm:text-sm text-slate-700 leading-snug">
+                        Food donors and humanitarian organizations frequently lack an efficient, real-time bridge to connect.
+                      </p>
+                    </div>
+
+                    <div className="p-5 rounded-xl bg-white border border-slate-200/80 shadow-sm flex flex-col gap-3">
+                      <span className="w-8 h-8 rounded-lg bg-slate-100 text-[#0f392b] flex items-center justify-center">
+                        <Clock className="w-4 h-4" />
+                      </span>
+                      <p className="text-xs sm:text-sm text-slate-700 leading-snug">
+                        Collection and distribution require immediate coordination, temperature tracking, and timely action.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Highlighted Solution Statement */}
+                  <div className="p-6 rounded-2xl bg-[#0f392b] text-white shadow-md relative overflow-hidden border border-emerald-950">
+                    <div className="flex items-start gap-4">
+                      <Sparkles className="w-7 h-7 text-emerald-300 shrink-0 mt-1" />
+                      <div>
+                        <span className="text-base font-bold text-emerald-300 block mb-1">
+                          Our Integrated AI Solution
+                        </span>
+                        <p className="text-xs sm:text-sm text-white/90 leading-relaxed">
+                          AnnaSathi AI uses technology and artificial intelligence to connect surplus food donors with verified organizations and volunteers, helping food reach the right destination before it goes to waste.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right: Warehouse Image Frame with Telemetry Overlay */}
+                <div className="lg:col-span-6 relative">
+                  <div className="rounded-2xl overflow-hidden shadow-lg border border-slate-200/80 bg-slate-100 aspect-[4/3] relative">
+                    <img
+                      alt="Volunteers packing family food boxes in warehouse"
+                      className="w-full h-full object-cover"
+                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVemRBnm5TkJm2BQXOfkXuUpiwDpQwv9gVfXPr1BvoPqnXaQRuvqR9ZiaCwRl-yoyII_eNIqQ-4gTODjuoUwTXqtvrP-LGrCbMXCtoZ2pWaePQzyNrYwAmccQRhiEFgp6ndaW8IgGansdnNnQ-FwF5RMuIug0IB2fsPOiDqEe1bjQJh0Nu5hj0UCWKhA6oqCOQs5CB8YjtgeerajgExO_DDtDQEx7N48pcwZdZhxw"
+                    />
+                    <div className="absolute bottom-6 left-6 right-6 bg-white/95 border border-slate-200/80 backdrop-blur-md p-4 rounded-xl shadow-md flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className="w-3 h-3 rounded-full bg-[#15803d] animate-ping" />
+                        <div>
+                          <h4 className="text-xs sm:text-sm font-bold text-[#0f392b]">
+                            Zero-Waste Logistics Engine
+                          </h4>
+                          <p className="text-[11px] text-slate-500">
+                            Real-time matching active across metropolitan nodes
+                          </p>
+                        </div>
+                      </div>
+                      <Radio className="w-5 h-5 text-[#15803d]" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* =========================================================================
+              4. HOW IT WORKS (#how-it-works)
+          ========================================================================== */}
+          <section className="py-20 lg:py-28 bg-slate-50 border-y border-slate-200/70 relative" id="how-it-works">
+            <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+              <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-16">
+                <span className="text-xs text-[#15803d] tracking-widest uppercase mb-2 font-bold font-mono">
+                  SEAMLESS 7-STEP WORKFLOW
+                </span>
+                <h2 className="text-3xl sm:text-4xl font-bold text-[#0f392b] tracking-tight mb-4">
+                  How Surplus Food Reaches Those in Need
+                </h2>
+                <p className="text-base text-slate-600">
+                  From donor notification to shelter receipt, each phase is coordinated with machine precision and community care.
+                </p>
+              </div>
+
+              {/* 7-Step Sequence Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-4">
+                {/* STEP 1 */}
+                <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between group hover:shadow-md hover:border-slate-300 transition-all">
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="w-8 h-8 rounded-full bg-slate-100 text-[#0f392b] font-mono text-xs flex items-center justify-center font-bold">
+                        01
+                      </span>
+                      <Building2 className="w-5 h-5 text-[#15803d]" />
+                    </div>
+                    <h3 className="font-bold text-sm text-[#0f392b] mb-1.5">Donate Food</h3>
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      Donors register, add food details, quantity, prep timestamp, expiry info, and pickup location.
+                    </p>
+                  </div>
+                  <div className="mt-4 pt-3 border-t border-slate-100 text-right">
+                    <span className="text-[11px] font-mono text-slate-400 group-hover:text-[#15803d] transition-colors">Phase 1</span>
+                  </div>
+                </div>
+
+                {/* STEP 2 */}
+                <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between group hover:shadow-md hover:border-slate-300 transition-all">
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="w-8 h-8 rounded-full bg-slate-100 text-[#0f392b] font-mono text-xs flex items-center justify-center font-bold">
+                        02
+                      </span>
+                      <Sparkles className="w-5 h-5 text-[#15803d]" />
+                    </div>
+                    <h3 className="font-bold text-sm text-[#0f392b] mb-1.5">AI Analysis</h3>
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      The AI system estimates food urgency and evaluates temperature and storage stability.
+                    </p>
+                  </div>
+                  <div className="mt-4 pt-3 border-t border-slate-100 text-right">
+                    <span className="text-[11px] font-mono text-slate-400 group-hover:text-[#15803d] transition-colors">Phase 2</span>
+                  </div>
+                </div>
+
+                {/* STEP 3 */}
+                <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between group hover:shadow-md hover:border-slate-300 transition-all">
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="w-8 h-8 rounded-full bg-slate-100 text-[#0f392b] font-mono text-xs flex items-center justify-center font-bold">
+                        03
+                      </span>
+                      <Layers className="w-5 h-5 text-[#15803d]" />
+                    </div>
+                    <h3 className="font-bold text-sm text-[#0f392b] mb-1.5">NGO Matching</h3>
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      Platform recommends suitable verified NGOs based on proximity, capacity, and dietary criteria.
+                    </p>
+                  </div>
+                  <div className="mt-4 pt-3 border-t border-slate-100 text-right">
+                    <span className="text-[11px] font-mono text-slate-400 group-hover:text-[#15803d] transition-colors">Phase 3</span>
+                  </div>
+                </div>
+
+                {/* STEP 4 */}
+                <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between group hover:shadow-md hover:border-slate-300 transition-all">
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="w-8 h-8 rounded-full bg-slate-100 text-[#0f392b] font-mono text-xs flex items-center justify-center font-bold">
+                        04
+                      </span>
+                      <HeartHandshake className="w-5 h-5 text-[#15803d]" />
+                    </div>
+                    <h3 className="font-bold text-sm text-[#0f392b] mb-1.5">NGO Acceptance</h3>
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      The NGO reviews donation details and accepts or declines based on current kitchen meal capacity.
+                    </p>
+                  </div>
+                  <div className="mt-4 pt-3 border-t border-slate-100 text-right">
+                    <span className="text-[11px] font-mono text-slate-400 group-hover:text-[#15803d] transition-colors">Phase 4</span>
+                  </div>
+                </div>
+
+                {/* STEP 5 */}
+                <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between group hover:shadow-md hover:border-slate-300 transition-all">
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="w-8 h-8 rounded-full bg-slate-100 text-[#0f392b] font-mono text-xs flex items-center justify-center font-bold">
+                        05
+                      </span>
+                      <Truck className="w-5 h-5 text-[#15803d]" />
+                    </div>
+                    <h3 className="font-bold text-sm text-[#0f392b] mb-1.5">Volunteer Sync</h3>
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      An available neighborhood volunteer accepts the route delivery task via their live dashboard.
+                    </p>
+                  </div>
+                  <div className="mt-4 pt-3 border-t border-slate-100 text-right">
+                    <span className="text-[11px] font-mono text-slate-400 group-hover:text-[#15803d] transition-colors">Phase 5</span>
+                  </div>
+                </div>
+
+                {/* STEP 6 */}
+                <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between group hover:shadow-md hover:border-slate-300 transition-all">
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="w-8 h-8 rounded-full bg-slate-100 text-[#0f392b] font-mono text-xs flex items-center justify-center font-bold">
+                        06
+                      </span>
+                      <MapPin className="w-5 h-5 text-[#15803d]" />
+                    </div>
+                    <h3 className="font-bold text-sm text-[#0f392b] mb-1.5">Pickup &amp; Transit</h3>
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      The volunteer collects the sealed meals from donor and transports directly to the destination NGO.
+                    </p>
+                  </div>
+                  <div className="mt-4 pt-3 border-t border-slate-100 text-right">
+                    <span className="text-[11px] font-mono text-slate-400 group-hover:text-[#15803d] transition-colors">Phase 6</span>
+                  </div>
+                </div>
+
+                {/* STEP 7 */}
+                <div className="bg-white p-5 rounded-2xl border border-emerald-200 shadow-sm flex flex-col justify-between group hover:shadow-md transition-all">
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-800 font-mono text-xs flex items-center justify-center font-bold">
+                        07
+                      </span>
+                      <CheckCircle2 className="w-5 h-5 text-[#15803d]" />
+                    </div>
+                    <h3 className="font-bold text-sm text-[#0f392b] mb-1.5">Confirmation</h3>
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      The NGO verifies quality, confirms receipt digitally, and the donation cycle is fully completed.
+                    </p>
+                  </div>
+                  <div className="mt-4 pt-3 border-t border-slate-100 text-right">
+                    <span className="text-[11px] font-mono text-[#15803d] font-bold">Completed</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* =========================================================================
+              5. OUR FOUR MAIN ROLES (#roles)
+          ========================================================================== */}
+          <section className="py-20 lg:py-28 bg-[#fafaf9] relative" id="roles">
+            <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+              <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-16">
+                <span className="text-xs text-[#15803d] tracking-widest uppercase mb-2 font-bold font-mono">
+                  ECOSYSTEM STAKEHOLDERS
+                </span>
+                <h2 className="text-3xl sm:text-4xl font-bold text-[#0f392b] tracking-tight mb-4">
+                  Designed for Every Hero in the Network
+                </h2>
+                <p className="text-base text-slate-600 leading-relaxed">
+                  Whether you prepare surplus food, run a shelter, drive a delivery route, or administer safety, AnnaSathi gives you tailor-made tools.
+                </p>
+              </div>
+
+              {/* 4 Visually Distinct Cards (2x2 Grid) */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* CARD 1: Food Donors */}
+                <div className="bg-white p-8 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="px-3 py-1 rounded-full bg-slate-100 text-xs text-[#0f392b] font-semibold">
+                        Donors &amp; Partners
+                      </span>
+                      <Building2 className="w-6 h-6 text-[#15803d]" />
+                    </div>
+                    <h3 className="text-xl font-bold text-[#0f392b] mb-3">Donate Surplus Food</h3>
+                    <p className="text-sm text-slate-600 mb-6 leading-relaxed">
+                      Restaurants, hotels, college canteens, event organizers, and individuals can list surplus food and help prevent unnecessary food waste.
+                    </p>
+                    <ul className="space-y-3 mb-8 text-sm text-slate-700">
+                      <li className="flex items-center gap-3">
+                        <CheckCircle2 className="w-4 h-4 text-[#15803d] flex-shrink-0" />
+                        <span>Create food donations in seconds</span>
+                      </li>
+                      <li className="flex items-center gap-3">
+                        <CheckCircle2 className="w-4 h-4 text-[#15803d] flex-shrink-0" />
+                        <span>Upload food images &amp; freshness indicators</span>
+                      </li>
+                      <li className="flex items-center gap-3">
+                        <CheckCircle2 className="w-4 h-4 text-[#15803d] flex-shrink-0" />
+                        <span>Specify quantity &amp; expiry details</span>
+                      </li>
+                      <li className="flex items-center gap-3">
+                        <CheckCircle2 className="w-4 h-4 text-[#15803d] flex-shrink-0" />
+                        <span>Get AI-powered NGO recommendations</span>
+                      </li>
+                      <li className="flex items-center gap-3">
+                        <CheckCircle2 className="w-4 h-4 text-[#15803d] flex-shrink-0" />
+                        <span>Track donations &amp; delivery progress in real time</span>
+                      </li>
+                      <li className="flex items-center gap-3">
+                        <CheckCircle2 className="w-4 h-4 text-[#15803d] flex-shrink-0" />
+                        <span>View donation history &amp; total environmental impact</span>
+                      </li>
+                    </ul>
+                  </div>
                   <Link
-                    to="/register"
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-900 hover:bg-[#134E3F] text-white text-xs font-semibold shadow-sm transition-all"
+                    to={isAuthenticated && user?.role === 'donor' ? '/donor/create-donation' : '/register'}
+                    className="w-full inline-flex items-center justify-center gap-2 py-3 px-6 rounded-lg bg-[#15803d] text-white text-sm font-semibold hover:bg-[#0f392b] transition-colors shadow-sm"
                   >
-                    <span>Register as Food Donor</span>
+                    <span>Become a Donor</span>
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
-              </div>
-            )}
 
-            {activeEcoTab === 'ngos' && (
-              <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-brand-50 border border-emerald-100 text-brand-900 flex items-center justify-center">
-                    <HeartHandshake className="w-6 h-6 text-brand-900" />
-                  </div>
+                {/* CARD 2: Verified NGOs */}
+                <div className="bg-white p-8 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
                   <div>
-                    <h3 className="text-xl font-bold text-slate-900">
-                      Shelters, Orphanages &amp; Community Dining Halls
-                    </h3>
-                    <p className="text-sm text-slate-500">
-                      Reliable, high-quality nutrition delivered straight to your doorstep free of charge.
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="px-3 py-1 rounded-full bg-slate-100 text-xs text-[#0f392b] font-semibold">
+                        Community Kitchens &amp; Shelters
+                      </span>
+                      <HeartHandshake className="w-6 h-6 text-[#15803d]" />
+                    </div>
+                    <h3 className="text-xl font-bold text-[#0f392b] mb-3">Receive Food Donations</h3>
+                    <p className="text-sm text-slate-600 mb-6 leading-relaxed">
+                      Verified NGOs, food banks, shelters, and community kitchens can discover suitable food donations and distribute them to communities in need.
                     </p>
+                    <ul className="space-y-3 mb-8 text-sm text-slate-700">
+                      <li className="flex items-center gap-3">
+                        <CheckCircle2 className="w-4 h-4 text-[#15803d] flex-shrink-0" />
+                        <span>Organization registration &amp; instant verification</span>
+                      </li>
+                      <li className="flex items-center gap-3">
+                        <CheckCircle2 className="w-4 h-4 text-[#15803d] flex-shrink-0" />
+                        <span>Manage food requirements &amp; dining capacity</span>
+                      </li>
+                      <li className="flex items-center gap-3">
+                        <CheckCircle2 className="w-4 h-4 text-[#15803d] flex-shrink-0" />
+                        <span>Discover nearby donations tailored to your shelter</span>
+                      </li>
+                      <li className="flex items-center gap-3">
+                        <CheckCircle2 className="w-4 h-4 text-[#15803d] flex-shrink-0" />
+                        <span>Accept or decline suitable donations with 1 click</span>
+                      </li>
+                      <li className="flex items-center gap-3">
+                        <CheckCircle2 className="w-4 h-4 text-[#15803d] flex-shrink-0" />
+                        <span>Track volunteer deliveries with live arrival telemetry</span>
+                      </li>
+                      <li className="flex items-center gap-3">
+                        <CheckCircle2 className="w-4 h-4 text-[#15803d] flex-shrink-0" />
+                        <span>Confirm food receipt and log nutritional statistics</span>
+                      </li>
+                    </ul>
                   </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                  <div className="flex items-start gap-3 p-4 bg-white rounded-xl border border-slate-200">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-700 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <h4 className="font-bold text-sm text-slate-900">Tailored Diet Matching</h4>
-                      <p className="text-xs text-slate-500 mt-0.5">
-                        Receive meals aligned with your beneficiaries (Pure Veg, Jain, Halal, etc.).
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 p-4 bg-white rounded-xl border border-slate-200">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-700 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <h4 className="font-bold text-sm text-slate-900">Capacity-Aware Routing</h4>
-                      <p className="text-xs text-slate-500 mt-0.5">
-                        Our AI never overburdens your kitchen with more food than you can serve or store.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 p-4 bg-white rounded-xl border border-slate-200">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-700 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <h4 className="font-bold text-sm text-slate-900">Zero Administrative Overhead</h4>
-                      <p className="text-xs text-slate-500 mt-0.5">
-                        One-click accept and simple OTP verification upon delivery.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 p-4 bg-white rounded-xl border border-slate-200">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-700 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <h4 className="font-bold text-sm text-slate-900">Strict Quality Assurance</h4>
-                      <p className="text-xs text-slate-500 mt-0.5">
-                        Every donation is audited for preparation time and golden-hour viability.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pt-4 flex items-center justify-between border-t border-slate-200">
-                  <span className="text-xs text-slate-500">
-                    Need meals for your organization?
-                  </span>
                   <Link
                     to="/register"
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-900 hover:bg-[#134E3F] text-white text-xs font-semibold shadow-sm transition-all"
+                    className="w-full inline-flex items-center justify-center gap-2 py-3 px-6 rounded-lg bg-slate-100 border border-slate-200 text-[#0f392b] text-sm font-semibold hover:bg-slate-200 transition-colors shadow-sm"
                   >
                     <span>Register Your NGO</span>
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
-              </div>
-            )}
 
-            {activeEcoTab === 'volunteers' && (
-              <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-brand-50 border border-emerald-100 text-brand-900 flex items-center justify-center">
-                    <Truck className="w-6 h-6 text-brand-900" />
-                  </div>
+                {/* CARD 3: Volunteers */}
+                <div className="bg-white p-8 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
                   <div>
-                    <h3 className="text-xl font-bold text-slate-900">
-                      Volunteer Couriers &amp; Logistics Partners
-                    </h3>
-                    <p className="text-sm text-slate-500">
-                      Turn spare hours into lifelines for hungry children and families in your neighborhood.
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="px-3 py-1 rounded-full bg-slate-100 text-xs text-[#0f392b] font-semibold">
+                        Rescue Logistics
+                      </span>
+                      <Truck className="w-6 h-6 text-[#15803d]" />
+                    </div>
+                    <h3 className="text-xl font-bold text-[#0f392b] mb-3">Make a Difference</h3>
+                    <p className="text-sm text-slate-600 mb-6 leading-relaxed">
+                      Volunteers help transport surplus food from donors to verified NGOs and play an indispensable role in completing the rescue process.
                     </p>
+                    <ul className="space-y-3 mb-8 text-sm text-slate-700">
+                      <li className="flex items-center gap-3">
+                        <CheckCircle2 className="w-4 h-4 text-[#15803d] flex-shrink-0" />
+                        <span>Rapid volunteer registration &amp; ID check</span>
+                      </li>
+                      <li className="flex items-center gap-3">
+                        <CheckCircle2 className="w-4 h-4 text-[#15803d] flex-shrink-0" />
+                        <span>Manage flexible availability &amp; preferred radiuses</span>
+                      </li>
+                      <li className="flex items-center gap-3">
+                        <CheckCircle2 className="w-4 h-4 text-[#15803d] flex-shrink-0" />
+                        <span>Discover pickup &amp; delivery assignments nearby</span>
+                      </li>
+                      <li className="flex items-center gap-3">
+                        <CheckCircle2 className="w-4 h-4 text-[#15803d] flex-shrink-0" />
+                        <span>Accept pickup tasks with turnkey route navigation</span>
+                      </li>
+                      <li className="flex items-center gap-3">
+                        <CheckCircle2 className="w-4 h-4 text-[#15803d] flex-shrink-0" />
+                        <span>Update pickup &amp; delivery status at each checkpoint</span>
+                      </li>
+                      <li className="flex items-center gap-3">
+                        <CheckCircle2 className="w-4 h-4 text-[#15803d] flex-shrink-0" />
+                        <span>View personal volunteering history &amp; badges earned</span>
+                      </li>
+                    </ul>
                   </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                  <div className="flex items-start gap-3 p-4 bg-white rounded-xl border border-slate-200">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-700 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <h4 className="font-bold text-sm text-slate-900">Hyper-Local Missions</h4>
-                      <p className="text-xs text-slate-500 mt-0.5">
-                        Accept deliveries along your daily commute with intelligent route clustering.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 p-4 bg-white rounded-xl border border-slate-200">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-700 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <h4 className="font-bold text-sm text-slate-900">Turn-by-Turn GPS Guidance</h4>
-                      <p className="text-xs text-slate-500 mt-0.5">
-                        Built-in Leaflet navigation with direct contact info for both donor and shelter.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 p-4 bg-white rounded-xl border border-slate-200">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-700 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <h4 className="font-bold text-sm text-slate-900">Community Badges &amp; Credits</h4>
-                      <p className="text-xs text-slate-500 mt-0.5">
-                        Earn verifiable volunteer hours and recognition certificates for every successful rescue.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 p-4 bg-white rounded-xl border border-slate-200">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-700 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <h4 className="font-bold text-sm text-slate-900">Thermal Support Equipment</h4>
-                      <p className="text-xs text-slate-500 mt-0.5">
-                        Access to insulated transport containers and temperature monitoring guidelines.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pt-4 flex items-center justify-between border-t border-slate-200">
-                  <span className="text-xs text-slate-500">
-                    Have 45 minutes to save a meal?
-                  </span>
                   <Link
                     to="/register"
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-900 hover:bg-[#134E3F] text-white text-xs font-semibold shadow-sm transition-all"
+                    className="w-full inline-flex items-center justify-center gap-2 py-3 px-6 rounded-lg bg-slate-100 border border-slate-200 text-[#0f392b] text-sm font-semibold hover:bg-slate-200 transition-colors shadow-sm"
                   >
-                    <span>Join as Volunteer Courier</span>
+                    <span>Become a Volunteer</span>
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
 
-      {/* ─────────────────────────────────────────────────────────────────────────────
-          7. ABOUT THE PROJECT & AI INTELLIGENCE ARCHITECTURE
-      ────────────────────────────────────────────────────────────────────────────── */}
-      <section id="about-us" className="py-20 lg:py-28 bg-slate-50 relative z-10 border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 space-y-12">
-          <div className="max-w-3xl mx-auto text-center space-y-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-              Technology &amp; Mission
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-              About AnnaSathi AI
-            </h2>
-            <p className="text-base text-slate-600">
-              Every day, thousands of kilograms of pristine, wholesome prepared food are discarded while urban communities face nutrition deficits. AnnaSathi AI bridges this gap through high-velocity AI routing.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-800 flex items-center justify-center font-bold">
-                <Sparkles className="w-5 h-5 text-emerald-700" />
-              </div>
-              <h3 className="text-base font-bold text-slate-900">Google Gemini &amp; NVIDIA NIM</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Our dual-engine backend uses Google Gemini for conversational intake and vision analysis, paired with NVIDIA NIM for micro-second heuristic dispatch optimization.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-800 flex items-center justify-center font-bold">
-                <Clock className="w-5 h-5 text-emerald-700" />
-              </div>
-              <h3 className="text-base font-bold text-slate-900">The FSSAI Golden Hour</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Cooked food safety degrades rapidly. AnnaSathi AI enforces a strict 60-to-90 minute window from donor kitchen to beneficiary dining table, ensuring zero health risk.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-800 flex items-center justify-center font-bold">
-                <ShieldCheck className="w-5 h-5 text-emerald-700" />
-              </div>
-              <h3 className="text-base font-bold text-slate-900">Verifiable Transparency</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Every transaction generates cryptographic audit timestamps, digital OTP verifications, and automated 80G tax certificates backed by PostgreSQL on Supabase.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────────────────────
-          8. CALL TO ACTION (Clean, Spacious Banner)
-      ────────────────────────────────────────────────────────────────────────────── */}
-      <section className="py-16 sm:py-20 bg-brand-900 text-white relative z-10 overflow-hidden">
-        <div className="max-w-5xl mx-auto px-6 sm:px-8 text-center space-y-6">
-          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-            Ready to Prevent Food Waste in Your Kitchen?
-          </h2>
-          <p className="text-base text-emerald-100 max-w-2xl mx-auto leading-relaxed">
-            Join hundreds of food businesses and non-profits creating a zero-waste future today. Get started in less than 2 minutes.
-          </p>
-
-          <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
-            <Link
-              to="/register"
-              className="px-6 py-3.5 rounded-xl bg-white hover:bg-emerald-50 text-brand-900 font-bold text-sm sm:text-base shadow-sm transition-all"
-            >
-              Register as a Partner
-            </Link>
-            <Link
-              to="/login"
-              className="px-6 py-3.5 rounded-xl bg-emerald-800/80 hover:bg-emerald-800 text-white font-semibold text-sm sm:text-base border border-emerald-600/50 shadow-sm transition-all"
-            >
-              Sign In to Your Module
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────────────────────
-          9. GLOBAL FOOTER (Clear, balanced, 4-column)
-      ────────────────────────────────────────────────────────────────────────────── */}
-      <footer className="w-full border-t border-slate-200 bg-white py-12 relative z-10">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
-            {/* Col 1: Brand & Mission */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-brand-900 flex items-center justify-center text-white">
-                  <Leaf className="w-4 h-4 text-emerald-300" />
+                {/* CARD 4: Administration */}
+                <div className="bg-white p-8 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="px-3 py-1 rounded-full bg-slate-100 text-xs text-[#0f392b] font-semibold">
+                        Governance &amp; Security
+                      </span>
+                      <ShieldCheck className="w-6 h-6 text-[#15803d]" />
+                    </div>
+                    <h3 className="text-xl font-bold text-[#0f392b] mb-3">Responsible Management</h3>
+                    <p className="text-sm text-slate-600 mb-6 leading-relaxed">
+                      Authorized platform administrators maintain network reliability, enforce strict food safety rules, and oversee all active donations.
+                    </p>
+                    <ul className="space-y-3 mb-8 text-sm text-slate-700">
+                      <li className="flex items-center gap-3">
+                        <CheckCircle2 className="w-4 h-4 text-[#15803d] flex-shrink-0" />
+                        <span>Verify NGOs with government NGO-Darpan records</span>
+                      </li>
+                      <li className="flex items-center gap-3">
+                        <CheckCircle2 className="w-4 h-4 text-[#15803d] flex-shrink-0" />
+                        <span>Manage user permissions &amp; stakeholder accounts</span>
+                      </li>
+                      <li className="flex items-center gap-3">
+                        <CheckCircle2 className="w-4 h-4 text-[#15803d] flex-shrink-0" />
+                        <span>Monitor live active food donations in transit</span>
+                      </li>
+                      <li className="flex items-center gap-3">
+                        <CheckCircle2 className="w-4 h-4 text-[#15803d] flex-shrink-0" />
+                        <span>Monitor volunteer dispatch times &amp; route logs</span>
+                      </li>
+                      <li className="flex items-center gap-3">
+                        <CheckCircle2 className="w-4 h-4 text-[#15803d] flex-shrink-0" />
+                        <span>View platform analytics &amp; regional impact reports</span>
+                      </li>
+                      <li className="flex items-center gap-3">
+                        <CheckCircle2 className="w-4 h-4 text-[#15803d] flex-shrink-0" />
+                        <span>Review immutable safety audit logs &amp; SLA compliance</span>
+                      </li>
+                    </ul>
+                  </div>
+                  <Link
+                    to="/login"
+                    className="w-full inline-flex items-center justify-center gap-2 py-3 px-6 rounded-lg bg-[#0f392b] text-white text-sm font-semibold hover:bg-emerald-950 transition-colors shadow-sm"
+                  >
+                    <span>Admin Login</span>
+                    <Lock className="w-4 h-4" />
+                  </Link>
                 </div>
-                <span className="font-bold text-slate-900 text-lg">AnnaSathi AI</span>
               </div>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                Zero-Waste Surplus Food Rescue Network. Powered by AI and community passion to eliminate hunger and landfill greenhouse gas emissions.
+            </div>
+          </section>
+
+          {/* =========================================================================
+              6. AI-POWERED FEATURES (#ai-features)
+          ========================================================================== */}
+          <section className="py-20 lg:py-28 bg-slate-50 border-y border-slate-200/70 relative" id="ai-features">
+            <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+              <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-16">
+                <span className="text-xs text-[#15803d] tracking-widest uppercase mb-2 font-bold font-mono">
+                  INTELLIGENT INNOVATION
+                </span>
+                <h2 className="text-3xl sm:text-4xl font-bold text-[#0f392b] tracking-tight mb-4">
+                  Powered by AI. Driven by Humanity.
+                </h2>
+                <p className="text-base text-slate-600 leading-relaxed">
+                  AnnaSathi AI combines state-of-the-art predictive intelligence with real-world logistics to make zero-waste food distribution smarter, faster, and reliable.
+                </p>
+              </div>
+
+              {/* 5 Bento Style Feature Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* FEATURE 1 */}
+                <div className="bg-white p-7 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between group hover:shadow-md hover:border-slate-300 transition-all">
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-[#0f392b] group-hover:bg-[#15803d] group-hover:text-white transition-colors">
+                        <Clock className="w-6 h-6" />
+                      </span>
+                      <span className="px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-[11px] font-mono text-[#15803d] font-bold">
+                        REAL-TIME
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-bold text-[#0f392b] mb-2.5">
+                      AI Food Urgency Estimation
+                    </h3>
+                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                      Analyzes food category, preparation timestamp, temperature, and ambient storage to compute an automated shelf-life urgency score, preventing spoilage before it happens.
+                    </p>
+                  </div>
+                  <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-mono text-slate-500">
+                    <span>Thermal &amp; Moisture Sensors</span>
+                    <Radio className="w-4 h-4 text-[#15803d]" />
+                  </div>
+                </div>
+
+                {/* FEATURE 2 */}
+                <div className="bg-white p-7 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between group hover:shadow-md hover:border-slate-300 transition-all">
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-[#0f392b] group-hover:bg-[#15803d] group-hover:text-white transition-colors">
+                        <MapPin className="w-6 h-6" />
+                      </span>
+                      <span className="px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-[11px] font-mono text-[#15803d] font-bold">
+                        ALGORITHMIC
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-bold text-[#0f392b] mb-2.5">
+                      Intelligent NGO Matching
+                    </h3>
+                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                      Optimal algorithmic matching scoring proximity, dietary requirements, vehicle capacity, and real-time shelter dining schedules for zero transit bottlenecking.
+                    </p>
+                  </div>
+                  <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-mono text-slate-500">
+                    <span>Optimal Radial Proximity</span>
+                    <Activity className="w-4 h-4 text-[#15803d]" />
+                  </div>
+                </div>
+
+                {/* FEATURE 3 */}
+                <div className="bg-white p-7 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between group hover:shadow-md hover:border-slate-300 transition-all">
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-[#0f392b] group-hover:bg-[#15803d] group-hover:text-white transition-colors">
+                        <Activity className="w-6 h-6" />
+                      </span>
+                      <span className="px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-[11px] font-mono text-[#15803d] font-bold">
+                        PREDICTIVE
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-bold text-[#0f392b] mb-2.5">
+                      AI Demand Prediction
+                    </h3>
+                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                      Predictive models analyzing historical food wastage cycles across banquet peaks to anticipate regional hunger demand and coordinate preemptive volunteer rosters.
+                    </p>
+                  </div>
+                  <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-mono text-slate-500">
+                    <span>Time-Series Pattern Analysis</span>
+                    <Sparkles className="w-4 h-4 text-[#15803d]" />
+                  </div>
+                </div>
+
+                {/* FEATURE 4 */}
+                <div className="bg-white p-7 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between group hover:shadow-md hover:border-slate-300 transition-all lg:col-span-1">
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-[#0f392b] group-hover:bg-[#15803d] group-hover:text-white transition-colors">
+                        <Sparkles className="w-6 h-6" />
+                      </span>
+                      <span className="px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-[11px] font-mono text-[#15803d] font-bold">
+                        NLP MULTILINGUAL
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-bold text-[#0f392b] mb-2.5">
+                      AI Chatbot Assistant
+                    </h3>
+                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                      Multilingual conversational agent assisting donors with packaging instructions, NGO onboarding queries, and live operational help in vernacular languages.
+                    </p>
+                  </div>
+                  <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-mono text-slate-500">
+                    <span>24/7 Contextual Guidance</span>
+                    <CheckCircle2 className="w-4 h-4 text-[#15803d]" />
+                  </div>
+                </div>
+
+                {/* FEATURE 5 (Spanning 2 columns on lg) */}
+                <div className="bg-white p-7 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between group hover:shadow-md hover:border-slate-300 transition-all lg:col-span-2">
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-[#0f392b] group-hover:bg-[#15803d] group-hover:text-white transition-colors">
+                        <Layers className="w-6 h-6" />
+                      </span>
+                      <span className="px-2.5 py-1 rounded-full bg-emerald-100 border border-emerald-200 text-[11px] font-mono text-emerald-900 font-bold">
+                        HIGH AVAILABILITY
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-bold text-[#0f392b] mb-2.5">
+                      Multi-Provider AI Architecture
+                    </h3>
+                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-2xl">
+                      Robust dual-engine infrastructure powered by Google Gemini and NVIDIA NIM with automatic failover and zero latency spikes, ensuring 99.9% uptime for time-critical food rescue operations.
+                    </p>
+                  </div>
+                  <div className="mt-6 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-3">
+                      <span className="inline-flex items-center gap-1.5 text-xs font-mono text-slate-600 bg-slate-100 px-2.5 py-1 rounded">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#15803d]" /> Google Gemini Core
+                      </span>
+                      <span className="inline-flex items-center gap-1.5 text-xs font-mono text-slate-600 bg-slate-100 px-2.5 py-1 rounded">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#15803d]" /> NVIDIA NIM Inference
+                      </span>
+                    </div>
+                    <span className="text-xs font-mono text-[#15803d] font-bold">&lt; 140ms Latency</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* =========================================================================
+              7. REAL-TIME TRACKING AND TRANSPARENCY (#tracking)
+          ========================================================================== */}
+          <section className="py-20 lg:py-28 bg-[#fafaf9] relative" id="tracking">
+            <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+              <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-16">
+                <span className="text-xs text-[#15803d] tracking-widest uppercase mb-2 font-bold font-mono">
+                  LIVE OPERATIONS MOCKUP
+                </span>
+                <h2 className="text-3xl sm:text-4xl font-bold text-[#0f392b] tracking-tight mb-4">
+                  Every Donation. Every Journey. Every Impact.
+                </h2>
+                <p className="text-base text-slate-600 leading-relaxed">
+                  Clear operational visibility including donation status tracking, NGO acceptance updates, volunteer dispatching, live transit progress, digital delivery confirmation, and instant in-app alerts.
+                </p>
+              </div>
+
+              {/* Live Mockup Board */}
+              <div className="bg-white p-6 sm:p-10 rounded-2xl shadow-md border border-slate-200/80 max-w-5xl mx-auto">
+                {/* Header row of the order card */}
+                <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-100">
+                  <div className="flex items-center gap-3">
+                    <span className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-[#0f392b] font-bold">
+                      <Truck className="w-5 h-5" />
+                    </span>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-base font-bold text-[#0f392b]">Donation #AS-8942</h3>
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-mono font-bold">
+                          LIVE IN TRANSIT
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-500">The Grand Canteen ➔ Sneha Shelter (4.2 km)</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="text-right">
+                      <span className="text-[11px] font-mono text-slate-400 block">Food Safety Temp</span>
+                      <span className="text-xs sm:text-sm text-[#15803d] font-bold">64°C (Safe Consumable)</span>
+                    </div>
+                    <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#15803d]">
+                      <Radio className="w-4 h-4" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Interactive Stepper Flow */}
+                <div className="py-8">
+                  <div className="grid grid-cols-2 md:grid-cols-6 gap-4 relative">
+                    {/* Step 1 */}
+                    <div className="flex flex-col items-center text-center">
+                      <div className="w-10 h-10 rounded-full bg-[#15803d] text-white flex items-center justify-center mb-2 shadow-sm">
+                        <CheckCircle2 className="w-5 h-5" />
+                      </div>
+                      <span className="text-xs font-semibold text-[#0f392b]">Created</span>
+                      <span className="text-[11px] font-mono text-slate-400">14:10 IST</span>
+                    </div>
+                    {/* Step 2 */}
+                    <div className="flex flex-col items-center text-center">
+                      <div className="w-10 h-10 rounded-full bg-[#15803d] text-white flex items-center justify-center mb-2 shadow-sm">
+                        <CheckCircle2 className="w-5 h-5" />
+                      </div>
+                      <span className="text-xs font-semibold text-[#0f392b]">NGO Accepted</span>
+                      <span className="text-[11px] font-mono text-slate-400">14:14 IST</span>
+                    </div>
+                    {/* Step 3 */}
+                    <div className="flex flex-col items-center text-center">
+                      <div className="w-10 h-10 rounded-full bg-[#15803d] text-white flex items-center justify-center mb-2 shadow-sm">
+                        <CheckCircle2 className="w-5 h-5" />
+                      </div>
+                      <span className="text-xs font-semibold text-[#0f392b]">Volunteer Assigned</span>
+                      <span className="text-[11px] font-mono text-slate-400">14:18 IST</span>
+                    </div>
+                    {/* Step 4 (Active) */}
+                    <div className="flex flex-col items-center text-center">
+                      <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center mb-2 shadow-[0_0_12px_rgba(22,163,74,0.35)] animate-pulse">
+                        <Truck className="w-5 h-5" />
+                      </div>
+                      <span className="text-xs font-bold text-[#15803d]">Picked Up (In Transit)</span>
+                      <span className="text-[11px] font-mono text-slate-400">14:26 IST</span>
+                    </div>
+                    {/* Step 5 (Pending) */}
+                    <div className="flex flex-col items-center text-center opacity-40">
+                      <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center mb-2 text-slate-400">
+                        <MapPin className="w-5 h-5" />
+                      </div>
+                      <span className="text-xs font-semibold text-slate-700">Delivered</span>
+                      <span className="text-[11px] font-mono text-slate-400">Est: 14:40</span>
+                    </div>
+                    {/* Step 6 (Pending) */}
+                    <div className="flex flex-col items-center text-center opacity-40">
+                      <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center mb-2 text-slate-400">
+                        <ShieldCheck className="w-5 h-5" />
+                      </div>
+                      <span className="text-xs font-semibold text-slate-700">Receipt Confirmed</span>
+                      <span className="text-[11px] font-mono text-slate-400">Awaiting Arrival</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Telemetry Details Footer */}
+                <div className="pt-6 border-t border-slate-100 flex flex-wrap items-center justify-between gap-4 bg-slate-50 p-4 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <Leaf className="w-5 h-5 text-[#15803d]" />
+                    <span className="text-xs sm:text-sm text-[#0f392b] font-medium">
+                      45 wholesome prepared lunch boxes • Packed with eco-friendly containers
+                    </span>
+                  </div>
+                  <span className="text-[11px] font-mono text-slate-400 italic">
+                    *Live automated food safety telemetry
+                  </span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* =========================================================================
+              8. OUR MISSION (#mission)
+          ========================================================================== */}
+          <section className="py-20 lg:py-28 bg-slate-50 border-t border-slate-200/70 relative" id="mission">
+            <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+              <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-16">
+                <span className="text-xs text-[#15803d] tracking-widest uppercase mb-2 font-bold font-mono">
+                  PURPOSE DRIVEN
+                </span>
+                <h2 className="text-3xl sm:text-4xl font-bold text-[#0f392b] tracking-tight mb-4">
+                  Building a Future Where No Food Goes to Waste.
+                </h2>
+                <p className="text-base text-slate-600 leading-relaxed">
+                  Our mission is to reduce food waste, strengthen communities, and make food redistribution accessible through technology, collaboration, and compassion.
+                </p>
+              </div>
+
+              {/* 3 Mission Pillars */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {/* Pillar 1 */}
+                <div className="bg-white p-8 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+                  <div>
+                    <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#0f392b] mb-6">
+                      <Leaf className="w-7 h-7 text-[#15803d]" />
+                    </div>
+                    <h3 className="text-lg font-bold text-[#0f392b] mb-3">
+                      Reduce Food Waste
+                    </h3>
+                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                      Diverting edible, nutritious sustenance away from municipal landfills into community kitchens, significantly curbing methane emissions and ecological strain.
+                    </p>
+                  </div>
+                  <div className="mt-6 pt-4 border-t border-slate-100">
+                    <span className="text-xs font-mono text-[#15803d] font-bold">
+                      Landfill Diversion Target: 100%
+                    </span>
+                  </div>
+                </div>
+
+                {/* Pillar 2 */}
+                <div className="bg-white p-8 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+                  <div>
+                    <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#0f392b] mb-6">
+                      <HeartHandshake className="w-7 h-7 text-[#15803d]" />
+                    </div>
+                    <h3 className="text-lg font-bold text-[#0f392b] mb-3">
+                      Support Hunger Prevention
+                    </h3>
+                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                      Ensuring vulnerable children, elderly, and unhoused citizens receive daily dignified meals prepared with high culinary safety and nutritional integrity.
+                    </p>
+                  </div>
+                  <div className="mt-6 pt-4 border-t border-slate-100">
+                    <span className="text-xs font-mono text-[#15803d] font-bold">
+                      Nutritional Security Focused
+                    </span>
+                  </div>
+                </div>
+
+                {/* Pillar 3 */}
+                <div className="bg-white p-8 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+                  <div>
+                    <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#0f392b] mb-6">
+                      <Users className="w-7 h-7 text-[#15803d]" />
+                    </div>
+                    <h3 className="text-lg font-bold text-[#0f392b] mb-3">
+                      Build Connected Communities
+                    </h3>
+                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                      Forging unbreakable civic bonds between hospitality leaders, civil society organizations, and local volunteers who care about neighborhood welfare.
+                    </p>
+                  </div>
+                  <div className="mt-6 pt-4 border-t border-slate-100">
+                    <span className="text-xs font-mono text-[#15803d] font-bold">
+                      Civic Solidarity &amp; Action
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* =========================================================================
+              9. CALL-TO-ACTION SECTION (#cta)
+          ========================================================================== */}
+          <section className="py-20 lg:py-28 bg-[#0f392b] text-white relative overflow-hidden" id="cta">
+            {/* Ambient Green Glows behind CTA Banner */}
+            <div className="absolute -top-32 left-1/4 w-[500px] h-[500px] bg-[#15803d]/20 blur-[130px] rounded-full pointer-events-none" />
+            <div className="absolute -bottom-32 right-1/4 w-[500px] h-[500px] bg-emerald-400/10 blur-[130px] rounded-full pointer-events-none" />
+
+            <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 relative z-10">
+              <div className="max-w-3xl mx-auto text-center flex flex-col items-center">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-950/80 border border-emerald-800/60 text-emerald-300 text-xs font-semibold mb-6 shadow-sm">
+                  <span className="w-2 h-2 rounded-full bg-[#15803d] animate-pulse" />
+                  <span>Join the Zero-Hunger Movement</span>
+                </div>
+
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight mb-6">
+                  Be the Reason Someone Smiles Today.
+                </h2>
+                <p className="text-base text-emerald-100/80 max-w-2xl mb-10 leading-relaxed">
+                  Whether you donate food, support an NGO, or volunteer your time, you can help turn surplus food into hope. Every minute and every meal count.
+                </p>
+
+                {/* 3 Clear Action Buttons */}
+                <div className="flex flex-wrap items-center justify-center gap-4">
+                  <Link
+                    to={isAuthenticated && user?.role === 'donor' ? '/donor/create-donation' : '/login'}
+                    className="inline-flex items-center gap-2 px-6 py-3.5 rounded-lg bg-[#15803d] text-white text-sm font-semibold hover:bg-emerald-600 transition-all shadow-md"
+                  >
+                    <span>Donate Food</span>
+                    <Building2 className="w-4 h-4" />
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="inline-flex items-center gap-2 px-6 py-3.5 rounded-lg bg-white text-[#0f392b] text-sm font-semibold hover:bg-slate-100 transition-all shadow-sm"
+                  >
+                    <span>Join as NGO</span>
+                    <HeartHandshake className="w-4 h-4 text-[#15803d]" />
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="inline-flex items-center gap-2 px-6 py-3.5 rounded-lg bg-emerald-950/80 border border-emerald-800 text-white text-sm font-semibold hover:bg-emerald-900 transition-all shadow-sm"
+                  >
+                    <span>Become a Volunteer</span>
+                    <Truck className="w-4 h-4" />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+
+      {/* =========================================================================
+          GLOBAL FOOTER (#contact)
+      ========================================================================== */}
+      <footer className="w-full bg-slate-900 text-slate-200 border-t border-slate-800" id="contact">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 pt-16 pb-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-y-12 lg:gap-x-12">
+            {/* Col 1: Brand & Overview (4 cols) */}
+            <div className="lg:col-span-4 flex flex-col gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-[#15803d] flex items-center justify-center text-white">
+                  <Leaf className="w-4 h-4 text-emerald-200" />
+                </div>
+                <span className="text-xl font-bold text-white tracking-tight">AnnaSathi AI</span>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-400 max-w-sm leading-relaxed">
+                Connecting surplus food with those who need it through AI, technology, and community collaboration.
               </p>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/80 border border-slate-700/60 w-fit">
+                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                <span className="text-xs text-slate-300 font-semibold font-mono">99.8% Surplus Rescue Uptime</span>
+              </div>
             </div>
 
-            {/* Col 2: Platform Links */}
-            <div>
-              <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-3">
-                Platform
-              </h4>
-              <ul className="space-y-2 text-xs text-slate-600">
-                <li>
-                  <a href="#how-it-works" className="hover:text-emerald-800 transition-colors">
-                    How It Works
-                  </a>
-                </li>
-                <li>
-                  <a href="#live-radar" className="hover:text-emerald-800 transition-colors">
-                    Live Rescue Radar
-                  </a>
-                </li>
-                <li>
-                  <a href="#network-ecosystem" className="hover:text-emerald-800 transition-colors">
-                    Stakeholder Ecosystem
-                  </a>
-                </li>
-                <li>
-                  <a href="#about-us" className="hover:text-emerald-800 transition-colors">
-                    Safety &amp; Compliance
-                  </a>
-                </li>
-              </ul>
+            {/* Col 2: Quick Links (3 cols) */}
+            <div className="lg:col-span-3 flex flex-col gap-3">
+              <h4 className="text-sm font-bold text-white uppercase tracking-wider">Quick Links</h4>
+              <nav className="flex flex-col gap-2.5 text-xs sm:text-sm">
+                <a href="#hero" className="text-emerald-400 font-semibold hover:underline w-fit">
+                  Home
+                </a>
+                <a href="#about" className="text-slate-400 hover:text-white transition-colors w-fit">
+                  About Us
+                </a>
+                <a href="#how-it-works" className="text-slate-400 hover:text-white transition-colors w-fit">
+                  How It Works
+                </a>
+                <a href="#ai-features" className="text-slate-400 hover:text-white transition-colors w-fit">
+                  Our Features
+                </a>
+                <a href="#mission" className="text-slate-400 hover:text-white transition-colors w-fit">
+                  Our Mission
+                </a>
+              </nav>
             </div>
 
-            {/* Col 3: Portal Access */}
-            <div>
-              <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-3">
-                Portals
-              </h4>
-              <ul className="space-y-2 text-xs text-slate-600">
-                <li>
-                  <Link to="/donor/dashboard" className="hover:text-emerald-800 transition-colors">
-                    Donor Dashboard
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/ngo/dashboard" className="hover:text-emerald-800 transition-colors">
-                    NGO Verification &amp; Intake
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/volunteer/dashboard" className="hover:text-emerald-800 transition-colors">
-                    Volunteer Delivery Portal
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/admin/dashboard" className="hover:text-emerald-800 transition-colors">
-                    Admin Governance Center
-                  </Link>
-                </li>
-              </ul>
+            {/* Col 3: Get Involved (3 cols) */}
+            <div className="lg:col-span-3 flex flex-col gap-3">
+              <h4 className="text-sm font-bold text-white uppercase tracking-wider">Get Involved</h4>
+              <nav className="flex flex-col gap-2.5 text-xs sm:text-sm">
+                <Link to="/register" className="text-slate-400 hover:text-white transition-colors w-fit">
+                  Become a Donor
+                </Link>
+                <Link to="/register" className="text-slate-400 hover:text-white transition-colors w-fit">
+                  Register as NGO
+                </Link>
+                <Link to="/register" className="text-slate-400 hover:text-white transition-colors w-fit">
+                  Become a Volunteer
+                </Link>
+                <Link to="/login" className="text-slate-400 hover:text-white transition-colors w-fit">
+                  Admin Login
+                </Link>
+              </nav>
             </div>
 
-            {/* Col 4: Trust & Compliance */}
-            <div>
-              <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-3">
-                Compliance &amp; Trust
-              </h4>
-              <ul className="space-y-2 text-xs text-slate-600">
-                <li>
-                  <span>FSSAI Good Samaritan Protected</span>
-                </li>
-                <li>
-                  <span>80G Income Tax Deductions</span>
-                </li>
-                <li>
-                  <span>ISO 27001 Data Privacy</span>
-                </li>
-                <li>
-                  <span>256-Bit TLS Secured</span>
-                </li>
-              </ul>
+            {/* Col 4: Legal & Contact (2 cols) */}
+            <div className="lg:col-span-2 flex flex-col gap-3">
+              <h4 className="text-sm font-bold text-white uppercase tracking-wider">Legal &amp; Contact</h4>
+              <nav className="flex flex-col gap-2.5 text-xs sm:text-sm">
+                <a href="#contact" className="text-slate-400 hover:text-white transition-colors w-fit">
+                  Contact Us
+                </a>
+                <a href="mailto:support@annasathi.org" className="text-slate-400 hover:text-white transition-colors w-fit">
+                  Email Support
+                </a>
+                <span className="text-slate-400 hover:text-white transition-colors cursor-pointer w-fit">
+                  Privacy Policy
+                </span>
+                <span className="text-slate-400 hover:text-white transition-colors cursor-pointer w-fit">
+                  Terms &amp; Conditions
+                </span>
+              </nav>
             </div>
           </div>
 
-          <div className="pt-8 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-            <div>
-              &copy; {new Date().getFullYear()} AnnaSathi AI Technologies Inc. All rights reserved.
-            </div>
-            <div className="flex items-center gap-6">
-              <span className="hover:text-slate-800 cursor-pointer">Privacy Policy</span>
-              <span className="hover:text-slate-800 cursor-pointer">Terms of Service</span>
-              <span className="hover:text-slate-800 cursor-pointer">Security Desk</span>
-              <span className="hover:text-slate-800 cursor-pointer">Contact Support</span>
+          {/* Sub-footer Strip */}
+          <div className="mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 border-t border-slate-800 text-slate-400 text-xs">
+            <p className="text-center md:text-left">
+              &copy; {new Date().getFullYear()} AnnaSathi AI. All Rights Reserved. Together, let's make every meal count.
+            </p>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1.5 font-mono text-[11px] text-slate-400 bg-slate-800/80 px-2.5 py-1 rounded-md border border-slate-700/60">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <span>ISO 27001 AI SECURE</span>
+              </div>
+              <div className="flex items-center gap-1.5 font-mono text-[11px] text-slate-400 bg-slate-800/80 px-2.5 py-1 rounded-md border border-slate-700/60">
+                <Lock className="w-3.5 h-3.5 text-emerald-400" />
+                <span>256-BIT ENCRYPTED</span>
+              </div>
             </div>
           </div>
         </div>
