@@ -169,20 +169,19 @@ export const AIChatbotModal: React.FC = () => {
 
   return (
     <>
-      {/* Floating Launcher Pill */}
+      {/* Floating Launcher Pill matching AnnaSathi AI status marker */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 bg-primary hover:bg-primary-container text-on-primary rounded-full shadow-2xl transition-all duration-300 transform hover:scale-105 border border-primary-fixed-dim/30 group"
-          aria-label="Open AI Assistant"
+          className="fixed bottom-4 right-4 z-50 flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#0f392b]/95 backdrop-blur shadow-lg shadow-[#07241b]/20 text-white border border-[#166534]/80 hover:bg-[#0f392b] transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500/50 group"
+          aria-label="Open AnnaSathi AI Assistant"
         >
-          <span className="relative flex h-3 w-3">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary-container opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-3 w-3 bg-secondary-container"></span>
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
           </span>
-          <Bot size={20} className="text-secondary-container" />
-          <span className="font-semibold text-sm tracking-wide">AnnaSathi AI</span>
-          <span className="hidden sm:inline text-xs px-2 py-0.5 rounded-full bg-primary-container text-secondary-container font-mono">
+          <span className="text-xs font-bold tracking-tight">AnnaSathi AI</span>
+          <span className="text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded-full border border-emerald-400/30">
             v4.0
           </span>
         </button>
