@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../../components/common/PageHeader';
 import { Button } from '../../components/common/Button';
@@ -66,16 +66,70 @@ const CreateDonation: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Real-time rule-based Urgency Score calculation preview
-  const urgencyPreview = useMemo(() => {
+  const [aiUrgency, setAiUrgency] = useState<{
+    urgencyScore: number;
+    urgencyLevel: 'low' | 'medium' | 'high' | 'critical';
+    explanation: string;
+    disclaimer?: string;
+    isExpired?: boolean;
+  } | null>(null);
+
+  useEffect(() => {
     if (!preparationTime || !expiryTime) {
-      return { score: 50, level: 'medium' as const, explanation: 'Awaiting valid time window.' };
+      setAiUrgency(null);
+      return;
     }
-    return mockDataService.calculateUrgency(
+    const timer = setTimeout(async () => {
+      try {
+        const res = await apiClient.ai.predictUrgency({
+          foodCategory: category,
+          preparationTime: new Date(preparationTime).toISOString(),
+          expiryTime: new Date(expiryTime).toISOString(),
+          quantity: Number(quantity) || 1,
+        });
+        if (res?.data) {
+          setAiUrgency({
+            urgencyScore: res.data.urgencyScore,
+            urgencyLevel: res.data.urgencyLevel,
+            explanation: res.data.explanation,
+            disclaimer: res.data.disclaimer,
+            isExpired: res.data.isExpired,
+          });
+        }
+      } catch {
+        // graceful offline fallback handled below
+      }
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [category, preparationTime, expiryTime, quantity]);
+
+  const urgencyPreview = useMemo(() => {
+    if (aiUrgency) {
+      return {
+        score: aiUrgency.urgencyScore,
+        level: aiUrgency.urgencyLevel,
+        explanation: aiUrgency.explanation,
+        disclaimer: aiUrgency.disclaimer,
+      };
+    }
+    if (!preparationTime || !expiryTime) {
+      return {
+        score: 50,
+        level: 'medium' as const,
+        explanation: 'Awaiting valid time window.',
+        disclaimer: 'DISCLAIMER: Operational dispatch metric, not a certified laboratory food safety test.',
+      };
+    }
+    const calculated = mockDataService.calculateUrgency(
       category,
       new Date(preparationTime).toISOString(),
       new Date(expiryTime).toISOString()
     );
-  }, [category, preparationTime, expiryTime]);
+    return {
+      ...calculated,
+      disclaimer: 'DISCLAIMER: Operational dispatch metric, not a certified laboratory food safety test.',
+    };
+  }, [aiUrgency, category, preparationTime, expiryTime]);
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -352,8 +406,9 @@ const CreateDonation: React.FC = () => {
               </div>
               <p className="text-xs text-secondary-text mt-1">{urgencyPreview.explanation}</p>
             </div>
-            <div className="text-[11px] text-secondary-text bg-surface p-2 rounded border border-border/80 max-w-xs">
-              <strong>Notice:</strong> This is a demonstration rule-based score factoring shelf life and food category perishability, not an external AI model prediction.
+            <div className="text-[11px] text-secondary-text bg-surface p-2.5 rounded-lg border border-border max-w-sm">
+              <span className="font-semibold text-primary block mb-0.5">FSSAI Operational Dispatch Notice:</span>
+              <p className="leading-tight">{urgencyPreview.disclaimer}</p>
             </div>
           </div>
         </Card>

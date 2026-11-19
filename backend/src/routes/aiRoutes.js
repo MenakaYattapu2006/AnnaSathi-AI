@@ -3,11 +3,17 @@ import {
   predictUrgency,
   matchNGOsForDonation,
   predictDemand,
-  chatWithAI
+  chatWithAI,
+  getAIProviderStatus,
+  updateAIProvider,
 } from '../controllers/aiController.js';
-import { requireAuth } from '../middleware/auth.js';
+import { requireAuth, requireRole } from '../middleware/auth.js';
 
 const router = Router();
+
+// Provider status and switching
+router.get('/provider', getAIProviderStatus);
+router.put('/provider', requireAuth, requireRole('admin'), updateAIProvider);
 
 // Chatbot can be accessed by authenticated users or visitors
 router.post('/chat', chatWithAI);

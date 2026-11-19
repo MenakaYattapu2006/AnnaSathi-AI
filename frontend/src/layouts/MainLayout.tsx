@@ -6,6 +6,7 @@ import type { UserRole } from '../contexts/AuthContext';
 import { getNavItems, ROLE_LABELS } from '../routes/navigation';
 import { Sidebar } from '../components/common/Sidebar';
 import { Badge } from '../components/common/Badge';
+import { AIChatbotModal } from '../components/common/AIChatbotModal';
 import { apiClient, mapNotificationFromDb } from '../lib/apiClient';
 import { mockDataService } from '../lib/mockDataService';
 import type { Notification } from '../types/notification';
@@ -344,6 +345,9 @@ export const MainLayout: React.FC = () => {
           <Outlet />
         </main>
       </div>
+
+      {/* Persistent AI Assistant Widget */}
+      <AIChatbotModal />
     </div>
   );
 };

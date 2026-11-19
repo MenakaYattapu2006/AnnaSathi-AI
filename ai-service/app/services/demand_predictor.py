@@ -1,9 +1,9 @@
 import datetime
 import math
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from ..schemas.demand import DemandPredictionRequest, DemandPredictionResponse, CategoryDistribution
 
-# Zone baseline weights
+# Regional baseline meal capacities per zone
 ZONE_BASELINES = {
     "central": 450,
     "north": 320,
@@ -15,10 +15,26 @@ ZONE_BASELINES = {
     "industrial_area": 300
 }
 
+def get_season_factor(month: int) -> float:
+    """
+    Seasonal demand adjustments for India regional climate & hunger cycles:
+    - Monsoon (June - September): Transport disruption, elevated shelter demand (1.15x)
+    - Festival & Wedding season (October - December): Surge in banquet surplus & community feeds (1.20x)
+    - Peak Summer (April - May): Higher perishable spoilage, hydration & ration focus (1.05x)
+    - Winter (January - February): Night shelter hot dinner dependence (1.10x)
+    """
+    if month in (6, 7, 8, 9):
+        return 1.15
+    elif month in (10, 11, 12):
+        return 1.20
+    elif month in (1, 2):
+        return 1.10
+    return 1.05
+
 def predict_food_demand(request: DemandPredictionRequest) -> DemandPredictionResponse:
     """
-    Predict surplus food demand based on city zone, temporal indicators, and historical trends.
-    Uses regression/moving average heuristics and statistical adjustments.
+    Predict surplus food demand based on city zone, temporal indicators, seasonal cycles,
+    and historical trends. Distinguishes statistical baselines from empirical trend regressions.
     """
     zone_key = request.zone.lower().replace(" ", "_")
     base_meals = ZONE_BASELINES.get(zone_key, 350)
@@ -29,41 +45,63 @@ def predict_food_demand(request: DemandPredictionRequest) -> DemandPredictionRes
     except Exception:
         target_date = datetime.date.today()
 
-    day_of_week = target_date.weekday() # 0 = Monday, 6 = Sunday
+    day_of_week = target_date.weekday()  # 0 = Monday, 6 = Sunday
+    month = target_date.month
 
-    # Weekend effect: higher demand near community centres on weekends
-    weekend_factor = 1.25 if day_of_week in (5, 6) else 1.0
+    # Seasonal adjustment
+    seasonal_multiplier = get_season_factor(month)
 
-    # Mid-week dip/peak adjustments
+    # Day-of-week adjustments
     day_adjustments = {
-        0: 1.05, # Monday
-        1: 0.98, # Tuesday
-        2: 0.95, # Wednesday
-        3: 1.02, # Thursday
-        4: 1.15, # Friday evening rush
-        5: 1.25, # Saturday
-        6: 1.30  # Sunday
+        0: 1.05,  # Monday
+        1: 0.98,  # Tuesday
+        2: 0.95,  # Wednesday
+        3: 1.02,  # Thursday
+        4: 1.15,  # Friday evening rush
+        5: 1.25,  # Saturday
+        6: 1.30   # Sunday
     }
     temporal_multiplier = day_adjustments.get(day_of_week, 1.0)
 
-    # Historical trend regression if supplied
+    # Historical trend analysis & Data Sufficiency verification
     trend_multiplier = 1.0
+    data_sufficiency = "INSUFFICIENT_HISTORICAL_DATA"
+    historical_samples_count = 0
+
     if request.past_trends and len(request.past_trends) > 0:
-        total_recent_meals = sum(t.meals for t in request.past_trends)
-        avg_recent = total_recent_meals / len(request.past_trends)
-        trend_multiplier = avg_recent / base_meals if base_meals > 0 else 1.0
-        # Bound trend multiplier between 0.6 and 1.8
-        trend_multiplier = max(0.6, min(1.8, trend_multiplier))
+        historical_samples_count = len(request.past_trends)
+        total_recent_meals = sum(getattr(t, 'meals', 0) if hasattr(t, 'meals') else (t.get('meals', 0) if isinstance(t, dict) else 0) for t in request.past_trends)
+        if historical_samples_count >= 7:
+            data_sufficiency = "SUFFICIENT_HISTORICAL_DATA"
+            avg_recent = total_recent_meals / historical_samples_count
+            trend_multiplier = avg_recent / base_meals if base_meals > 0 else 1.0
+            # Bound trend multiplier between 0.65 and 1.75
+            trend_multiplier = max(0.65, min(1.75, trend_multiplier))
+        elif historical_samples_count >= 3:
+            data_sufficiency = "MODERATE_HISTORICAL_DATA"
+            avg_recent = total_recent_meals / historical_samples_count
+            raw_multiplier = avg_recent / base_meals if base_meals > 0 else 1.0
+            # Dampen trend toward baseline when sample is small
+            trend_multiplier = 0.5 + 0.5 * max(0.7, min(1.5, raw_multiplier))
+        else:
+            data_sufficiency = "INSUFFICIENT_HISTORICAL_DATA"
 
     event_multiplier = max(0.5, min(2.5, request.event_multiplier or 1.0))
 
-    final_prediction = int(base_meals * temporal_multiplier * trend_multiplier * event_multiplier)
+    final_prediction = int(base_meals * temporal_multiplier * seasonal_multiplier * trend_multiplier * event_multiplier)
 
-    # Calculate confidence score based on data availability
-    confidence = 0.88 if request.past_trends and len(request.past_trends) >= 7 else 0.76
+    # Confidence score explicitly tied to data sufficiency
+    if data_sufficiency == "SUFFICIENT_HISTORICAL_DATA":
+        confidence = 0.86
+        estimation_type = "trend_adjusted_regression"
+    elif data_sufficiency == "MODERATE_HISTORICAL_DATA":
+        confidence = 0.74
+        estimation_type = "damped_moving_average"
+    else:
+        confidence = 0.65
+        estimation_type = "regional_statistical_baseline"
 
     # Category distribution
-    # On weekends, cooked meals demand is higher; on weekdays packaged rations increase
     if day_of_week in (5, 6):
         cat_dist = CategoryDistribution(
             cooked_meals=55.0,
@@ -88,9 +126,9 @@ def predict_food_demand(request: DemandPredictionRequest) -> DemandPredictionRes
 
     explanation = (
         f"Demand predicted for {request.zone}, {request.city} on {target_date.strftime('%A, %B %d, %Y')}. "
-        f"Baseline: {base_meals} meals. Day-of-week factor: {temporal_multiplier:.2f}x. "
-        f"Event multiplier: {event_multiplier:.2f}x. "
-        f"{'Elevated demand expected due to weekend community distribution.' if day_of_week in (5, 6) else 'Standard weekday baseline active.'}"
+        f"Baseline: {base_meals} meals. Day: {temporal_multiplier:.2f}x. Season: {seasonal_multiplier:.2f}x. "
+        f"Trend factor: {trend_multiplier:.2f}x ({data_sufficiency.replace('_', ' ').title()}). "
+        f"Estimation type: {estimation_type}."
     )
 
     return DemandPredictionResponse(
