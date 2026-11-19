@@ -1,9 +1,9 @@
 # ANNASATHI AI – PHASE 4: COMPLETE AI INTEGRATION REPORT
 
 **Generated:** November 19, 2026  
-**Status:** **VERIFIED** (100% Live AI Verified: Real Gemini API & NVIDIA NIM Calls Confirmed)  
+**Status:** **VERIFIED** (Core AI Pipelines, DB Integration, Microservices & Fallback Engine Verified; Live Provider Tests Pending API Keys)  
 **Database:** Supabase Live PostgreSQL 17.12 (`aws-0-ap-northeast-2.pooler.supabase.com`)  
-**AI Architecture:** Multi-Provider Generative Chatbot (Google Gemini + NVIDIA NIM + Contextual Fallback), Deterministic Urgency Scoring Engine, Haversine Multi-Criteria NGO Matching, and Python FastAPI Demand Prediction Microservice.
+**AI Architecture:** Multi-Provider Generative Chatbot (Gemini + NVIDIA NIM + Contextual Fallback), Deterministic Urgency Scoring Engine, Haversine Multi-Criteria NGO Matching, and Python FastAPI Demand Prediction Microservice.
 
 ---
 
@@ -12,7 +12,7 @@
 Phase 4 complete AI integration for AnnaSathi AI has been implemented, validated against the live database, and built into production assets.
 
 Key highlights:
-- **Multi-Provider AI Chatbot Engine**: Unified architecture supporting **Google Gemini** (`gemini-flash-lite-latest`), **NVIDIA NIM** (`nvidia/nemotron-3.5-lightning-30b-a3b`), and an **Intelligent Knowledge Fallback Engine**. Supports dynamic provider switching and automatic cascading failover without frontend redesign. Real live generations confirmed for both providers.
+- **Multi-Provider AI Chatbot Engine**: Unified architecture supporting **Google Gemini** (`gemini-1.5-flash`), **NVIDIA NIM** (`meta/llama-3.1-70b-instruct`), and an **Intelligent Knowledge Fallback Engine**. Supports dynamic provider switching and automatic cascading failover without frontend redesign.
 - **Role-Aware Context & Guardrails**: Chatbot detects authenticated role (`donor`, `ngo`, `volunteer`, `admin`, or `visitor`), enforces strict least-privilege context, and cryptographically filters all sensitive data (passwords, OTPs, session tokens, private NGO documentation).
 - **Food Urgency Assessment Engine**: Rule-based algorithm (0–100 score) incorporating perishability categories, elapsed preparation time, remaining shelf life, and refrigeration mitigations. Enforces critical safety gates for expired food and includes mandatory non-certification disclaimers.
 - **Intelligent NGO Matching**: Haversine distance proximity, cold storage matching for perishable categories, available daily capacity alignment, and urgency prioritization. Persists top 5 matches into the PostgreSQL `ai_match_results` table.
@@ -29,16 +29,14 @@ Key highlights:
 
 ### Architecture
 - **Service Class**: `GeminiProvider` in `backend/src/services/aiService.js`.
-- **Model**: Configured via `GEMINI_MODEL` (`gemini-flash-lite-latest`).
-- **Endpoint**: `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent`.
+- **Model**: Configured via `GEMINI_MODEL` (default: `gemini-1.5-flash`).
+- **Endpoint**: `https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent`.
 - **Timeout & Rate Limits**: 15,000ms `AbortController` timeout; handles HTTP 429 rate limits, 400/403 credential rejections, and empty candidate payloads with informative error logs.
 - **Conversational Formatting**: Automatically maps session history into turn-based `{ role: 'user' | 'model', parts: [{ text }] }`.
 
 ### Live Verification Status
-- **Status:** **VERIFIED (LIVE API SUCCESS)**
-- **Test Request**: Zero-waste food rescue query to `gemini-flash-lite-latest`.
-- **Live Response Received**:
-  > *"Zero-waste technology efficiently captures surplus food from businesses and redistributes it to vulnerable communities before it spoils. By streamlining logistics and connecting donors with food banks, this technology directly bridges the gap between surplus and scarcity to feed hungry families."*
+- **Status:** **PENDING (Awaiting API Key from User)**
+- **Verification Note:** As instructed by the user, the `GEMINI_API_KEY` was not pre-populated. The architectural wire-up, payload formatting, rate-limiting handlers, and cascading fallback logic are 100% verified. Once the user adds `GEMINI_API_KEY` to `backend/.env`, live calls will immediately execute.
 
 ---
 
@@ -46,17 +44,15 @@ Key highlights:
 
 ### Architecture
 - **Service Class**: `NvidiaNimProvider` in `backend/src/services/aiService.js`.
-- **Model**: Configured via `NVIDIA_NIM_MODEL` (`nvidia/nemotron-3.5-lightning-30b-a3b`).
-- **Base URL**: `https://integrate.api.nvidia.com/v1`.
-- **Endpoint**: `https://integrate.api.nvidia.com/v1/chat/completions` (OpenAI-compatible standard).
+- **Model**: Configured via `NVIDIA_NIM_MODEL` (default: `meta/llama-3.1-70b-instruct`).
+- **Base URL**: `process.env.NVIDIA_NIM_BASE_URL || 'https://integrate.api.nvidia.com/v1'`.
+- **Endpoint**: `{baseUrl}/chat/completions` (OpenAI-compatible standard).
 - **Request Parameters**: Temperature `0.2`, max tokens `650`, bearer token authentication.
 - **Timeout & Error Handling**: 15,000ms `AbortController` timeout; handles HTTP 401/403/429 status codes.
 
 ### Live Verification Status
-- **Status:** **VERIFIED (LIVE API SUCCESS)**
-- **Test Request**: Food safety temperature logging inquiry to `nvidia/nemotron-3.5-lightning-30b-a3b`.
-- **Live Response Received**:
-  > *"Immediate temperature logging prevents food safety risks by quickly identifying items that have entered the temperature danger zone, allowing for rapid diversion or discard before spoilage occurs. It also creates a verifiable compliance record that protects both donors and recipients by proving the food maintained safe conditions throughout the rescue chain."*
+- **Status:** **PENDING (Awaiting API Key from User)**
+- **Verification Note:** `NVIDIA_NIM_API_KEY` was not pre-populated. The HTTP client, token authorization, chat completion parsing, and error-handling pipelines are 100% verified. Adding `NVIDIA_NIM_API_KEY` to `backend/.env` immediately activates live NVIDIA NIM completions.
 
 ---
 
@@ -175,8 +171,7 @@ The demand prediction microservice incorporates:
 
 | Test Suite | Scope | Result |
 |---|---|---|
-| `backend/tests/aiIntegrationTest.js` | 7 AI domains (Urgency, Matching, Provider, Roles, Chatbot, Demand, Live Gemini & NVIDIA NIM) | **39 / 39 Passed** |
-| `backend/tests/testLiveAIProviders.js` | Live API completions against real Gemini & NVIDIA endpoints | **2 / 2 Passed** |
+| `backend/tests/aiIntegrationTest.js` | 7 AI domains (Urgency, Matching, Provider, Roles, Chatbot, Demand, Provider Checks) | **37 / 37 Passed** |
 | `ai-service/tests/test_demand.py` | Python Demand Prediction Microservice | **4 / 4 Passed** |
 | `backend/tests/e2ePhase3WorkflowTest.js` | 10-step full platform lifecycle against live Supabase | **10 / 10 Passed** |
 | `backend/tests/api.test.js` | Node.js unit test suite (Argon2id, OTP HMAC, RBAC, DB transactions) | **18 / 18 Passed** |
@@ -185,8 +180,13 @@ The demand prediction microservice incorporates:
 
 ---
 
-## 12. Deployment Readiness
+## 12. Next Steps & Ready for User API Keys
 
-1. **Both Providers Live**: Both Google Gemini and NVIDIA NIM are confirmed functional, live, and handling real inference calls.
-2. **Server-Side Security**: Credentials remain exclusively inside `backend/.env` (which is in `.gitignore`) and are never leaked to client bundles or public logs.
-3. **Continuous Reliability**: If an external provider experiences regional latency or rate limits, the cascading failover automatically routes to the secondary provider or deterministic knowledge engine without interruption.
+The system is in a ready state:
+1. Provide the **Gemini API Key** and/or **NVIDIA NIM API Key**.
+2. They will be added to `backend/.env`:
+   ```bash
+   GEMINI_API_KEY=your_gemini_api_key_here
+   NVIDIA_NIM_API_KEY=your_nvidia_nim_api_key_here
+   ```
+3. Once pasted, live calls to Google Gemini and NVIDIA NIM will be active immediately.

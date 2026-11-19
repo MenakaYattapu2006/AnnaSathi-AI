@@ -29,11 +29,11 @@ export function getProviderStatus() {
     activeProvider: currentProvider,
     gemini: {
       configured: Boolean(geminiKey && geminiKey.trim().length > 0),
-      model: process.env.GEMINI_MODEL || 'gemini-flash-lite-latest',
+      model: process.env.GEMINI_MODEL || 'gemini-1.5-flash',
     },
     nvidia_nim: {
       configured: Boolean(nvidiaKey && nvidiaKey.trim().length > 0),
-      model: process.env.NVIDIA_NIM_MODEL || config.ai.nvidiaNimModel || 'nvidia/nemotron-3.5-lightning-30b-a3b',
+      model: process.env.NVIDIA_NIM_MODEL || 'meta/llama-3.1-70b-instruct',
       baseUrl: process.env.NVIDIA_NIM_BASE_URL || config.ai.nvidiaNimBaseUrl || 'https://integrate.api.nvidia.com/v1',
     },
     rule_fallback: {
@@ -310,7 +310,7 @@ export async function matchNGOsForDonation(donation) {
 export class GeminiProvider {
   constructor(apiKey, model) {
     this.apiKey = apiKey || process.env.GEMINI_API_KEY || config.ai.geminiApiKey || '';
-    this.model = model || process.env.GEMINI_MODEL || 'gemini-flash-lite-latest';
+    this.model = model || process.env.GEMINI_MODEL || 'gemini-1.5-flash';
   }
 
   async generate(messages, systemPrompt, timeoutMs = 15000) {
@@ -379,7 +379,7 @@ export class NvidiaNimProvider {
   constructor(apiKey, baseUrl, model) {
     this.apiKey = apiKey || process.env.NVIDIA_NIM_API_KEY || config.ai.nvidiaNimApiKey || '';
     this.baseUrl = baseUrl || process.env.NVIDIA_NIM_BASE_URL || config.ai.nvidiaNimBaseUrl || 'https://integrate.api.nvidia.com/v1';
-    this.model = model || process.env.NVIDIA_NIM_MODEL || config.ai.nvidiaNimModel || 'nvidia/nemotron-3.5-lightning-30b-a3b';
+    this.model = model || process.env.NVIDIA_NIM_MODEL || 'meta/llama-3.1-70b-instruct';
   }
 
   async generate(messages, systemPrompt, timeoutMs = 15000) {
