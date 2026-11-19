@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../../components/common/PageHeader';
 import { DashboardStatCard } from '../../components/common/DashboardStatCard';
@@ -27,7 +27,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { apiClient, mapNgoFromDb, mapDonationFromDb } from '../../lib/apiClient';
 import { mockDataService } from '../../lib/mockDataService';
 import type { NGO } from '../../types/ngo';
-import type { Donation, DonationStatus } from '../../types/donation';
+import type { Donation, DonationStatus, FoodCategory } from '../../types/donation';
 
 const isProduction = Boolean((import.meta as any).env?.PROD);
 
@@ -49,7 +49,7 @@ const NGODashboard: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const [ngo, setNgo] = useState<NGO | null>(null);
+  const [ngo, setNgo] = useState<NGO | undefined>(undefined);
   const [selectedDonation, setSelectedDonation] = useState<Donation | null>(null);
   const [stats, setStats] = useState({
     availableDonationsCount: 0,
@@ -58,7 +58,7 @@ const NGODashboard: React.FC = () => {
     completedDeliveriesCount: 0,
     receiptConfirmedCount: 0,
     totalMealsReceived: 0,
-    categoryDistribution: [] as { category: string; count: number }[],
+    categoryDistribution: [] as { category: FoodCategory; count: number; totalQuantity: number; unit: string }[],
     recentDonations: [] as Donation[],
   });
   const [isLoading, setIsLoading] = useState(true);
@@ -91,6 +91,15 @@ const NGODashboard: React.FC = () => {
             .filter((d) => d.status === 'DELIVERED' || d.status === 'RECEIPT_CONFIRMED')
             .reduce((sum, d) => sum + (d.numberOfServings || (d.unit === 'meals' ? d.quantity : d.quantity * 2)), 0);
 
+          const categoryMap: Record<string, { category: FoodCategory; count: number; totalQuantity: number; unit: string }> = {};
+          acceptedList.forEach((d) => {
+            if (!categoryMap[d.category]) {
+              categoryMap[d.category] = { category: d.category, count: 0, totalQuantity: 0, unit: d.unit };
+            }
+            categoryMap[d.category].count += 1;
+            categoryMap[d.category].totalQuantity += Number(d.quantity);
+          });
+
           setStats({
             availableDonationsCount: availCount,
             acceptedDonationsCount: acceptedList.length,
@@ -98,7 +107,7 @@ const NGODashboard: React.FC = () => {
             completedDeliveriesCount: completedCount,
             receiptConfirmedCount: confirmedCount,
             totalMealsReceived: totalMeals,
-            categoryDistribution: [],
+            categoryDistribution: Object.values(categoryMap),
             recentDonations: acceptedList.slice(0, 5),
           });
           setIsLoading(false);
@@ -112,7 +121,7 @@ const NGODashboard: React.FC = () => {
       }
 
       if (user && isMounted) {
-        setNgo(mockDataService.getNGOByUserId(user.id) || null);
+        setNgo(mockDataService.getNGOByUserId(user.id));
         setStats(mockDataService.getNGODashboardStats(user.id));
       }
       if (isMounted) setIsLoading(false);

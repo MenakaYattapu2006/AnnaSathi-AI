@@ -32,7 +32,7 @@ const isProduction = Boolean((import.meta as any).env?.PROD);
 
 const AvailableDonations: React.FC = () => {
   const { user } = useAuth();
-  const [ngo, setNgo] = useState<NGO | null>(null);
+  const [ngo, setNgo] = useState<NGO | undefined>(undefined);
   const [donations, setDonations] = useState<Donation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedDonation, setSelectedDonation] = useState<Donation | null>(null);
@@ -72,7 +72,7 @@ const AvailableDonations: React.FC = () => {
     }
 
     if (user) {
-      setNgo(mockDataService.getNGOByUserId(user.id) || null);
+      setNgo(mockDataService.getNGOByUserId(user.id));
       setDonations(mockDataService.getAvailableDonationsForNGO(user.id));
     }
     setIsLoading(false);

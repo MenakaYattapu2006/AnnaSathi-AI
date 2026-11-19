@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../../components/common/PageHeader';
 import { DashboardStatCard } from '../../components/common/DashboardStatCard';
@@ -47,7 +47,7 @@ const VolunteerDashboard: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const [volunteer, setVolunteer] = useState<Volunteer | null>(null);
+  const [volunteer, setVolunteer] = useState<Volunteer | undefined>(undefined);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
   const [stats, setStats] = useState({
     availableTasksCount: 0,
@@ -55,7 +55,7 @@ const VolunteerDashboard: React.FC = () => {
     completedTasksCount: 0,
     totalMealsDelivered: 0,
     recentAssignments: [] as Assignment[],
-    statusDistribution: [] as any[],
+    statusDistribution: [] as { status: AssignmentStatus; count: number }[],
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -99,7 +99,7 @@ const VolunteerDashboard: React.FC = () => {
       }
 
       if (user && isMounted) {
-        setVolunteer(mockDataService.getVolunteerByUserId(user.id) || null);
+        setVolunteer(mockDataService.getVolunteerByUserId(user.id));
         setStats(mockDataService.getVolunteerDashboardStats(user.id));
       }
       if (isMounted) setIsLoading(false);
@@ -428,7 +428,7 @@ const VolunteerDashboard: React.FC = () => {
                 {stats.statusDistribution.map((item) => {
                   const total = stats.recentAssignments.length || 1;
                   const pct = Math.round((item.count / total) * 100);
-                  const conf = statusBadgeMap[item.status] || { label: item.status };
+                  const conf = statusBadgeMap[item.status as AssignmentStatus] || { label: item.status, variant: 'neutral' as const };
 
                   return (
                     <div key={item.status} className="space-y-1">

@@ -8,7 +8,7 @@ import { query, withTransaction } from '../config/db.js';
 export const getSystemStats = async (req, res, next) => {
   try {
     const userStats = await query(
-      `SELECT role, count(*)::int as count, is_active FROM users GROUP BY role, is_active`
+      `SELECT role, count(*)::int as count, status FROM users GROUP BY role, status`
     );
 
     const donationStats = await query(
@@ -52,7 +52,7 @@ export const getSystemStats = async (req, res, next) => {
 // GET /api/v1/admin/users
 export const listUsers = async (req, res, next) => {
   try {
-    const { role, is_active, search, page = 1, limit = 20 } = req.query;
+    const { role, is_active, status: queryStatus, search, page = 1, limit = 20 } = req.query;
     const offset = (page - 1) * limit;
     const conditions = [];
     const params = [];
@@ -62,9 +62,13 @@ export const listUsers = async (req, res, next) => {
       conditions.push(`role = $${params.length}`);
     }
 
-    if (is_active !== undefined) {
-      params.push(is_active === 'true');
-      conditions.push(`is_active = $${params.length}`);
+    if (queryStatus) {
+      params.push(queryStatus);
+      conditions.push(`status = $${params.length}`);
+    } else if (is_active !== undefined) {
+      const activeState = is_active === 'true' || is_active === true ? 'active' : 'suspended';
+      params.push(activeState);
+      conditions.push(`status = $${params.length}`);
     }
 
     if (search) {
@@ -74,7 +78,7 @@ export const listUsers = async (req, res, next) => {
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
     const usersResult = await query(
-      `SELECT id, email, name, phone, role, is_active, is_verified, created_at, updated_at
+      `SELECT id, email, name, phone, role, status, (status = 'active') as is_active, (email_verified_at IS NOT NULL) as is_verified, created_at, updated_at
        FROM users ${whereClause} ORDER BY created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
       [...params, limit, offset]
     );
@@ -102,15 +106,13 @@ export const listUsers = async (req, res, next) => {
 export const updateUserStatus = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { is_active } = req.body;
+    const { is_active, status: reqStatus } = req.body;
 
-    if (typeof is_active !== 'boolean') {
-      return res.status(400).json({ success: false, error: 'is_active boolean is required' });
-    }
+    const targetStatus = reqStatus || (is_active === true ? 'active' : is_active === false ? 'suspended' : 'active');
 
     const result = await query(
-      `UPDATE users SET is_active = $1, updated_at = NOW() WHERE id = $2 RETURNING id, email, name, role, is_active`,
-      [is_active, id]
+      `UPDATE users SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING id, email, name, role, status, (status = 'active') as is_active`,
+      [targetStatus, id]
     );
 
     if (result.rows.length === 0) {
@@ -121,12 +123,12 @@ export const updateUserStatus = async (req, res, next) => {
     await query(
       `INSERT INTO admin_activity_logs (admin_id, action_type, target_id, target_type, description, metadata)
        VALUES ($1, $2, $3, $4, $5, $6)`,
-      [req.user.id, is_active ? 'USER_ACTIVATED' : 'USER_SUSPENDED', id, 'users', `Admin updated user status to ${is_active ? 'Active' : 'Suspended'}`, JSON.stringify({ is_active })]
+      [req.user.id, targetStatus === 'active' ? 'USER_ACTIVATED' : 'USER_SUSPENDED', id, 'users', `Admin updated user status to ${targetStatus}`, JSON.stringify({ status: targetStatus })]
     );
 
     res.status(200).json({
       success: true,
-      message: `User status updated to ${is_active ? 'Active' : 'Suspended'}`,
+      message: `User status updated to ${targetStatus}`,
       data: result.rows[0]
     });
   } catch (error) {
@@ -148,7 +150,7 @@ export const listNGOs = async (req, res, next) => {
 
     if (search) {
       params.push(`%${search}%`);
-      conditions.push(`(n.organization_name ILIKE $${params.length} OR u.email ILIKE $${params.length} OR n.darpan_id ILIKE $${params.length})`);
+      conditions.push(`(n.organization_name ILIKE $${params.length} OR u.email ILIKE $${params.length} OR n.registration_number ILIKE $${params.length})`);
     }
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
@@ -200,8 +202,8 @@ export const reviewNGOVerification = async (req, res, next) => {
 
       // Also update user's verified status
       await client.query(
-        `UPDATE users SET is_verified = $1, updated_at = NOW() WHERE id = $2`,
-        [status === 'VERIFIED', updatedNGO.rows[0].user_id]
+        `UPDATE users SET email_verified_at = $1, updated_at = NOW() WHERE id = $2`,
+        [status === 'VERIFIED' ? new Date() : null, updatedNGO.rows[0].user_id]
       );
 
       // Audit log
