@@ -262,6 +262,10 @@ export const apiClient = {
       password?: string;
       role: string;
       organizationName?: string;
+      address?: string;
+      city?: string;
+      state?: string;
+      pincode?: string;
     }) =>
       request('/auth/register', {
         method: 'POST',

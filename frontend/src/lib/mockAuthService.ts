@@ -11,7 +11,10 @@ export interface RegisterInput {
   phone?: string;
   role: UserRole;
   organizationName?: string;
+  address?: string;
   city?: string;
+  state?: string;
+  pincode?: string;
 }
 
 /**

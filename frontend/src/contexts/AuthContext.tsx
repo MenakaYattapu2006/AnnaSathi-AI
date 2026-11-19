@@ -94,6 +94,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           password: userData.password,
           role: userData.role,
           organizationName: userData.organizationName,
+          address: userData.address,
+          city: userData.city,
+          state: userData.state,
+          pincode: userData.pincode,
         });
         if (response?.user) {
           // Registration succeeded. Do NOT auto-login.

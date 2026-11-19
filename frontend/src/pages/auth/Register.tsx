@@ -12,6 +12,7 @@ import {
   Building2,
   ShieldCheck,
   ArrowRight,
+  MapPin,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import type { UserRole } from '../../types/user';
@@ -25,6 +26,10 @@ const Register: React.FC = () => {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [organizationName, setOrganizationName] = useState('');
+  const [address, setAddress] = useState('');
+  const [city, setCity] = useState('');
+  const [state, setState] = useState('');
+  const [pincode, setPincode] = useState('');
   const [role, setRole] = useState<UserRole>('donor');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -42,8 +47,24 @@ const Register: React.FC = () => {
       setError('Please provide a valid email address.');
       return;
     }
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters.');
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters.');
+      return;
+    }
+    if (!address.trim()) {
+      setError('Please enter your street address or facility location.');
+      return;
+    }
+    if (!city.trim()) {
+      setError('Please enter your city.');
+      return;
+    }
+    if (!state.trim()) {
+      setError('Please enter your state.');
+      return;
+    }
+    if (!pincode.trim() || pincode.trim().length < 4) {
+      setError('Please enter a valid postal / PIN code.');
       return;
     }
 
@@ -57,6 +78,10 @@ const Register: React.FC = () => {
         password,
         role,
         organizationName: organizationName.trim() || undefined,
+        address: address.trim(),
+        city: city.trim(),
+        state: state.trim(),
+        pincode: pincode.trim(),
       });
 
       // Redirect to login page - user must authenticate to enter their respective module
@@ -124,7 +149,7 @@ const Register: React.FC = () => {
 
       {/* Main Content Layout */}
       <main className="flex-grow flex items-center justify-center px-4 sm:px-6 py-12 relative z-10">
-        <div className="w-full max-w-lg">
+        <div className="w-full max-w-xl">
           {/* Premium Registration Card */}
           <div className="bg-white rounded-2xl border border-slate-200/90 shadow-premium p-8 sm:p-10 relative overflow-hidden">
             {/* Accent Top Bar */}
@@ -180,56 +205,59 @@ const Register: React.FC = () => {
                 </div>
               </div>
 
-              {/* Email Address */}
-              <div>
-                <label
-                  htmlFor="register-email"
-                  className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5"
-                >
-                  Email Address
-                </label>
-                <div className="relative rounded-lg shadow-xs">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                    <Mail className="w-4 h-4" />
+              {/* Email & Phone Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Email Address */}
+                <div>
+                  <label
+                    htmlFor="register-email"
+                    className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5"
+                  >
+                    Email Address
+                  </label>
+                  <div className="relative rounded-lg shadow-xs">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                      <Mail className="w-4 h-4" />
+                    </div>
+                    <input
+                      id="register-email"
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => {
+                        setEmail(e.target.value);
+                        setError(null);
+                      }}
+                      placeholder="name@example.com"
+                      className="block w-full pl-10 pr-3.5 py-2 text-sm text-slate-900 border border-slate-300 rounded-lg focus:border-brand-900 focus:ring-2 focus:ring-brand-900/20 bg-slate-50/40 hover:bg-white transition-all placeholder:text-slate-400 outline-none"
+                    />
                   </div>
-                  <input
-                    id="register-email"
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => {
-                      setEmail(e.target.value);
-                      setError(null);
-                    }}
-                    placeholder="name@example.com"
-                    className="block w-full pl-10 pr-3.5 py-2 text-sm text-slate-900 border border-slate-300 rounded-lg focus:border-brand-900 focus:ring-2 focus:ring-brand-900/20 bg-slate-50/40 hover:bg-white transition-all placeholder:text-slate-400 outline-none"
-                  />
                 </div>
-              </div>
 
-              {/* Phone Number */}
-              <div>
-                <label
-                  htmlFor="register-phone"
-                  className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5"
-                >
-                  Phone Number
-                </label>
-                <div className="relative rounded-lg shadow-xs">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                    <Phone className="w-4 h-4" />
+                {/* Phone Number */}
+                <div>
+                  <label
+                    htmlFor="register-phone"
+                    className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5"
+                  >
+                    Phone Number
+                  </label>
+                  <div className="relative rounded-lg shadow-xs">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                      <Phone className="w-4 h-4" />
+                    </div>
+                    <input
+                      id="register-phone"
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => {
+                        setPhone(e.target.value);
+                        setError(null);
+                      }}
+                      placeholder="+91 98765 43210"
+                      className="block w-full pl-10 pr-3.5 py-2 text-sm text-slate-900 border border-slate-300 rounded-lg focus:border-brand-900 focus:ring-2 focus:ring-brand-900/20 bg-slate-50/40 hover:bg-white transition-all placeholder:text-slate-400 outline-none"
+                    />
                   </div>
-                  <input
-                    id="register-phone"
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => {
-                      setPhone(e.target.value);
-                      setError(null);
-                    }}
-                    placeholder="+91 98765 43210"
-                    className="block w-full pl-10 pr-3.5 py-2 text-sm text-slate-900 border border-slate-300 rounded-lg focus:border-brand-900 focus:ring-2 focus:ring-brand-900/20 bg-slate-50/40 hover:bg-white transition-all placeholder:text-slate-400 outline-none"
-                  />
                 </div>
               </div>
 
@@ -242,7 +270,7 @@ const Register: React.FC = () => {
                   >
                     Password
                   </label>
-                  <span className="text-[11px] text-slate-400">Min 6 characters</span>
+                  <span className="text-[11px] text-slate-400">Min 8 characters</span>
                 </div>
                 <div className="relative rounded-lg shadow-xs">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -318,6 +346,110 @@ const Register: React.FC = () => {
                   </div>
                 </div>
               )}
+
+              {/* Location Details: Address, City, State, Pincode */}
+              <div className="pt-2 border-t border-slate-100 space-y-3">
+                <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-800">
+                  <MapPin className="w-3.5 h-3.5 text-emerald-700" />
+                  <span>Location &amp; Proximity Matching</span>
+                </div>
+
+                {/* Street Address */}
+                <div>
+                  <label
+                    htmlFor="register-address"
+                    className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5"
+                  >
+                    Street Address / Facility Location
+                  </label>
+                  <div className="relative rounded-lg shadow-xs">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                      <MapPin className="w-4 h-4" />
+                    </div>
+                    <input
+                      id="register-address"
+                      type="text"
+                      required
+                      value={address}
+                      onChange={(e) => {
+                        setAddress(e.target.value);
+                        setError(null);
+                      }}
+                      placeholder="e.g. Road No. 36, Jubilee Hills"
+                      className="block w-full pl-10 pr-3.5 py-2 text-sm text-slate-900 border border-slate-300 rounded-lg focus:border-brand-900 focus:ring-2 focus:ring-brand-900/20 bg-slate-50/40 hover:bg-white transition-all placeholder:text-slate-400 outline-none"
+                    />
+                  </div>
+                </div>
+
+                {/* City, State & Pincode Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  {/* City */}
+                  <div>
+                    <label
+                      htmlFor="register-city"
+                      className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5"
+                    >
+                      City
+                    </label>
+                    <input
+                      id="register-city"
+                      type="text"
+                      required
+                      value={city}
+                      onChange={(e) => {
+                        setCity(e.target.value);
+                        setError(null);
+                      }}
+                      placeholder="e.g. Hyderabad"
+                      className="block w-full px-3 py-2 text-sm text-slate-900 border border-slate-300 rounded-lg focus:border-brand-900 focus:ring-2 focus:ring-brand-900/20 bg-slate-50/40 hover:bg-white transition-all placeholder:text-slate-400 outline-none"
+                    />
+                  </div>
+
+                  {/* State */}
+                  <div>
+                    <label
+                      htmlFor="register-state"
+                      className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5"
+                    >
+                      State
+                    </label>
+                    <input
+                      id="register-state"
+                      type="text"
+                      required
+                      value={state}
+                      onChange={(e) => {
+                        setState(e.target.value);
+                        setError(null);
+                      }}
+                      placeholder="e.g. Telangana"
+                      className="block w-full px-3 py-2 text-sm text-slate-900 border border-slate-300 rounded-lg focus:border-brand-900 focus:ring-2 focus:ring-brand-900/20 bg-slate-50/40 hover:bg-white transition-all placeholder:text-slate-400 outline-none"
+                    />
+                  </div>
+
+                  {/* Pincode */}
+                  <div>
+                    <label
+                      htmlFor="register-pincode"
+                      className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5"
+                    >
+                      PIN Code
+                    </label>
+                    <input
+                      id="register-pincode"
+                      type="text"
+                      required
+                      value={pincode}
+                      onChange={(e) => {
+                        setPincode(e.target.value);
+                        setError(null);
+                      }}
+                      placeholder="e.g. 500033"
+                      className="block w-full px-3 py-2 text-sm text-slate-900 border border-slate-300 rounded-lg focus:border-brand-900 focus:ring-2 focus:ring-brand-900/20 bg-slate-50/40 hover:bg-white transition-all placeholder:text-slate-400 outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
 
               {/* Submit Button */}
               <button
