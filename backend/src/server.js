@@ -20,7 +20,7 @@ initSockets(io);
 
 const PORT = config.port || 5000;
 
-server.listen(PORT, () => {
+server.listen(PORT, async () => {
   console.log(`=======================================================`);
   console.log(`🚀 AnnaSathi AI Backend running on port ${PORT}`);
   console.log(`📡 Environment: ${config.env}`);
@@ -28,6 +28,7 @@ server.listen(PORT, () => {
   console.log(`🔒 Security: Argon2id + Brevo OTP + HttpOnly Sessions`);
   console.log(`⚡ Sockets: Real-time telemetry & notification channels active`);
   console.log(`=======================================================`);
+  await initDbPool();
 });
 
 // Graceful shutdown

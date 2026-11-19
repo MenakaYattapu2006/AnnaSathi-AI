@@ -25,21 +25,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Safely restore authenticated session on initial mount
+  // Safely restore authenticated session on initial mount with instant local cache
   useEffect(() => {
     let isMounted = true;
 
+    // Instant initial load from saved session so user does not wait
+    const cachedUser = mockAuthService.getCurrentUser();
+    if (cachedUser && isMounted) {
+      setUser(cachedUser);
+      setIsLoading(false);
+    }
+
     async function restoreSession() {
       try {
-        // Attempt session verification with live backend
         const response = await apiClient.auth.getMe();
         if (response?.user && isMounted) {
           setUser(response.user);
+          mockAuthService.saveSession(response.user);
           return;
         }
-      } catch {
-        if (isMounted) {
+      } catch (err) {
+        // If server actively rejects (401), clear invalid cached session
+        if (isMounted && (err as any)?.status === 401) {
           setUser(null);
+          mockAuthService.logout();
         }
       } finally {
         if (isMounted) setIsLoading(false);
@@ -64,20 +73,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return response.user;
         }
       } catch (err: any) {
-        // In production, or on real validation errors, propagate error immediately
-        if (isProduction || err.status === 400 || err.status === 401) {
-          throw err;
+        // If the server returns 400 or 401, throw the real server message immediately
+        if (err.status === 400 || err.status === 401 || err.status === 403) {
+          throw new Error(err.message || 'Invalid email or password.');
         }
+        // If server is completely offline / unreachable
+        if (err.status === 0) {
+          throw new Error('Unable to connect to AnnaSathi backend services. Ensure the server is running on port 5000.');
+        }
+        throw new Error(err.message || 'Login failed. Please check your credentials.');
       }
 
-      if (isProduction) {
-        throw new Error('Production authentication failed: unable to connect to backend.');
-      }
-
-      // Backend offline fallback to mock authentication strictly in development mode
-      const authenticatedUser = await mockAuthService.login(email, password);
-      setUser(authenticatedUser);
-      return authenticatedUser;
+      throw new Error('Unexpected login response from server.');
     } finally {
       setIsLoading(false);
     }
