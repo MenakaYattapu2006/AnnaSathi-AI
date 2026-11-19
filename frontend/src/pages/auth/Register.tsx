@@ -40,7 +40,7 @@ const Register: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      const newUser = await register({
+      await register({
         name,
         email,
         phone,
@@ -49,7 +49,13 @@ const Register: React.FC = () => {
         organizationName: organizationName.trim() || undefined,
       });
 
-      navigate(`/${newUser.role}/dashboard`);
+      // Redirect to login page - user must authenticate to enter their respective module
+      navigate('/login', {
+        state: {
+          message: 'Account registered successfully! Please sign in with your credentials to access your dashboard.',
+          email,
+        },
+      });
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);

@@ -127,25 +127,10 @@ export const authController = {
       return user;
     });
 
-    // Create session
-    const sessionToken = generateSessionToken();
-    const tokenHash = hashSessionToken(sessionToken);
-    const csrfToken = generateCsrfToken();
-    const expiresAt = new Date(Date.now() + config.cookie.maxAge);
-
-    await query(
-      `INSERT INTO user_sessions (user_id, session_token_hash, ip_address, user_agent, expires_at)
-       VALUES ($1, $2, $3, $4, $5)`,
-      [newUser.id, tokenHash, req.ip, req.headers['user-agent'] || 'client', expiresAt]
-    );
-
-    setAuthCookies(res, sessionToken, csrfToken);
-
     return res.status(201).json({
       success: true,
-      message: 'Account successfully registered.',
+      message: 'Account successfully registered. Please log in with your credentials to access your dashboard.',
       user: newUser,
-      csrfToken,
     });
   },
 

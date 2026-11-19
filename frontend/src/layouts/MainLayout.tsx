@@ -1,8 +1,7 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Outlet, useNavigate, NavLink } from 'react-router-dom';
-import { Bell, LogOut, Menu, X, ChevronDown, Check, CheckCheck } from 'lucide-react';
+import { Bell, LogOut, Menu, X, Check, CheckCheck } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import type { UserRole } from '../contexts/AuthContext';
 import { getNavItems, ROLE_LABELS } from '../routes/navigation';
 import { Sidebar } from '../components/common/Sidebar';
 import { Badge } from '../components/common/Badge';
@@ -13,19 +12,15 @@ import type { Notification } from '../types/notification';
 
 const isProduction = Boolean((import.meta as any).env?.PROD);
 
-const ALL_ROLES: UserRole[] = ['donor', 'ngo', 'volunteer', 'admin'];
-
 /**
  * Main application layout.
  * Renders the top header bar, desktop sidebar, mobile sidebar overlay,
  * and the main content area (<Outlet />).
  */
 export const MainLayout: React.FC = () => {
-  const { user, logout, switchRole } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [roleMenuOpen, setRoleMenuOpen] = useState(false);
-  const roleMenuRef = useRef<HTMLDivElement>(null);
 
   const [notifMenuOpen, setNotifMenuOpen] = useState(false);
   const notifMenuRef = useRef<HTMLDivElement>(null);
@@ -82,18 +77,6 @@ export const MainLayout: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClick);
   }, [notifMenuOpen]);
 
-  // Close role dropdown on outside click
-  useEffect(() => {
-    if (!roleMenuOpen) return;
-    const handleClick = (e: MouseEvent) => {
-      if (roleMenuRef.current && !roleMenuRef.current.contains(e.target as Node)) {
-        setRoleMenuOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, [roleMenuOpen]);
-
   // Close mobile sidebar on Escape
   useEffect(() => {
     if (!sidebarOpen) return;
@@ -129,12 +112,6 @@ export const MainLayout: React.FC = () => {
     navigate('/login');
   };
 
-  const handleRoleSwitch = (role: UserRole) => {
-    switchRole(role);
-    setRoleMenuOpen(false);
-    navigate(`/${role}/dashboard`);
-  };
-
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* ───── Top header bar ───── */}
@@ -165,38 +142,11 @@ export const MainLayout: React.FC = () => {
 
         {/* Right: controls */}
         <div className="flex items-center gap-3">
-          {/* Role switcher (dev convenience) */}
-          <div ref={roleMenuRef} className="relative hidden md:block">
-            <button
-              onClick={() => setRoleMenuOpen(!roleMenuOpen)}
-              className="flex items-center gap-1 text-white/80 hover:text-white text-sm"
-              aria-haspopup="true"
-              aria-expanded={roleMenuOpen}
-            >
-              <Badge variant="neutral" size="sm" className="bg-white/20 text-white border-white/30">
-                {ROLE_LABELS[user.role]}
-              </Badge>
-              <ChevronDown size={14} />
-            </button>
-
-            {roleMenuOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-surface rounded-md shadow-lg border border-border py-1 z-50">
-                <div className="px-3 py-1.5 border-b border-border text-[10px] uppercase font-bold text-secondary-text tracking-wider">
-                  Demo Role Switcher
-                </div>
-                {ALL_ROLES.map((r) => (
-                  <button
-                    key={r}
-                    onClick={() => handleRoleSwitch(r)}
-                    className={`block w-full text-left px-4 py-2 text-sm hover:bg-background transition-colors ${
-                      r === user.role ? 'font-medium text-primary bg-primary/5' : 'text-primary-text'
-                    }`}
-                  >
-                    {ROLE_LABELS[r]} {r === user.role ? '✓' : ''}
-                  </button>
-                ))}
-              </div>
-            )}
+          {/* User Authenticated Role Badge */}
+          <div className="hidden md:flex items-center">
+            <Badge variant="neutral" size="sm" className="bg-white/20 text-white border-white/30 capitalize">
+              {ROLE_LABELS[user.role]}
+            </Badge>
           </div>
 
           {/* Notifications */}
@@ -314,23 +264,17 @@ export const MainLayout: React.FC = () => {
                 ))}
               </nav>
 
-              {/* Mobile-only: role switcher + logout */}
-              <div className="border-t border-border mt-4 pt-4 px-4 space-y-2">
-                <p className="text-xs text-secondary-text uppercase tracking-wider mb-2">Switch Role</p>
-                {ALL_ROLES.map((r) => (
-                  <button
-                    key={r}
-                    onClick={() => { handleRoleSwitch(r); closeSidebar(); }}
-                    className={`block w-full text-left px-3 py-1.5 text-sm rounded-md ${
-                      r === user.role ? 'bg-primary text-white font-medium' : 'text-primary-text hover:bg-surface-container-low'
-                    }`}
-                  >
-                    {ROLE_LABELS[r]}
-                  </button>
-                ))}
+              {/* Mobile-only: user role + logout */}
+              <div className="border-t border-border mt-4 pt-4 px-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-secondary-text uppercase tracking-wider">Role</span>
+                  <Badge variant="neutral" size="sm" className="capitalize">
+                    {ROLE_LABELS[user.role]}
+                  </Badge>
+                </div>
                 <button
                   onClick={() => { handleLogout(); closeSidebar(); }}
-                  className="flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-danger hover:bg-danger/10 rounded-md mt-4"
+                  className="flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-danger hover:bg-danger/10 rounded-md mt-2"
                 >
                   <LogOut size={16} />
                   Log out

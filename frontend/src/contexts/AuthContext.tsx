@@ -38,15 +38,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return;
         }
       } catch {
-        if (isProduction) {
-          // In production mode, never silently fall back to mock session!
-          console.warn('Production session check: unauthenticated.');
-          return;
-        }
-        // Fall back to local mock session only in local development mode
-        const activeUser = mockAuthService.getCurrentUser();
-        if (activeUser && isMounted) {
-          setUser(activeUser);
+        if (isMounted) {
+          setUser(null);
         }
       } finally {
         if (isMounted) setIsLoading(false);
@@ -103,8 +96,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           organizationName: userData.organizationName,
         });
         if (response?.user) {
-          setUser(response.user);
-          mockAuthService.saveSession(response.user);
+          // Registration succeeded. Do NOT auto-login.
+          // User must explicitly log in with their credentials to access their dashboard module.
           return response.user;
         }
       } catch (err: any) {
@@ -117,9 +110,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error('Production registration failed: unable to connect to backend.');
       }
 
-      // Offline mock fallback strictly in local development
+      // Offline mock fallback strictly in local development if backend offline
       const newUser = await mockAuthService.register(userData);
-      setUser(newUser);
       return newUser;
     } finally {
       setIsLoading(false);

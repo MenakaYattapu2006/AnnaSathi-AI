@@ -1,28 +1,27 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, AlertCircle, Sparkles, LogIn } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Eye, EyeOff, AlertCircle, CheckCircle2, LogIn } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components/common/Button';
 import { Input } from '../../components/common/Input';
-import { DEMO_ACCOUNTS, type DemoAccount } from '../../mocks/demo-credentials';
+
+interface LocationState {
+  message?: string;
+  email?: string;
+}
 
 const Login: React.FC = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const locationState = location.state as LocationState | null;
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [selectedDemoRole, setSelectedDemoRole] = useState<string>('');
+  const [email, setEmail] = useState<string>(locationState?.email || '');
+  const [password, setPassword] = useState<string>('');
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleSelectDemoAccount = (account: DemoAccount) => {
-    setSelectedDemoRole(account.role);
-    setEmail(account.email);
-    setPassword(account.password);
-    setError(null);
-  };
+  const [successMessage] = useState<string | null>(locationState?.message || null);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,6 +30,7 @@ const Login: React.FC = () => {
 
     try {
       const loggedInUser = await login(email, password);
+      // Route user strictly into their authenticated role module
       navigate(`/${loggedInUser.role}/dashboard`);
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -64,41 +64,16 @@ const Login: React.FC = () => {
           </p>
         </div>
 
-        {/* Administrator Quick-Access & Clean State Notice */}
-        <div className="mt-6 bg-surface-container-low border border-primary/20 rounded-lg p-3 text-left">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex items-start gap-2">
-              <Sparkles className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="text-xs font-semibold text-primary-text uppercase tracking-wide">
-                  Clean Database State
-                </p>
-                <p className="text-xs text-secondary-text mt-0.5">
-                  Register fresh Donor, NGO, or Volunteer accounts via{' '}
-                  <Link to="/register" className="text-primary font-semibold hover:underline">
-                    Create Account
-                  </Link>
-                  . Use Administrator to verify newly registered NGOs.
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                setSelectedDemoRole('admin');
-                setEmail('admin@annasathi.org');
-                setPassword('demo@admin123');
-                setError(null);
-              }}
-              className="px-2.5 py-1 text-xs font-semibold rounded border border-primary bg-primary text-white hover:bg-primary/90 whitespace-nowrap shadow-sm"
-            >
-              Fill Admin
-            </button>
-          </div>
-        </div>
-
         {/* Card Form */}
-        <div className="mt-4 card p-6 shadow-md border border-border">
+        <div className="mt-6 card p-6 shadow-md border border-border">
+          {/* Post-Registration Success Notification */}
+          {successMessage && (
+            <div className="mb-4 bg-emerald-50 border border-emerald-300 text-emerald-800 rounded-md p-3 flex items-start gap-2">
+              <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+              <p className="text-sm font-medium">{successMessage}</p>
+            </div>
+          )}
+
           {error && (
             <div className="mb-4 bg-danger/10 border border-danger/30 rounded-md p-3 flex items-start gap-2">
               <AlertCircle className="h-5 w-5 text-danger flex-shrink-0 mt-0.5" />
