@@ -37,8 +37,9 @@ function setAuthCookies(res, sessionToken, csrfToken) {
 
 export const authController = {
   /**
-   * Step 1: Initiate User Registration
-   * Validates input, hashes password, generates 6-digit OTP, sends via Brevo.
+   * User Registration
+   * Creates user and corresponding role profile (Donor, NGO, Volunteer) in Supabase DB,
+   * generates session cookies, and logs the user in immediately.
    */
   async register(req, res) {
     const validation = validateRegistrationInput(req.body);
@@ -58,38 +59,93 @@ export const authController = {
     // Hash password with Argon2id
     const passwordHash = await hashPassword(password);
 
-    // Generate 6-digit OTP
-    const otp = generateOtp();
-    const otpHmac = hashOtp(normalizedEmail, otp);
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    // Create user and role entity within a transactional boundary
+    const newUser = await withTransaction(async (client) => {
+      const userRes = await client.query(
+        `INSERT INTO users (name, email, phone, password_hash, role, status, organization_name, address, city, state, pincode, email_verified_at)
+         VALUES ($1, $2, $3, $4, $5, 'active', $6, $7, $8, $9, $10, NOW())
+         RETURNING id, name, email, phone, role, status, organization_name, city, state, pincode, created_at`,
+        [
+          name,
+          normalizedEmail,
+          phone || '+91 98765 43210',
+          passwordHash,
+          role,
+          organizationName || null,
+          address || null,
+          city || 'Hyderabad',
+          state || 'Telangana',
+          pincode || '500001',
+        ]
+      );
 
-    // Store OTP Challenge
+      const user = userRes.rows[0];
+
+      // Role-specific profile initialization
+      if (user.role === 'ngo') {
+        const ngoRes = await client.query(
+          `INSERT INTO ngos (user_id, organization_name, registration_number, contact_person, contact_phone, contact_email, street, city, state, pincode, latitude, longitude, verification_status)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'pending')
+           RETURNING id`,
+          [
+            user.id,
+            organizationName || `${user.name} Organization`,
+            `REG-${Date.now().toString().slice(-6)}`,
+            user.name,
+            user.phone,
+            user.email,
+            address || 'Facility Address',
+            city || 'Hyderabad',
+            state || 'Telangana',
+            pincode || '500001',
+            17.3850,
+            78.4867,
+          ]
+        );
+
+        // Seed initial capacity record
+        await client.query(
+          `INSERT INTO ngo_capacity (ngo_id, max_daily_meals, current_available_capacity, has_cold_storage)
+           VALUES ($1, 100, 100, FALSE)`,
+          [ngoRes.rows[0].id]
+        );
+      } else if (user.role === 'volunteer') {
+        await client.query(
+          `INSERT INTO volunteers (user_id, name, phone, email, vehicle_type, service_areas, availability, status)
+           VALUES ($1, $2, $3, $4, 'two_wheeler', ARRAY['Hyderabad Metropolitan'], 'available', 'active')`,
+          [user.id, user.name, user.phone, user.email]
+        );
+      }
+
+      // Initialize notification preferences
+      await client.query(
+        `INSERT INTO notification_preferences (user_id, email_notifications, in_app_notifications)
+         VALUES ($1, TRUE, TRUE)`,
+        [user.id]
+      );
+
+      return user;
+    });
+
+    // Create session
+    const sessionToken = generateSessionToken();
+    const tokenHash = hashSessionToken(sessionToken);
+    const csrfToken = generateCsrfToken();
+    const expiresAt = new Date(Date.now() + config.cookie.maxAge);
+
     await query(
-      `INSERT INTO email_otp_challenges (email, otp_hmac, purpose, expires_at)
-       VALUES ($1, $2, 'register', $3)`,
-      [normalizedEmail, otpHmac, expiresAt]
+      `INSERT INTO user_sessions (user_id, session_token_hash, ip_address, user_agent, expires_at)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [newUser.id, tokenHash, req.ip, req.headers['user-agent'] || 'client', expiresAt]
     );
 
-    // Dispatch via Brevo
-    await sendOtpEmail(normalizedEmail, otp, 'register');
+    setAuthCookies(res, sessionToken, csrfToken);
 
-    // Return response without password or plaintext OTP
-    return res.status(200).json({
+    return res.status(201).json({
       success: true,
-      message: 'Registration challenge initiated. A 6-digit verification code has been sent to your email.',
-      email: normalizedEmail,
-      pendingData: {
-        name,
-        email: normalizedEmail,
-        phone,
-        passwordHash,
-        role,
-        organizationName,
-        address,
-        city,
-        state,
-        pincode,
-      },
+      message: 'Account successfully registered.',
+      user: newUser,
+      csrfToken,
     });
   },
 
@@ -223,8 +279,8 @@ export const authController = {
   },
 
   /**
-   * Step 1: Initiate Login Challenge
-   * Verifies password, generates 2FA email OTP, sends via Brevo.
+   * User Login
+   * Verifies password against Argon2id hash and issues session directly.
    */
   async login(req, res) {
     const { email, password } = req.body;
@@ -235,7 +291,7 @@ export const authController = {
     const normalizedEmail = email.trim().toLowerCase();
 
     const userRes = await query(
-      'SELECT id, name, email, password_hash, role, status FROM users WHERE email = $1',
+      'SELECT id, name, email, phone, password_hash, role, status, organization_name, city, state, pincode FROM users WHERE email = $1',
       [normalizedEmail]
     );
 
@@ -257,24 +313,28 @@ export const authController = {
       return res.status(401).json({ success: false, error: 'Invalid email or password.' });
     }
 
-    // Generate 6-digit Login OTP
-    const otp = generateOtp();
-    const otpHmac = hashOtp(normalizedEmail, otp);
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    // Issue cryptographic session token & CSRF token
+    const sessionToken = generateSessionToken();
+    const tokenHash = hashSessionToken(sessionToken);
+    const csrfToken = generateCsrfToken();
+    const expiresAt = new Date(Date.now() + config.cookie.maxAge);
 
     await query(
-      `INSERT INTO email_otp_challenges (email, otp_hmac, purpose, expires_at)
-       VALUES ($1, $2, 'login', $3)`,
-      [normalizedEmail, otpHmac, expiresAt]
+      `INSERT INTO user_sessions (user_id, session_token_hash, ip_address, user_agent, expires_at)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [user.id, tokenHash, req.ip, req.headers['user-agent'] || 'client', expiresAt]
     );
 
-    await sendOtpEmail(normalizedEmail, otp, 'login');
+    setAuthCookies(res, sessionToken, csrfToken);
+
+    // Strip password hash from returned user object
+    const { password_hash, ...safeUser } = user;
 
     return res.status(200).json({
       success: true,
-      requiresOtp: true,
-      message: 'Credentials verified. A one-time verification code has been dispatched to your email.',
-      email: normalizedEmail,
+      message: 'Login successful.',
+      user: safeUser,
+      csrfToken,
     });
   },
 
