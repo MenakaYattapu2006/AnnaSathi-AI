@@ -48,6 +48,15 @@ const shutdown = async (signal) => {
   }, 10000);
 };
 
+// Crash resilience: prevent unhandled promise rejections from killing server
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('⚠️ Unhandled Promise Rejection at:', promise, 'reason:', reason);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('⚠️ Uncaught Exception caught by server boundary:', err);
+});
+
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
 

@@ -2,6 +2,7 @@ import { query } from '../config/db.js';
 
 /**
  * Notification Controller for AnnaSathi AI
+ * Matches database schema: recipient_id, status ('unread' | 'read'), read_at
  */
 
 // GET /api/v1/notifications
@@ -11,11 +12,11 @@ export const getNotifications = async (req, res, next) => {
     const { unread_only, limit = 20, page = 1 } = req.query;
     const offset = (page - 1) * limit;
 
-    let filter = `WHERE user_id = $1`;
+    let filter = `WHERE recipient_id = $1`;
     const params = [userId];
 
     if (unread_only === 'true') {
-      filter += ` AND is_read = false`;
+      filter += ` AND status = 'unread'`;
     }
 
     const result = await query(
@@ -33,10 +34,11 @@ export const getNotifications = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
+      notifications: result.rows,
       data: {
         notifications: result.rows,
         pagination: {
-          total: countRes.rows[0].total,
+          total: countRes.rows[0]?.total || 0,
           page: Number(page),
           limit: Number(limit)
         }
@@ -52,14 +54,15 @@ export const getUnreadCount = async (req, res, next) => {
   try {
     const userId = req.user.id;
     const result = await query(
-      `SELECT count(*)::int as unread_count FROM notifications WHERE user_id = $1 AND is_read = false`,
+      `SELECT count(*)::int as unread_count FROM notifications WHERE recipient_id = $1 AND status = 'unread'`,
       [userId]
     );
 
     res.status(200).json({
       success: true,
+      unreadCount: result.rows[0]?.unread_count || 0,
       data: {
-        unreadCount: result.rows[0].unread_count
+        unreadCount: result.rows[0]?.unread_count || 0
       }
     });
   } catch (error) {
@@ -74,7 +77,7 @@ export const markNotificationRead = async (req, res, next) => {
     const { id } = req.params;
 
     const result = await query(
-      `UPDATE notifications SET is_read = true WHERE id = $1 AND user_id = $2 RETURNING *`,
+      `UPDATE notifications SET status = 'read', read_at = NOW() WHERE id = $1 AND recipient_id = $2 RETURNING *`,
       [id, userId]
     );
 
@@ -84,6 +87,7 @@ export const markNotificationRead = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
+      notification: result.rows[0],
       data: result.rows[0]
     });
   } catch (error) {
@@ -97,7 +101,7 @@ export const markAllNotificationsRead = async (req, res, next) => {
     const userId = req.user.id;
 
     await query(
-      `UPDATE notifications SET is_read = true WHERE user_id = $1 AND is_read = false`,
+      `UPDATE notifications SET status = 'read', read_at = NOW() WHERE recipient_id = $1 AND status = 'unread'`,
       [userId]
     );
 

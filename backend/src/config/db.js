@@ -12,8 +12,10 @@ if (config.databaseUrl) {
     connectionString: config.databaseUrl,
     ssl: isSupabase || config.isProduction ? { rejectUnauthorized: false } : false,
     max: 20,
-    idleTimeoutMillis: 30000,
+    min: 2, // Keep minimum 2 connections pre-warmed to eliminate cold-start TLS latency
+    idleTimeoutMillis: 120000,
     connectionTimeoutMillis: 10000,
+    keepAlive: true,
   });
 
   pool.on('error', (err) => {

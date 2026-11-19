@@ -75,7 +75,7 @@ export const volunteerController = {
        JOIN donations d ON a.donation_id = d.id
        JOIN ngos n ON a.ngo_id = n.id
        WHERE a.status = 'available'
-         AND (a.volunteer_id IS NULL OR a.volunteer_id = '')
+         AND a.volunteer_id IS NULL
          AND d.status = 'NGO_ACCEPTED'
        ORDER BY d.urgency_score DESC, a.created_at DESC`
     );
