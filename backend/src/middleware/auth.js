@@ -120,8 +120,15 @@ export function verifyCsrf(req, res, next) {
     return next();
   }
 
+  const currentPath = req.path || req.originalUrl || req.url || '';
+
   // Exempt auth bootstrap endpoints if session is not yet established
-  if (req.path.startsWith('/api/v1/auth/login') || req.path.startsWith('/api/v1/auth/register') || req.path.startsWith('/api/v1/auth/verify-otp') || req.path.startsWith('/api/v1/auth/verify-login-otp')) {
+  if (
+    currentPath.startsWith('/api/v1/auth/login') ||
+    currentPath.startsWith('/api/v1/auth/register') ||
+    currentPath.startsWith('/api/v1/auth/verify-otp') ||
+    currentPath.startsWith('/api/v1/auth/verify-login-otp')
+  ) {
     return next();
   }
 

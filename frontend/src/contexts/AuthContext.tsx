@@ -19,6 +19,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const isProduction = Boolean((import.meta as any).env?.PROD);
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -36,7 +38,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return;
         }
       } catch {
-        // Fall back to local mock session if backend is offline or unauthorized
+        if (isProduction) {
+          // In production mode, never silently fall back to mock session!
+          console.warn('Production session check: unauthenticated.');
+          return;
+        }
+        // Fall back to local mock session only in local development mode
         const activeUser = mockAuthService.getCurrentUser();
         if (activeUser && isMounted) {
           setUser(activeUser);
@@ -64,13 +71,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return response.user;
         }
       } catch (err: any) {
-        // If it's a real invalid credential from live backend, propagate error
-        if (err.status === 400 || err.status === 401) {
+        // In production, or on real validation errors, propagate error immediately
+        if (isProduction || err.status === 400 || err.status === 401) {
           throw err;
         }
       }
 
-      // Backend offline fallback to mock authentication
+      if (isProduction) {
+        throw new Error('Production authentication failed: unable to connect to backend.');
+      }
+
+      // Backend offline fallback to mock authentication strictly in development mode
       const authenticatedUser = await mockAuthService.login(email, password);
       setUser(authenticatedUser);
       return authenticatedUser;
@@ -97,12 +108,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return response.user;
         }
       } catch (err: any) {
-        if (err.status === 400 || err.status === 409) {
+        if (isProduction || err.status === 400 || err.status === 409) {
           throw err;
         }
       }
 
-      // Offline mock fallback
+      if (isProduction) {
+        throw new Error('Production registration failed: unable to connect to backend.');
+      }
+
+      // Offline mock fallback strictly in local development
       const newUser = await mockAuthService.register(userData);
       setUser(newUser);
       return newUser;

@@ -105,3 +105,5 @@ export async function withTransaction(callback) {
 export function isDbConnected() {
   return pool !== null;
 }
+
+export { pool };

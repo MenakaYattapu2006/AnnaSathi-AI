@@ -1,11 +1,11 @@
-import test from 'node:test';
+import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
 import { hashPassword, verifyPassword, generateOtp, hashOtp, verifyOtpHmac } from '../src/utils/crypto.js';
 import { calculateUrgencyScore, findMatchingNGOs } from '../src/services/aiService.js';
 import { requireAuth, requireRole } from '../src/middleware/auth.js';
 import { notFoundHandler } from '../src/middleware/errorHandler.js';
 import { validateRegistrationInput, validateDonationInput } from '../src/validators/index.js';
-import { query, withTransaction } from '../src/config/db.js';
+import { query, withTransaction, pool } from '../src/config/db.js';
 
 test('1. Cryptography & Security Tests', async (t) => {
   await t.test('Argon2id password hashing and verification', async () => {
@@ -208,4 +208,10 @@ test('6. 404 Not Found Handler Test', () => {
   assert.equal(status, 404);
   assert.equal(jsonBody.success, false);
   assert.ok(jsonBody.error.includes('non-existent-endpoint'));
+});
+
+after(async () => {
+  if (pool) {
+    await pool.end();
+  }
 });
