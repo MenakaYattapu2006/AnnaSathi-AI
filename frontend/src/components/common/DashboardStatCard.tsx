@@ -44,13 +44,13 @@ export const DashboardStatCard: React.FC<DashboardStatCardProps> = ({
   ) : null;
 
   return (
-    <Card className="p-5">
+    <Card className="p-5 hover:shadow-md transition-shadow">
       <div className="flex items-center gap-4">
-        {icon && <div className="text-primary text-2xl flex-shrink-0">{icon}</div>}
+        {icon && <div className="text-emerald-700 dark:text-emerald-400 text-2xl flex-shrink-0">{icon}</div>}
         <div className="flex-1 min-w-0">
-          <p className="text-sm text-secondary-text">{title}</p>
-          <p className="text-3xl font-bold text-primary-text mt-1">{value}</p>
-          {description && <p className="text-sm text-secondary-text mt-1">{description}</p>}
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">{title}</p>
+          <p className="text-3xl font-extrabold text-slate-900 dark:text-white mt-1 tracking-tight">{value}</p>
+          {description && <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{description}</p>}
         </div>
         {trend !== undefined && (
           <Badge variant={resolvedBadgeVariant} size="sm">

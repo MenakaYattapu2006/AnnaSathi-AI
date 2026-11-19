@@ -35,7 +35,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <aside
-      className={`hidden md:flex flex-col w-64 border-r border-slate-200 bg-white flex-shrink-0 min-h-[calc(100vh-4rem)] ${className}`}
+      className={`hidden md:flex flex-col w-64 border-r border-slate-200 dark:border-[#1E293B] bg-white dark:bg-[#11171D] flex-shrink-0 min-h-[calc(100vh-4rem)] transition-colors duration-200 ${className}`}
       data-purpose="primary-sidebar"
     >
       {/* Navigation Links */}
@@ -47,8 +47,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             onClick={onItemClick}
             className={({ isActive }) =>
               isActive
-                ? 'flex items-center gap-3 px-3.5 py-2.5 text-sm font-semibold rounded-xl bg-[#0f392b] text-white shadow-sm shadow-[#0f392b]/20 group transition-all'
-                : 'flex items-center gap-3 px-3.5 py-2.5 text-sm font-medium rounded-xl text-slate-600 hover:text-[#0f392b] hover:bg-slate-50 transition-all group'
+                ? 'flex items-center gap-3 px-3.5 py-2.5 text-sm font-semibold rounded-xl bg-[#0f392b] dark:bg-emerald-950/70 dark:border dark:border-emerald-600/30 text-white shadow-sm shadow-[#0f392b]/20 group transition-all'
+                : 'flex items-center gap-3 px-3.5 py-2.5 text-sm font-medium rounded-xl text-slate-600 dark:text-slate-400 hover:text-[#0f392b] dark:hover:text-emerald-400 hover:bg-slate-50 dark:hover:bg-[#1A232E] transition-all group'
             }
           >
             {({ isActive }) => (
@@ -57,7 +57,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   className={
                     isActive
                       ? 'text-emerald-400'
-                      : 'text-slate-400 group-hover:text-emerald-700 transition-colors'
+                      : 'text-slate-400 dark:text-slate-500 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors'
                   }
                 >
                   {item.icon}
@@ -68,7 +68,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     className={`px-2 py-0.5 text-[11px] font-semibold rounded-full ${
                       isActive
                         ? 'bg-emerald-800 text-emerald-200'
-                        : 'bg-slate-100 text-slate-500'
+                        : 'bg-slate-100 dark:bg-[#1A232E] text-slate-500 dark:text-slate-400'
                     }`}
                   >
                     {item.badge}

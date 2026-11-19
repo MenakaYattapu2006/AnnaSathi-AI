@@ -33,22 +33,35 @@ export const Table = <T,>({ columns, data, emptyState, className = '' }: TablePr
   }
 
   return (
-    <div className={`overflow-x-auto ${className}`}>
-      <table className="table min-w-full">
-        <thead className="thead">
-          <tr className="tr">
+    <div className={`overflow-x-auto rounded-xl border border-slate-200 dark:border-[#1E293B] ${className}`}>
+      <table className="min-w-full divide-y divide-slate-200 dark:divide-[#1E293B]">
+        <thead className="bg-slate-50 dark:bg-[#131B22]">
+          <tr>
             {columns.map((col, idx) => (
-              <th key={idx} className={`th ${col.className ?? ''}`}>
+              <th
+                key={idx}
+                className={`px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 ${
+                  col.className ?? ''
+                }`}
+              >
                 {col.header}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-border">
+        <tbody className="divide-y divide-slate-200 dark:divide-[#1E293B] bg-white dark:bg-[#11171D]">
           {data.map((row, rowIndex) => (
-            <tr key={rowIndex} className="tr">
+            <tr
+              key={rowIndex}
+              className="hover:bg-slate-50 dark:hover:bg-[#1A232E] transition-colors"
+            >
               {columns.map((col, colIdx) => (
-                <td key={colIdx} className={`td ${col.className ?? ''}`}>
+                <td
+                  key={colIdx}
+                  className={`px-4 py-3.5 text-sm text-slate-700 dark:text-slate-300 ${
+                    col.className ?? ''
+                  }`}
+                >
                   {col.accessor(row)}
                 </td>
               ))}

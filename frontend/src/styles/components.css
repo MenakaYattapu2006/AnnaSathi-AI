@@ -16,7 +16,7 @@
 
   /* Card – already a React component, but utility for plain HTML usage */
   .card {
-    @apply bg-surface rounded-lg shadow-sm p-4;
+    @apply bg-surface border border-border rounded-xl shadow-sm p-4 transition-colors duration-200;
   }
 
   /* Form field wrapper */

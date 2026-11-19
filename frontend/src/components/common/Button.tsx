@@ -31,11 +31,11 @@ export const Button: React.FC<ButtonProps> = ({
 
   const variantMap: Record<ButtonVariant, string> = {
     primary:
-      'bg-primary text-white hover:bg-secondary focus-visible:ring-primary',
+      'bg-[#0f392b] text-white hover:bg-emerald-800 dark:bg-emerald-700 dark:hover:bg-emerald-600 focus-visible:ring-emerald-600 shadow-xs',
     secondary:
-      'bg-secondary text-white hover:bg-primary focus-visible:ring-secondary',
+      'bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-500 focus-visible:ring-emerald-500 shadow-xs',
     outline:
-      'border border-border text-primary hover:bg-primary hover:text-white focus-visible:ring-primary',
+      'border border-slate-200 dark:border-[#1E293B] text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#1A232E] focus-visible:ring-emerald-600',
   };
 
   return (

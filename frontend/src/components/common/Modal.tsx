@@ -128,7 +128,7 @@ export const Modal: React.FC<ModalProps> = ({
 
   return (
     <div
-      className="modal-backdrop"
+      className="fixed inset-0 bg-slate-900/60 dark:bg-black/70 backdrop-blur-xs flex items-center justify-center z-50 p-4 transition-all"
       onMouseDown={handleBackdropClick}
       aria-modal="true"
       role="dialog"
@@ -136,28 +136,28 @@ export const Modal: React.FC<ModalProps> = ({
     >
       <div
         ref={modalRef}
-        className={`modal ${className}`}
+        className={`bg-white dark:bg-[#11171D] border border-slate-200 dark:border-[#1E293B] rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden text-slate-800 dark:text-slate-100 transition-colors duration-200 ${className}`}
         role="document"
         onKeyDown={handleKeyDown}
       >
-        <div className="modal-header">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-[#1E293B]">
           {title && (
-            <h2 id="modal-title" className="text-lg font-medium text-primary-text">
+            <h2 id="modal-title" className="text-base font-bold text-slate-900 dark:text-white">
               {title}
             </h2>
           )}
           <button
             type="button"
             onClick={onClose}
-            className="text-primary-text hover:text-primary"
+            className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#1A232E] transition-colors"
             aria-label="Close modal"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
-        <div className="modal-body">{children}</div>
+        <div className="p-6 text-sm leading-relaxed">{children}</div>
         {footerAction && (
-          <div className="modal-footer">
+          <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-100 dark:border-[#1E293B] bg-slate-50/50 dark:bg-[#131B22]">
             <Button
               variant={footerAction.variant ?? 'primary'}
               onClick={footerAction.onClick}

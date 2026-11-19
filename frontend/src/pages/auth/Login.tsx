@@ -51,7 +51,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-between text-slate-900 font-sans antialiased bg-slate-50 relative selection:bg-brand-900 selection:text-white">
+    <div className="min-h-screen flex flex-col justify-between text-slate-900 dark:text-slate-100 font-sans antialiased bg-slate-50 dark:bg-[#090D10] relative selection:bg-brand-900 selection:text-white transition-colors duration-200">
       {/* Subtle Dot Grid Background */}
       <div className="fixed inset-0 grid-bg-pattern pointer-events-none z-0" />
 
@@ -59,7 +59,7 @@ const Login: React.FC = () => {
       <div className="absolute -top-[300px] left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-emerald-500/10 blur-[130px] rounded-full pointer-events-none" />
 
       {/* Global Header Bar */}
-      <header className="w-full border-b border-slate-200/80 bg-white/70 backdrop-blur-md sticky top-0 z-50">
+      <header className="w-full border-b border-slate-200/80 dark:border-[#1E293B] bg-white/70 dark:bg-[#11171D]/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5 no-underline group">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-900 via-emerald-800 to-teal-700 flex items-center justify-center text-white shadow-sm ring-1 ring-emerald-900/10 transition-transform group-hover:scale-105">
@@ -76,19 +76,19 @@ const Login: React.FC = () => {
                 <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
               </svg>
             </div>
-            <span className="text-lg font-bold tracking-tight text-slate-900">
+            <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
               AnnaSathi AI
             </span>
           </Link>
 
-          <div className="flex items-center gap-4 text-xs font-medium text-slate-600">
-            <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200/60 text-emerald-800">
+          <div className="flex items-center gap-4 text-xs font-medium text-slate-600 dark:text-slate-400">
+            <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/60 dark:border-emerald-800/40 text-emerald-800 dark:text-emerald-300">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               <span>Zero-Waste Operations Live</span>
             </div>
-            <span className="hidden md:inline-block text-slate-300">|</span>
-            <div className="hidden md:flex items-center gap-1.5 text-slate-500">
-              <ShieldCheck className="w-4 h-4 text-emerald-700" />
+            <span className="hidden md:inline-block text-slate-300 dark:text-slate-700">|</span>
+            <div className="hidden md:flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+              <ShieldCheck className="w-4 h-4 text-emerald-700 dark:text-emerald-400" />
               <span>256-Bit TLS Secured</span>
             </div>
           </div>
@@ -99,19 +99,19 @@ const Login: React.FC = () => {
       <main className="flex-grow flex items-center justify-center px-4 sm:px-6 py-12 relative z-10">
         <div className="w-full max-w-md">
           {/* Premium Auth Card */}
-          <div className="bg-white rounded-2xl border border-slate-200/90 shadow-premium p-8 sm:p-10 relative overflow-hidden">
+          <div className="bg-white dark:bg-[#11171D] rounded-2xl border border-slate-200/90 dark:border-[#1E293B] shadow-premium p-8 sm:p-10 relative overflow-hidden transition-colors">
             {/* Accent Top Bar */}
             <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-brand-900 via-emerald-600 to-teal-500" />
 
             {/* Header */}
             <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-brand-50 border border-emerald-100 text-brand-900 mb-4 shadow-sm">
-                <Lock className="w-6 h-6 text-brand-900" />
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-brand-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800/40 text-brand-900 dark:text-emerald-300 mb-4 shadow-sm">
+                <Lock className="w-6 h-6 text-brand-900 dark:text-emerald-400" />
               </div>
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
                 Welcome to AnnaSathi AI
               </h1>
-              <p className="text-sm text-slate-500 mt-1.5">
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5">
                 Sign in to coordinate zero-waste logistics & distributions
               </p>
             </div>
@@ -138,7 +138,7 @@ const Login: React.FC = () => {
               <div>
                 <label
                   htmlFor="email-input"
-                  className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2"
+                  className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2"
                 >
                   Email Address
                 </label>
@@ -156,7 +156,7 @@ const Login: React.FC = () => {
                       setError(null);
                     }}
                     placeholder="name@example.com"
-                    className="block w-full pl-10 pr-3.5 py-2.5 text-sm text-slate-900 border border-slate-300 rounded-lg focus:border-brand-900 focus:ring-2 focus:ring-brand-900/20 bg-slate-50/40 hover:bg-white transition-all placeholder:text-slate-400 outline-none"
+                    className="block w-full pl-10 pr-3.5 py-2.5 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg focus:border-brand-900 dark:focus:border-emerald-500 focus:ring-2 focus:ring-brand-900/20 bg-slate-50/40 dark:bg-[#131B22] hover:bg-white dark:hover:bg-[#18222b] transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none"
                   />
                 </div>
               </div>
@@ -166,7 +166,7 @@ const Login: React.FC = () => {
                 <div className="flex items-center justify-between mb-2">
                   <label
                     htmlFor="password-input"
-                    className="block text-xs font-semibold text-slate-700 uppercase tracking-wider"
+                    className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider"
                   >
                     Password
                   </label>
@@ -186,12 +186,12 @@ const Login: React.FC = () => {
                       setError(null);
                     }}
                     placeholder="Enter password"
-                    className="block w-full pl-10 pr-10 py-2.5 text-sm text-slate-900 border border-slate-300 rounded-lg focus:border-brand-900 focus:ring-2 focus:ring-brand-900/20 bg-slate-50/40 hover:bg-white transition-all placeholder:text-slate-400 outline-none"
+                    className="block w-full pl-10 pr-10 py-2.5 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg focus:border-brand-900 dark:focus:border-emerald-500 focus:ring-2 focus:ring-brand-900/20 bg-slate-50/40 dark:bg-[#131B22] hover:bg-white dark:hover:bg-[#18222b] transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
+                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -203,7 +203,7 @@ const Login: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-brand-900 hover:bg-[#134E3F] text-white text-sm font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-900/40 focus:ring-offset-2 transition-all duration-150 disabled:opacity-60 cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-brand-900 hover:bg-[#134E3F] dark:bg-emerald-700 dark:hover:bg-emerald-600 text-white text-sm font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-900/40 focus:ring-offset-2 transition-all duration-150 disabled:opacity-60 cursor-pointer"
               >
                 <span>{isSubmitting ? 'Authenticating...' : 'Sign In to Dashboard'}</span>
                 <ArrowRight className="w-4 h-4" />
@@ -211,12 +211,12 @@ const Login: React.FC = () => {
             </form>
 
             {/* Register Link */}
-            <div className="mt-8 pt-6 border-t border-slate-100 text-center">
-              <p className="text-xs text-slate-500">
+            <div className="mt-8 pt-6 border-t border-slate-100 dark:border-[#1E293B] text-center">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Don't have an account?{' '}
                 <Link
                   to="/register"
-                  className="font-semibold text-brand-900 hover:text-emerald-700 underline decoration-emerald-500/30 underline-offset-4 transition-colors"
+                  className="font-semibold text-brand-900 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 underline decoration-emerald-500/30 underline-offset-4 transition-colors"
                 >
                   Register as a Partner
                 </Link>
@@ -227,8 +227,8 @@ const Login: React.FC = () => {
       </main>
 
       {/* Global Footer */}
-      <footer className="w-full border-t border-slate-200/80 bg-white/60 backdrop-blur-xs py-6 relative z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+      <footer className="w-full border-t border-slate-200/80 dark:border-[#1E293B] bg-white/60 dark:bg-[#11171D]/60 backdrop-blur-xs py-6 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
           <div>
             &copy; {new Date().getFullYear()} AnnaSathi AI Technologies Inc. All rights reserved.
           </div>
