@@ -56,36 +56,6 @@ const getSearchPlaceholder = (role: string): string => {
   }
 };
 
-const getRoleSectionTitle = (role: string): string => {
-  switch (role) {
-    case 'admin':
-      return 'Governance Console';
-    case 'donor':
-      return 'Surplus Dispatch';
-    case 'ngo':
-      return 'Relief Operations';
-    case 'volunteer':
-      return 'Field Operations';
-    default:
-      return 'Operations Console';
-  }
-};
-
-const getRoleSectionTag = (role: string): string => {
-  switch (role) {
-    case 'admin':
-      return 'Enterprise';
-    case 'donor':
-      return 'Partner';
-    case 'ngo':
-      return 'Verified NGO';
-    case 'volunteer':
-      return 'Courier';
-    default:
-      return 'Active';
-  }
-};
-
 /**
  * Enterprise MainLayout component for authenticated modules (Admin, Donor, NGO, Volunteer).
  * Features a sticky frosted-glass navigation bar, high-contrast sidebar, and responsive mobile drawer.
@@ -370,16 +340,6 @@ export const MainLayout: React.FC = () => {
               aria-hidden="true"
             />
             <aside className="fixed top-16 left-0 w-64 h-[calc(100vh-4rem)] bg-white border-r border-slate-200 z-50 md:hidden flex flex-col overflow-y-auto">
-              {/* Context Tag */}
-              <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-                <span className="text-[11px] font-bold tracking-wider text-slate-400 uppercase">
-                  {getRoleSectionTitle(user.role)}
-                </span>
-                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-600">
-                  {getRoleSectionTag(user.role)}
-                </span>
-              </div>
-
               {/* Navigation Links */}
               <nav aria-label="Mobile Navigation" className="flex-1 p-3 space-y-1.5">
                 {sidebarItems.map((item) => (
