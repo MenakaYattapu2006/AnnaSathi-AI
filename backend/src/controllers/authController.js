@@ -109,6 +109,44 @@ export const authController = {
            VALUES ($1, 100, 100, FALSE)`,
           [ngoRes.rows[0].id]
         );
+
+        // Notify all platform administrators about the new pending verification request
+        const adminUsers = await client.query(`SELECT id FROM users WHERE role = 'admin'`);
+        for (const admin of adminUsers.rows) {
+          await client.query(
+            `INSERT INTO notifications (recipient_id, title, message, type, related_entity_id)
+             VALUES ($1, $2, $3, 'verification_status', $4)`,
+            [
+              admin.id,
+              'New NGO Verification Request',
+              `Organization "${organizationName || user.name}" has registered and requires admin verification approval before collecting surplus food donations.`,
+              ngoRes.rows[0].id,
+            ]
+          );
+
+          await client.query(
+            `INSERT INTO admin_activity_logs (admin_id, action_type, target_id, target_type, description, metadata)
+             VALUES ($1, 'NGO_REGISTRATION_SUBMITTED', $2, 'ngos', $3, $4)`,
+            [
+              admin.id,
+              ngoRes.rows[0].id,
+              `New NGO registration submitted for review: ${organizationName || user.name}`,
+              JSON.stringify({ organizationName: organizationName || user.name, city, state, pincode }),
+            ]
+          );
+        }
+
+        // Notify the newly registered NGO user about their pending verification status
+        await client.query(
+          `INSERT INTO notifications (recipient_id, title, message, type, related_entity_id)
+           VALUES ($1, $2, $3, 'verification_status', $4)`,
+          [
+            user.id,
+            'Verification In Progress',
+            'Your organization registration has been submitted for administrator review. You will be notified once verified to begin accepting and collecting surplus food donations.',
+            ngoRes.rows[0].id,
+          ]
+        );
       } else if (user.role === 'volunteer') {
         await client.query(
           `INSERT INTO volunteers (user_id, name, phone, email, vehicle_type, service_areas, availability, status)
@@ -222,6 +260,44 @@ export const authController = {
           `INSERT INTO ngo_capacity (ngo_id, max_daily_meals, current_available_capacity, has_cold_storage)
            VALUES ($1, 100, 100, FALSE)`,
           [ngoRes.rows[0].id]
+        );
+
+        // Notify all platform administrators about the new pending verification request
+        const adminUsers = await client.query(`SELECT id FROM users WHERE role = 'admin'`);
+        for (const admin of adminUsers.rows) {
+          await client.query(
+            `INSERT INTO notifications (recipient_id, title, message, type, related_entity_id)
+             VALUES ($1, $2, $3, 'verification_status', $4)`,
+            [
+              admin.id,
+              'New NGO Verification Request',
+              `Organization "${organizationName || user.name}" has registered and requires admin verification approval before collecting surplus food donations.`,
+              ngoRes.rows[0].id,
+            ]
+          );
+
+          await client.query(
+            `INSERT INTO admin_activity_logs (admin_id, action_type, target_id, target_type, description, metadata)
+             VALUES ($1, 'NGO_REGISTRATION_SUBMITTED', $2, 'ngos', $3, $4)`,
+            [
+              admin.id,
+              ngoRes.rows[0].id,
+              `New NGO registration submitted for review: ${organizationName || user.name}`,
+              JSON.stringify({ organizationName: organizationName || user.name, city, state, pincode }),
+            ]
+          );
+        }
+
+        // Notify the newly registered NGO user about their pending verification status
+        await client.query(
+          `INSERT INTO notifications (recipient_id, title, message, type, related_entity_id)
+           VALUES ($1, $2, $3, 'verification_status', $4)`,
+          [
+            user.id,
+            'Verification In Progress',
+            'Your organization registration has been submitted for administrator review. You will be notified once verified to begin accepting and collecting surplus food donations.',
+            ngoRes.rows[0].id,
+          ]
         );
       } else if (user.role === 'volunteer') {
         await client.query(

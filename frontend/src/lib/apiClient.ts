@@ -95,7 +95,7 @@ export function mapNgoFromDb(row: any): NGO {
     },
     verificationStatus: (row.verification_status || row.verificationStatus || 'pending').toLowerCase() as any,
     verifiedAt: row.verified_at || row.verifiedAt,
-    rejectionReason: row.verification_notes || row.rejectionReason,
+    rejectionReason: row.rejection_reason || row.verification_notes || row.rejectionReason,
     createdAt: row.created_at || row.createdAt || new Date().toISOString(),
   };
 }

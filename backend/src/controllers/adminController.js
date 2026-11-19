@@ -179,7 +179,8 @@ export const reviewNGOVerification = async (req, res, next) => {
     const { id } = req.params;
     const { status, notes } = req.body;
 
-    if (!['VERIFIED', 'REJECTED'].includes(status)) {
+    const normalizedStatus = status ? status.toLowerCase() : '';
+    if (!['verified', 'rejected'].includes(normalizedStatus)) {
       return res.status(400).json({
         success: false,
         error: "Status must be either 'VERIFIED' or 'REJECTED'"
@@ -194,23 +195,37 @@ export const reviewNGOVerification = async (req, res, next) => {
 
       const updatedNGO = await client.query(
         `UPDATE ngos
-         SET verification_status = $1, verified_at = $2, verification_notes = $3, updated_at = NOW()
+         SET verification_status = $1, verified_at = $2, rejection_reason = $3, updated_at = NOW()
          WHERE id = $4
          RETURNING *`,
-        [status, status === 'VERIFIED' ? new Date() : null, notes || null, id]
+        [normalizedStatus, normalizedStatus === 'verified' ? new Date() : null, notes || null, id]
       );
 
       // Also update user's verified status
       await client.query(
         `UPDATE users SET email_verified_at = $1, updated_at = NOW() WHERE id = $2`,
-        [status === 'VERIFIED' ? new Date() : null, updatedNGO.rows[0].user_id]
+        [normalizedStatus === 'verified' ? new Date() : null, updatedNGO.rows[0].user_id]
       );
 
       // Audit log
       await client.query(
         `INSERT INTO admin_activity_logs (admin_id, action_type, target_id, target_type, description, metadata)
          VALUES ($1, $2, $3, $4, $5, $6)`,
-        [req.user.id, `NGO_${status}`, id, 'ngos', `Admin reviewed NGO verification: ${status}`, JSON.stringify({ notes })]
+        [req.user.id, `NGO_${status.toUpperCase()}`, id, 'ngos', `Admin reviewed NGO verification: ${status.toUpperCase()}`, JSON.stringify({ notes })]
+      );
+
+      // Notify the NGO user about the approval or rejection
+      await client.query(
+        `INSERT INTO notifications (recipient_id, title, message, type, related_entity_id)
+         VALUES ($1, $2, $3, 'verification_status', $4)`,
+        [
+          updatedNGO.rows[0].user_id,
+          normalizedStatus === 'verified' ? 'NGO Verification Approved' : 'NGO Verification Rejected',
+          normalizedStatus === 'verified'
+            ? `Congratulations! Your organization "${updatedNGO.rows[0].organization_name}" has been verified by the administrator. You are now authorized to accept and collect surplus food donations.`
+            : `Your organization verification request was rejected. Reason: ${notes || 'Documentation requirements not met.'}`,
+          id
+        ]
       );
 
       return updatedNGO.rows[0];
