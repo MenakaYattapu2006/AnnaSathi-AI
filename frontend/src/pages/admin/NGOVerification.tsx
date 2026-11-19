@@ -51,15 +51,10 @@ export const NGOVerification: React.FC = () => {
         return;
       }
     } catch (err: any) {
-      if (isProduction) {
-        setFeedback({ type: 'error', message: err.message || 'Failed to load NGOs from server.' });
-        setIsLoading(false);
-        return;
-      }
+      setFeedback({ type: 'error', message: err.message || 'Failed to load NGOs from server.' });
+    } finally {
+      setIsLoading(false);
     }
-
-    setNgos(mockDataService.getNGOs());
-    setIsLoading(false);
   };
 
   useEffect(() => {

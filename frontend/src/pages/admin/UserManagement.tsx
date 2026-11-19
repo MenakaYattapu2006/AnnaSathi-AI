@@ -52,15 +52,10 @@ export const UserManagement: React.FC = () => {
         return;
       }
     } catch (err: any) {
-      if (isProduction) {
-        setFeedback({ type: 'error', message: err.message || 'Failed to load user accounts from server.' });
-        setIsLoading(false);
-        return;
-      }
+      setFeedback({ type: 'error', message: err.message || 'Failed to load user accounts from server.' });
+    } finally {
+      setIsLoading(false);
     }
-
-    setUsers(mockDataService.getUsers());
-    setIsLoading(false);
   };
 
   useEffect(() => {

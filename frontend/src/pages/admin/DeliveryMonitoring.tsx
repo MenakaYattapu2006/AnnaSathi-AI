@@ -53,16 +53,11 @@ export const DeliveryMonitoring: React.FC = () => {
         setIsLoading(false);
         return;
       }
-    } catch {
-      if (isProduction) {
-        setIsLoading(false);
-        return;
-      }
+    } catch (err) {
+      console.warn('Failed to load live delivery telemetry:', err);
+    } finally {
+      setIsLoading(false);
     }
-
-    setAssignments(mockDataService.getAssignments());
-    setDonations(mockDataService.getDonations());
-    setIsLoading(false);
   };
 
   useEffect(() => {

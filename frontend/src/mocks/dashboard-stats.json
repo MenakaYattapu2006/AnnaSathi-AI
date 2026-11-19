@@ -2,164 +2,88 @@
   "donor": {
     "role": "donor",
     "primaryStats": {
-      "totalCount": 24,
-      "activeCount": 4,
-      "completedCount": 18,
-      "pendingCount": 2
+      "totalCount": 0,
+      "activeCount": 0,
+      "completedCount": 0,
+      "pendingCount": 0
     },
     "impact": {
-      "mealsRescued": 1820,
-      "co2PreventedKg": 728.5,
-      "waterSavedLiters": 91000,
-      "beneficiariesServed": 1450
+      "mealsRescued": 0,
+      "co2PreventedKg": 0,
+      "waterSavedLiters": 0,
+      "beneficiariesServed": 0
     },
     "recentTrends": {
-      "monthlyActivity": [
-        { "label": "Nov", "value": 3 },
-        { "label": "Dec", "value": 5 },
-        { "label": "Jan", "value": 7 },
-        { "label": "Feb", "value": 6 },
-        { "label": "Mar", "value": 3 }
-      ],
-      "donationsByCategory": [
-        { "category": "cooked_meals", "count": 14, "totalQuantity": 1150, "unit": "meals" },
-        { "category": "bakery_items", "count": 4, "totalQuantity": 420, "unit": "packets" },
-        { "category": "packaged_food", "count": 3, "totalQuantity": 150, "unit": "liters" },
-        { "category": "raw_groceries", "count": 3, "totalQuantity": 300, "unit": "kg" }
-      ],
-      "statusBreakdown": {
-        "CREATED": 2,
-        "NGO_MATCHED": 1,
-        "NGO_ACCEPTED": 1,
-        "VOLUNTEER_ASSIGNED": 0,
-        "PICKED_UP": 1,
-        "DELIVERED": 2,
-        "RECEIPT_CONFIRMED": 16,
-        "CANCELLED": 1
-      }
-    },
-    "lastUpdated": "2026-03-01T12:00:00Z"
-  },
-  "ngo": {
-    "role": "ngo",
-    "primaryStats": {
-      "totalCount": 58,
-      "activeCount": 6,
-      "completedCount": 48,
-      "pendingCount": 4
-    },
-    "impact": {
-      "mealsRescued": 6450,
-      "co2PreventedKg": 2580.0,
-      "waterSavedLiters": 322500,
-      "beneficiariesServed": 5200
-    },
-    "recentTrends": {
-      "monthlyActivity": [
-        { "label": "Nov", "value": 8 },
-        { "label": "Dec", "value": 12 },
-        { "label": "Jan", "value": 15 },
-        { "label": "Feb", "value": 14 },
-        { "label": "Mar", "value": 9 }
-      ],
-      "donationsByCategory": [
-        { "category": "cooked_meals", "count": 38, "totalQuantity": 4200, "unit": "meals" },
-        { "category": "raw_groceries", "count": 12, "totalQuantity": 1450, "unit": "kg" },
-        { "category": "fruits_vegetables", "count": 8, "totalQuantity": 800, "unit": "kg" }
-      ],
-      "statusBreakdown": {
-        "CREATED": 3,
-        "NGO_MATCHED": 2,
-        "NGO_ACCEPTED": 2,
-        "VOLUNTEER_ASSIGNED": 1,
-        "PICKED_UP": 1,
-        "DELIVERED": 6,
-        "RECEIPT_CONFIRMED": 42,
-        "CANCELLED": 1
-      }
-    },
-    "lastUpdated": "2026-03-01T12:00:00Z"
-  },
-  "volunteer": {
-    "role": "volunteer",
-    "primaryStats": {
-      "totalCount": 42,
-      "activeCount": 2,
-      "completedCount": 38,
-      "pendingCount": 2
-    },
-    "impact": {
-      "mealsRescued": 2350,
-      "co2PreventedKg": 940.0,
-      "waterSavedLiters": 117500,
-      "beneficiariesServed": 1920
-    },
-    "recentTrends": {
-      "monthlyActivity": [
-        { "label": "Nov", "value": 6 },
-        { "label": "Dec", "value": 9 },
-        { "label": "Jan", "value": 11 },
-        { "label": "Feb", "value": 10 },
-        { "label": "Mar", "value": 6 }
-      ],
-      "donationsByCategory": [
-        { "category": "cooked_meals", "count": 28, "totalQuantity": 1650, "unit": "meals" },
-        { "category": "bakery_items", "count": 8, "totalQuantity": 450, "unit": "packets" },
-        { "category": "packaged_food", "count": 6, "totalQuantity": 250, "unit": "liters" }
-      ],
+      "monthlyActivity": [],
+      "donationsByCategory": [],
       "statusBreakdown": {
         "CREATED": 0,
         "NGO_MATCHED": 0,
         "NGO_ACCEPTED": 0,
-        "VOLUNTEER_ASSIGNED": 1,
-        "PICKED_UP": 1,
-        "DELIVERED": 3,
-        "RECEIPT_CONFIRMED": 35,
-        "CANCELLED": 2
+        "VOLUNTEER_ASSIGNED": 0,
+        "PICKED_UP": 0,
+        "DELIVERED": 0,
+        "RECEIPT_CONFIRMED": 0,
+        "CANCELLED": 0
       }
     },
-    "lastUpdated": "2026-03-01T12:00:00Z"
+    "lastUpdated": "2026-11-19T12:00:00Z"
+  },
+  "ngo": {
+    "role": "ngo",
+    "primaryStats": {
+      "totalCount": 0,
+      "activeCount": 0,
+      "completedCount": 0,
+      "pendingCount": 0
+    },
+    "impact": {
+      "mealsReceived": 0,
+      "peopleFed": 0,
+      "activePartnerships": 0
+    },
+    "recentTrends": {
+      "monthlyReceipts": [],
+      "receivedByCategory": []
+    },
+    "lastUpdated": "2026-11-19T12:00:00Z"
+  },
+  "volunteer": {
+    "role": "volunteer",
+    "primaryStats": {
+      "totalDeliveries": 0,
+      "activeTasks": 0,
+      "hoursContributed": 0,
+      "rating": 5.0
+    },
+    "impact": {
+      "mealsDelivered": 0,
+      "distanceCoveredKm": 0
+    },
+    "recentTrends": {
+      "weeklyDeliveries": []
+    },
+    "lastUpdated": "2026-11-19T12:00:00Z"
   },
   "admin": {
     "role": "admin",
     "primaryStats": {
-      "totalCount": 154,
-      "activeCount": 28,
-      "completedCount": 118,
-      "pendingCount": 8
+      "totalUsers": 1,
+      "activeDonations": 0,
+      "verifiedNgos": 0,
+      "activeDeliveries": 0
     },
-    "impact": {
-      "mealsRescued": 18450,
-      "co2PreventedKg": 7380.0,
-      "waterSavedLiters": 922500,
-      "beneficiariesServed": 14900
+    "platformHealth": {
+      "systemUptimePercent": 99.98,
+      "averageMatchTimeMinutes": 0,
+      "deliverySuccessRate": 100
     },
-    "recentTrends": {
-      "monthlyActivity": [
-        { "label": "Nov", "value": 24 },
-        { "label": "Dec", "value": 32 },
-        { "label": "Jan", "value": 41 },
-        { "label": "Feb", "value": 37 },
-        { "label": "Mar", "value": 20 }
-      ],
-      "donationsByCategory": [
-        { "category": "cooked_meals", "count": 92, "totalQuantity": 9800, "unit": "meals" },
-        { "category": "raw_groceries", "count": 28, "totalQuantity": 4100, "unit": "kg" },
-        { "category": "fruits_vegetables", "count": 18, "totalQuantity": 2200, "unit": "kg" },
-        { "category": "bakery_items", "count": 10, "totalQuantity": 1150, "unit": "packets" },
-        { "category": "packaged_food", "count": 6, "totalQuantity": 1200, "unit": "liters" }
-      ],
-      "statusBreakdown": {
-        "CREATED": 5,
-        "NGO_MATCHED": 4,
-        "NGO_ACCEPTED": 3,
-        "VOLUNTEER_ASSIGNED": 2,
-        "PICKED_UP": 2,
-        "DELIVERED": 12,
-        "RECEIPT_CONFIRMED": 106,
-        "CANCELLED": 20
-      }
+    "networkOverview": {
+      "donors": 0,
+      "ngos": 0,
+      "volunteers": 0,
+      "pendingVerifications": 0
     },
-    "lastUpdated": "2026-03-01T12:00:00Z"
+    "lastUpdated": "2026-11-19T12:00:00Z"
   }
 }

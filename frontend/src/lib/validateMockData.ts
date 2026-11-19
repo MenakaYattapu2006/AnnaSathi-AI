@@ -1,12 +1,19 @@
-import usersData from '../mocks/users.json';
-import ngosData from '../mocks/ngos.json';
-import donationsData from '../mocks/donations.json';
-import volunteersData from '../mocks/volunteers.json';
-import assignmentsData from '../mocks/assignments.json';
-import notificationsData from '../mocks/notifications.json';
+import rawUsers from '../mocks/users.json';
+import rawNgos from '../mocks/ngos.json';
+import rawDonations from '../mocks/donations.json';
+import rawVolunteers from '../mocks/volunteers.json';
+import rawAssignments from '../mocks/assignments.json';
+import rawNotifications from '../mocks/notifications.json';
 import dashboardStatsData from '../mocks/dashboard-stats.json';
 
-import type { DonationStatus } from '../types';
+import type { DonationStatus, User, NGO, Donation, Volunteer, Assignment, Notification } from '../types';
+
+const usersData = rawUsers as unknown as User[];
+const ngosData = rawNgos as unknown as NGO[];
+const donationsData = rawDonations as unknown as Donation[];
+const volunteersData = rawVolunteers as unknown as Volunteer[];
+const assignmentsData = rawAssignments as unknown as Assignment[];
+const notificationsData = rawNotifications as unknown as Notification[];
 
 export interface ValidationError {
   entity: string;
@@ -150,7 +157,7 @@ export function validateMockData(): ValidationReport {
       });
     }
 
-    if (!volunteerIds.has(asgn.volunteerId)) {
+    if (asgn.volunteerId && !volunteerIds.has(asgn.volunteerId)) {
       errors.push({
         entity: 'Assignment',
         id: asgn.id,

@@ -142,13 +142,13 @@ function savePersisted<T>(key: string, data: T[]): void {
 }
 
 // Initial static datasets (read-only base, never mutated)
-const staticUsers: User[] = usersData as User[];
-const staticNgos: NGO[] = ngosData as NGO[];
-const staticDonations: Donation[] = donationsData as Donation[];
-const staticVolunteers: Volunteer[] = volunteersData as Volunteer[];
-const staticAssignments: Assignment[] = assignmentsData as Assignment[];
-const staticNotifications: Notification[] = notificationsData as Notification[];
-const staticDashboardStats: Record<UserRole, DashboardStats> = dashboardStatsData as Record<UserRole, DashboardStats>;
+const staticUsers: User[] = usersData as unknown as User[];
+const staticNgos: NGO[] = ngosData as unknown as NGO[];
+const staticDonations: Donation[] = donationsData as unknown as Donation[];
+const staticVolunteers: Volunteer[] = volunteersData as unknown as Volunteer[];
+const staticAssignments: Assignment[] = assignmentsData as unknown as Assignment[];
+const staticNotifications: Notification[] = notificationsData as unknown as Notification[];
+const staticDashboardStats = dashboardStatsData as any as Record<UserRole, DashboardStats>;
 
 export const mockDataService = {
   // ─── Users ──────────────────────────────────────────────────────────

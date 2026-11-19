@@ -93,17 +93,9 @@ export const Reports: React.FC = () => {
           if (donRes?.data?.donations) setDonations(donRes.data.donations.map(mapDonationFromDb));
           if (ngoRes?.data) setNgos(ngoRes.data.map(mapNgoFromDb));
           if (userRes?.data?.users) setUsers(userRes.data.users.map(mapUserFromDb));
-          return;
         }
-      } catch {
-        if (isProduction) return;
-      }
-
-      if (isMounted) {
-        setDonations(mockDataService.getDonations());
-        setNgos(mockDataService.getNGOs());
-        setVolunteers(mockDataService.getVolunteers());
-        setUsers(mockDataService.getUsers());
+      } catch (err) {
+        console.warn('Failed to load live reports data:', err);
       }
     }
 

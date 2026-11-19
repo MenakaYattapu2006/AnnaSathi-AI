@@ -20,13 +20,35 @@ import { Badge } from '../../components/common/Badge';
 import { Button } from '../../components/common/Button';
 import { DashboardStatCard } from '../../components/common/DashboardStatCard';
 import { apiClient } from '../../lib/apiClient';
-import { mockDataService } from '../../lib/mockDataService';
 import type { AdminDashboardStats, AdminActivityLogEntry } from '../../types';
 
 const isProduction = Boolean((import.meta as any).env?.PROD);
 
+const initialCleanStats: AdminDashboardStats = {
+  totalUsers: 1,
+  totalDonors: 0,
+  totalNGOs: 0,
+  totalVolunteers: 0,
+  pendingNGOs: 0,
+  verifiedNGOs: 0,
+  rejectedNGOs: 0,
+  totalDonations: 0,
+  availableDonations: 0,
+  acceptedDonations: 0,
+  completedDeliveries: 0,
+  activeDeliveries: 0,
+  receiptConfirmedDonations: 0,
+  cancelledDonations: 0,
+  donationStatusDistribution: [],
+  userRoleDistribution: [{ role: 'admin', count: 1 }],
+  foodCategoryDistribution: [],
+  ngoVerificationDistribution: [],
+  recentDonations: [],
+  recentUsers: [],
+};
+
 export const AdminDashboard: React.FC = () => {
-  const [stats, setStats] = useState<AdminDashboardStats | null>(null);
+  const [stats, setStats] = useState<AdminDashboardStats>(initialCleanStats);
   const [activityLogs, setActivityLogs] = useState<AdminActivityLogEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -101,17 +123,12 @@ export const AdminDashboard: React.FC = () => {
           setIsLoading(false);
           return;
         }
-      } catch {
-        if (isProduction) {
-          if (isMounted) setIsLoading(false);
-          return;
+      } catch (err) {
+        console.warn('Unable to load live admin statistics, keeping clean state:', err);
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
         }
-      }
-
-      if (isMounted) {
-        setStats(mockDataService.getAdminDashboardStats());
-        setActivityLogs(mockDataService.getAdminActivityLogs().slice(0, 5));
-        setIsLoading(false);
       }
     }
 

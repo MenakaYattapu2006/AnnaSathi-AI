@@ -55,15 +55,10 @@ export const DonationManagement: React.FC = () => {
         return;
       }
     } catch (err: any) {
-      if (isProduction) {
-        setFeedback({ type: 'error', message: err.message || 'Failed to load donations from server.' });
-        setIsLoading(false);
-        return;
-      }
+      setFeedback({ type: 'error', message: err.message || 'Failed to load donations from server.' });
+    } finally {
+      setIsLoading(false);
     }
-
-    setDonations(mockDataService.getDonations());
-    setIsLoading(false);
   };
 
   useEffect(() => {
