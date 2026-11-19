@@ -76,7 +76,10 @@ export async function authenticateSession(req, res, next) {
 /**
  * Middleware: Strictly requires an active authenticated session.
  */
-export function requireAuth(req, res, next) {
+export async function requireAuth(req, res, next) {
+  if (!req.user && req.cookies?.annasathi_session) {
+    await authenticateSession(req, res, () => {});
+  }
   if (!req.user) {
     return res.status(401).json({
       success: false,
@@ -92,7 +95,10 @@ export function requireAuth(req, res, next) {
  */
 export function requireRole(...allowedRoles) {
   const roles = allowedRoles.flat();
-  return (req, res, next) => {
+  return async (req, res, next) => {
+    if (!req.user && req.cookies?.annasathi_session) {
+      await authenticateSession(req, res, () => {});
+    }
     if (!req.user) {
       return res.status(401).json({
         success: false,
