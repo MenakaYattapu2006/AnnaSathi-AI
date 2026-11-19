@@ -1,0 +1,92 @@
+[
+  {
+    "id": "vol-001",
+    "userId": "usr-vol-301",
+    "name": "Priya Sharma",
+    "phone": "+91 98765 43212",
+    "email": "priya.s@example.com",
+    "vehicleType": "two_wheeler",
+    "serviceArea": ["Gachibowli", "Hitec City", "Madhapur", "Kondapur"],
+    "availability": "available",
+    "status": "active",
+    "currentLocation": {
+      "latitude": 17.4401,
+      "longitude": 78.3489,
+      "lastUpdated": "2026-03-01T10:30:00Z"
+    },
+    "totalDeliveriesCompleted": 42,
+    "rating": 4.9,
+    "assignedTaskIds": ["asgn-001"],
+    "createdAt": "2026-01-18T15:45:00Z"
+  },
+  {
+    "id": "vol-002",
+    "userId": "usr-vol-302",
+    "name": "Vikram Singh",
+    "phone": "+91 98765 43220",
+    "email": "vikram.singh@example.com",
+    "vehicleType": "two_wheeler",
+    "serviceArea": ["Kondapur", "Jubilee Hills", "Banjara Hills"],
+    "availability": "busy",
+    "status": "active",
+    "currentLocation": {
+      "latitude": 17.4325,
+      "longitude": 78.4071,
+      "lastUpdated": "2026-03-01T11:15:00Z"
+    },
+    "totalDeliveriesCompleted": 78,
+    "rating": 4.95,
+    "assignedTaskIds": ["asgn-002", "asgn-003"],
+    "createdAt": "2026-01-22T09:30:00Z"
+  },
+  {
+    "id": "vol-003",
+    "userId": "usr-vol-303",
+    "name": "Arun Reddy",
+    "phone": "+91 98765 43221",
+    "email": "arun.reddy@example.com",
+    "vehicleType": "van",
+    "serviceArea": ["Ameerpet", "Begumpet", "Secunderabad", "Koti"],
+    "availability": "available",
+    "status": "active",
+    "currentLocation": {
+      "latitude": 17.4375,
+      "longitude": 78.4482,
+      "lastUpdated": "2026-03-01T09:45:00Z"
+    },
+    "totalDeliveriesCompleted": 56,
+    "rating": 4.85,
+    "assignedTaskIds": ["asgn-004"],
+    "createdAt": "2026-01-25T13:20:00Z"
+  },
+  {
+    "id": "vol-004",
+    "userId": "usr-vol-304",
+    "name": "Deepa Nambiar",
+    "phone": "+91 98765 43222",
+    "email": "deepa.n@example.com",
+    "vehicleType": "four_wheeler",
+    "serviceArea": ["Begumpet", "Somajiguda", "Khairatabad"],
+    "availability": "offline",
+    "status": "active",
+    "totalDeliveriesCompleted": 23,
+    "rating": 4.8,
+    "assignedTaskIds": ["asgn-005"],
+    "createdAt": "2026-02-02T11:15:00Z"
+  },
+  {
+    "id": "vol-005",
+    "userId": "usr-vol-305",
+    "name": "Karthik Menon",
+    "phone": "+91 98765 43223",
+    "email": "karthik.m@example.com",
+    "vehicleType": "two_wheeler",
+    "serviceArea": ["Hitec City", "Kukatpally"],
+    "availability": "available",
+    "status": "inactive",
+    "totalDeliveriesCompleted": 12,
+    "rating": 4.6,
+    "assignedTaskIds": [],
+    "createdAt": "2026-01-08T10:00:00Z"
+  }
+]

@@ -1,0 +1,151 @@
+[
+  {
+    "id": "asgn-001",
+    "donationId": "don-004",
+    "volunteerId": "vol-001",
+    "ngoId": "ngo-002",
+    "status": "assigned",
+    "pickup": {
+      "address": "Sunrise Catering Kitchen, Madhapur Main Road, Hyderabad",
+      "contactPerson": "Anita Desai",
+      "contactPhone": "+91 98765 43215",
+      "estimatedPickupTime": "2026-03-01T13:00:00Z",
+      "verificationOtp": "4821"
+    },
+    "delivery": {
+      "ngoName": "Roti Bank Hyderabad",
+      "address": "Koti Community Center, Sultan Bazar, Hyderabad",
+      "contactPerson": "Rajesh Patel",
+      "contactPhone": "+91 98765 43216",
+      "estimatedDeliveryTime": "2026-03-01T14:15:00Z"
+    },
+    "assignedAt": "2026-03-01T11:20:00Z",
+    "notes": "Urgent cooked food rescue. Thermal carrier bag required."
+  },
+  {
+    "id": "asgn-002",
+    "donationId": "don-005",
+    "volunteerId": "vol-002",
+    "ngoId": "ngo-004",
+    "status": "in_transit_to_pickup",
+    "pickup": {
+      "address": "Grand Palace Banquet Hall, Road No. 12, Banjara Hills, Hyderabad",
+      "contactPerson": "Ravi Kumar",
+      "contactPhone": "+91 98765 43210",
+      "estimatedPickupTime": "2026-03-01T11:45:00Z",
+      "verificationOtp": "7734"
+    },
+    "delivery": {
+      "ngoName": "Hope Shelter Trust",
+      "address": "14-2-88, Charminar West, Old City, Hyderabad",
+      "contactPerson": "Father Joseph Thomas",
+      "contactPhone": "+91 98765 43218",
+      "estimatedDeliveryTime": "2026-03-01T12:30:00Z"
+    },
+    "assignedAt": "2026-03-01T10:30:00Z",
+    "notes": "Volunteer on two-wheeler en route to Banjara Hills."
+  },
+  {
+    "id": "asgn-003",
+    "donationId": "don-003",
+    "volunteerId": "vol-002",
+    "ngoId": "ngo-001",
+    "status": "picked_up",
+    "pickup": {
+      "address": "Grand Palace Banquet Hall, Road No. 12, Banjara Hills, Hyderabad",
+      "contactPerson": "Ravi Kumar",
+      "contactPhone": "+91 98765 43210",
+      "estimatedPickupTime": "2026-03-01T10:00:00Z",
+      "actualPickupTime": "2026-03-01T10:05:00Z",
+      "verificationOtp": "3912"
+    },
+    "delivery": {
+      "ngoName": "AnnaDaan Foundation",
+      "address": "Plot 45, Jubilee Enclave, Road No. 36, Hyderabad",
+      "contactPerson": "Meera Iyer",
+      "contactPhone": "+91 98765 43211",
+      "estimatedDeliveryTime": "2026-03-01T10:45:00Z"
+    },
+    "assignedAt": "2026-03-01T09:35:00Z",
+    "pickedUpAt": "2026-03-01T10:05:00Z",
+    "notes": "Bakery packages verified and loaded into carrier."
+  },
+  {
+    "id": "asgn-004",
+    "donationId": "don-006",
+    "volunteerId": "vol-003",
+    "ngoId": "ngo-001",
+    "status": "delivered",
+    "pickup": {
+      "address": "Sunrise Catering Kitchen, Madhapur Main Road, Hyderabad",
+      "contactPerson": "Anita Desai",
+      "contactPhone": "+91 98765 43215",
+      "estimatedPickupTime": "2026-02-28T11:00:00Z",
+      "actualPickupTime": "2026-02-28T11:15:00Z",
+      "verificationOtp": "9102"
+    },
+    "delivery": {
+      "ngoName": "AnnaDaan Foundation",
+      "address": "Plot 45, Jubilee Enclave, Road No. 36, Hyderabad",
+      "contactPerson": "Meera Iyer",
+      "contactPhone": "+91 98765 43211",
+      "estimatedDeliveryTime": "2026-02-28T12:00:00Z",
+      "actualDeliveryTime": "2026-02-28T11:55:00Z",
+      "recipientSignatureName": "Meera Iyer"
+    },
+    "assignedAt": "2026-02-28T10:15:00Z",
+    "pickedUpAt": "2026-02-28T11:15:00Z",
+    "deliveredAt": "2026-02-28T11:55:00Z",
+    "notes": "Packaged milk cartons delivered in perfect condition."
+  },
+  {
+    "id": "asgn-005",
+    "donationId": "don-007",
+    "volunteerId": "vol-004",
+    "ngoId": "ngo-002",
+    "status": "delivered",
+    "pickup": {
+      "address": "Grand Palace Banquet Hall, Road No. 12, Banjara Hills, Hyderabad",
+      "contactPerson": "Ravi Kumar",
+      "contactPhone": "+91 98765 43210",
+      "estimatedPickupTime": "2026-02-25T14:00:00Z",
+      "actualPickupTime": "2026-02-25T14:10:00Z",
+      "verificationOtp": "1198"
+    },
+    "delivery": {
+      "ngoName": "Roti Bank Hyderabad",
+      "address": "Koti Community Center, Sultan Bazar, Hyderabad",
+      "contactPerson": "Rajesh Patel",
+      "contactPhone": "+91 98765 43216",
+      "estimatedDeliveryTime": "2026-02-25T15:30:00Z",
+      "actualDeliveryTime": "2026-02-25T15:20:00Z",
+      "recipientSignatureName": "Rajesh Patel"
+    },
+    "assignedAt": "2026-02-25T12:30:00Z",
+    "pickedUpAt": "2026-02-25T14:10:00Z",
+    "deliveredAt": "2026-02-25T15:20:00Z",
+    "notes": "Bulk grain delivery completed by van."
+  },
+  {
+    "id": "asgn-006",
+    "donationId": "don-008",
+    "volunteerId": "vol-003",
+    "ngoId": "ngo-001",
+    "status": "cancelled",
+    "pickup": {
+      "address": "Sunrise Catering Kitchen, Madhapur Main Road, Hyderabad",
+      "contactPerson": "Anita Desai",
+      "contactPhone": "+91 98765 43215",
+      "estimatedPickupTime": "2026-02-27T15:00:00Z"
+    },
+    "delivery": {
+      "ngoName": "AnnaDaan Foundation",
+      "address": "Plot 45, Jubilee Enclave, Road No. 36, Hyderabad",
+      "contactPerson": "Meera Iyer",
+      "contactPhone": "+91 98765 43211",
+      "estimatedDeliveryTime": "2026-02-27T16:00:00Z"
+    },
+    "assignedAt": "2026-02-27T14:40:00Z",
+    "notes": "Cancelled due to donor report of food spoilage."
+  }
+]

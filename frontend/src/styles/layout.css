@@ -1,0 +1,44 @@
+/* src/styles/layout.css */
+@layer components {
+  /* Page container – max width with responsive padding */
+  .page-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Simple responsive grid helpers */
+  .grid-base {
+    @apply grid gap-4;
+  }
+  .grid-2 {
+    @apply grid-base grid-cols-1 md:grid-cols-2;
+  }
+  .grid-3 {
+    @apply grid-base grid-cols-1 md:grid-cols-3;
+  }
+  .grid-4 {
+    @apply grid-base grid-cols-1 md:grid-cols-2 lg:grid-cols-4;
+  }
+
+  /* Header layout */
+  .site-header {
+    @apply bg-primary text-surface flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8 shadow-md;
+  }
+
+  /* Sidebar layout – collapsible on mobile */
+  .sidebar {
+    @apply bg-surface border-r border-border w-64 hidden md:block overflow-y-auto;
+  }
+  .sidebar-open {
+    @apply block md:hidden fixed inset-0 bg-black bg-opacity-50 z-40;
+  }
+
+  /* Main content area */
+  .main-content {
+    @apply flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto bg-background min-h-screen;
+  }
+
+  /* Footer */
+  .site-footer {
+    @apply bg-surface text-secondary-text py-4 text-center border-t border-border;
+  }
+}

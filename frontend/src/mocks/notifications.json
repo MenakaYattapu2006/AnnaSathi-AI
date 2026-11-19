@@ -1,0 +1,86 @@
+[
+  {
+    "id": "notif-001",
+    "recipientId": "usr-donor-101",
+    "title": "Donation Claimed by AnnaDaan",
+    "message": "Your donation 'Fresh Multigrain Breads' (don-003) has been accepted by AnnaDaan Foundation.",
+    "type": "donation_accepted",
+    "status": "unread",
+    "relatedEntityId": "don-003",
+    "createdAt": "2026-03-01T09:30:00Z"
+  },
+  {
+    "id": "notif-002",
+    "recipientId": "usr-donor-102",
+    "title": "Volunteer Dispatched",
+    "message": "Volunteer Priya Sharma is assigned for pickup of 'Paneer Butter Masala' (don-004).",
+    "type": "assignment_new",
+    "status": "read",
+    "relatedEntityId": "don-004",
+    "createdAt": "2026-03-01T11:20:00Z",
+    "readAt": "2026-03-01T11:25:00Z"
+  },
+  {
+    "id": "notif-003",
+    "recipientId": "usr-ngo-201",
+    "title": "Urgent Food Match Found",
+    "message": "Surplus cooked meals (120 servings) matched near your service area in Madhapur.",
+    "type": "donation_alert",
+    "status": "unread",
+    "relatedEntityId": "don-002",
+    "createdAt": "2026-03-01T12:00:00Z"
+  },
+  {
+    "id": "notif-004",
+    "recipientId": "usr-ngo-202",
+    "title": "Delivery Receipt Confirmed",
+    "message": "Receipt confirmed for 100 kg Bulk Sona Masoori Rice & Toor Dal (don-007).",
+    "type": "delivery_completed",
+    "status": "read",
+    "relatedEntityId": "don-007",
+    "createdAt": "2026-02-26T12:05:00Z",
+    "readAt": "2026-02-26T14:00:00Z"
+  },
+  {
+    "id": "notif-005",
+    "recipientId": "usr-vol-301",
+    "title": "New Food Rescue Task Available",
+    "message": "You have been assigned to rescue 80 meals from Sunrise Catering Kitchen, Madhapur.",
+    "type": "assignment_new",
+    "status": "unread",
+    "relatedEntityId": "asgn-001",
+    "createdAt": "2026-03-01T11:20:00Z"
+  },
+  {
+    "id": "notif-006",
+    "recipientId": "usr-vol-302",
+    "title": "Pickup Verification Successful",
+    "message": "Pickup confirmed for 100 meals from Grand Palace Banquet Hall (asgn-003).",
+    "type": "pickup_completed",
+    "status": "read",
+    "relatedEntityId": "asgn-003",
+    "createdAt": "2026-03-01T10:06:00Z",
+    "readAt": "2026-03-01T10:07:00Z"
+  },
+  {
+    "id": "notif-007",
+    "recipientId": "usr-admin-401",
+    "title": "New NGO Verification Request",
+    "message": "Karuna Community Kitchen has submitted 80G documents for verification review.",
+    "type": "verification_status",
+    "status": "unread",
+    "relatedEntityId": "ngo-003",
+    "createdAt": "2026-02-01T14:35:00Z"
+  },
+  {
+    "id": "notif-008",
+    "recipientId": "usr-admin-401",
+    "title": "Spoilage Cancellation Alert",
+    "message": "Donation 'Cut Fruit Platters' (don-008) was cancelled due to reported spoilage.",
+    "type": "system_alert",
+    "status": "read",
+    "relatedEntityId": "don-008",
+    "createdAt": "2026-02-27T16:05:00Z",
+    "readAt": "2026-02-27T16:30:00Z"
+  }
+]

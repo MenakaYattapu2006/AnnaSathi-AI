@@ -1,0 +1,11 @@
+/* src/styles/index.css */
+@import './reset.css';
+@import './variables.css';
+@import './typography.css';
+@import './layout.css';
+@import './components.css';
+@import './utilities.css';
+
+/* Tailwind utilities are emitted by the compiler */
+@tailwind components;
+@tailwind utilities;

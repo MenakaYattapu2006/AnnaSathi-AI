@@ -1,0 +1,28 @@
+/* src/styles/variables.css */
+:root {
+  /* Colors */
+  --color-primary: #174D35;
+  --color-secondary: #26734D;
+  --color-accent: #E98A35;
+  --color-background: #F4F7F4;
+  --color-surface: #FFFFFF;
+  --color-primary-text: #202B24;
+  --color-secondary-text: #68756C;
+  --color-border: #E2E8E3;
+
+  /* Spacing */
+  --space-0: 0;
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+
+  /* Border radius */
+  --radius-sm: 0.125rem; /* 2px */
+  --radius-md: 0.25rem;  /* 4px */
+  --radius-lg: 0.5rem;   /* 8px */
+}

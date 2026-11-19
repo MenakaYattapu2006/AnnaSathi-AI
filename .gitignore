@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Environment Variables & Secrets
+.env
+.env.local
+.env.*.local
+*.env
+backend/.env
+ai-service/.env
+frontend/.env
+!*.env.example
+
+# Production Builds
+dist/
+*/dist/
+build/
+*/build/
+
+# Python Cache & Artifacts
+__pycache__/
+*/__pycache__/
+*/**/__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+.pytest_cache/
+.coverage
+htmlcov/
+.env/
+venv/
+env/
+ENV/
+
+# Local Storage & Uploads
+uploads/
+backend/uploads/
+*.log
+
+# OS & IDE Metadata
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo

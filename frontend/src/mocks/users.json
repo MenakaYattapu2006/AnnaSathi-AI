@@ -1,0 +1,230 @@
+[
+  {
+    "id": "usr-donor-101",
+    "name": "Ravi Kumar",
+    "email": "ravi@example.com",
+    "phone": "+91 98765 43210",
+    "role": "donor",
+    "status": "active",
+    "profileImage": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80",
+    "profile": {
+      "bio": "Executive Chef at Grand Palace Banquet Hall",
+      "organizationName": "Grand Palace Banquet Hall",
+      "address": "Road No. 12, Banjara Hills",
+      "city": "Hyderabad",
+      "state": "Telangana",
+      "pincode": "500034"
+    },
+    "createdAt": "2026-01-10T08:30:00Z"
+  },
+  {
+    "id": "usr-donor-102",
+    "name": "Anita Desai",
+    "email": "anita.desai@example.com",
+    "phone": "+91 98765 43215",
+    "role": "donor",
+    "status": "active",
+    "profileImage": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80",
+    "profile": {
+      "bio": "Operations Manager at Sunrise Catering Services",
+      "organizationName": "Sunrise Caterers",
+      "address": "Madhapur Main Road",
+      "city": "Hyderabad",
+      "state": "Telangana",
+      "pincode": "500081"
+    },
+    "createdAt": "2026-01-15T11:00:00Z"
+  },
+  {
+    "id": "usr-ngo-201",
+    "name": "Meera Iyer",
+    "email": "contact@annadaan.org",
+    "phone": "+91 98765 43211",
+    "role": "ngo",
+    "status": "active",
+    "profileImage": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80",
+    "profile": {
+      "bio": "Director of Field Operations, AnnaDaan Foundation",
+      "organizationName": "AnnaDaan Foundation",
+      "address": "Plot 45, Jubilee Enclave",
+      "city": "Hyderabad",
+      "state": "Telangana",
+      "pincode": "500081"
+    },
+    "createdAt": "2026-01-05T09:15:00Z"
+  },
+  {
+    "id": "usr-ngo-202",
+    "name": "Rajesh Patel",
+    "email": "info@rotibankhyd.org",
+    "phone": "+91 98765 43216",
+    "role": "ngo",
+    "status": "active",
+    "profileImage": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
+    "profile": {
+      "bio": "General Secretary, Roti Bank Community Kitchen",
+      "organizationName": "Roti Bank Hyderabad",
+      "address": "Koti Community Center",
+      "city": "Hyderabad",
+      "state": "Telangana",
+      "pincode": "500095"
+    },
+    "createdAt": "2026-01-12T10:00:00Z"
+  },
+  {
+    "id": "usr-ngo-203",
+    "name": "Kavita Rao",
+    "email": "contact@karunakitchen.org",
+    "phone": "+91 98765 43217",
+    "role": "ngo",
+    "status": "active",
+    "profileImage": "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=150&q=80",
+    "profile": {
+      "bio": "Founder, Karuna Community Kitchen",
+      "organizationName": "Karuna Community Kitchen",
+      "address": "Near Secunderabad Station",
+      "city": "Hyderabad",
+      "state": "Telangana",
+      "pincode": "500003"
+    },
+    "createdAt": "2026-02-01T14:30:00Z"
+  },
+  {
+    "id": "usr-ngo-204",
+    "name": "Father Joseph Thomas",
+    "email": "help@hopeshelter.org",
+    "phone": "+91 98765 43218",
+    "role": "ngo",
+    "status": "active",
+    "profileImage": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80",
+    "profile": {
+      "bio": "Trustee, Hope Shelter Trust",
+      "organizationName": "Hope Shelter Trust",
+      "address": "Old City Shelter Home",
+      "city": "Hyderabad",
+      "state": "Telangana",
+      "pincode": "500002"
+    },
+    "createdAt": "2026-01-20T12:00:00Z"
+  },
+  {
+    "id": "usr-ngo-205",
+    "name": "Suresh Varma",
+    "email": "director@citymealsalliance.org",
+    "phone": "+91 98765 43219",
+    "role": "ngo",
+    "status": "suspended",
+    "profileImage": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80",
+    "profile": {
+      "bio": "City Meals Alliance representative",
+      "organizationName": "City Meals Alliance",
+      "address": "Dilsukhnagar Ring Road",
+      "city": "Hyderabad",
+      "state": "Telangana",
+      "pincode": "500060"
+    },
+    "createdAt": "2026-02-10T16:00:00Z"
+  },
+  {
+    "id": "usr-vol-301",
+    "name": "Priya Sharma",
+    "email": "priya.s@example.com",
+    "phone": "+91 98765 43212",
+    "role": "volunteer",
+    "status": "active",
+    "profileImage": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
+    "profile": {
+      "bio": "Engineering Student & Weekend Food Rescue Volunteer",
+      "address": "Gachibowli",
+      "city": "Hyderabad",
+      "state": "Telangana",
+      "pincode": "500032"
+    },
+    "createdAt": "2026-01-18T15:45:00Z"
+  },
+  {
+    "id": "usr-vol-302",
+    "name": "Vikram Singh",
+    "email": "vikram.singh@example.com",
+    "phone": "+91 98765 43220",
+    "role": "volunteer",
+    "status": "active",
+    "profileImage": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=150&q=80",
+    "profile": {
+      "bio": "Delivery Rider & Rapid Food Rescue Specialist",
+      "address": "Kondapur",
+      "city": "Hyderabad",
+      "state": "Telangana",
+      "pincode": "500084"
+    },
+    "createdAt": "2026-01-22T09:30:00Z"
+  },
+  {
+    "id": "usr-vol-303",
+    "name": "Arun Reddy",
+    "email": "arun.reddy@example.com",
+    "phone": "+91 98765 43221",
+    "role": "volunteer",
+    "status": "active",
+    "profileImage": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&q=80",
+    "profile": {
+      "bio": "Community Service Volunteer with Four Wheeler van",
+      "address": "Ameerpet",
+      "city": "Hyderabad",
+      "state": "Telangana",
+      "pincode": "500016"
+    },
+    "createdAt": "2026-01-25T13:20:00Z"
+  },
+  {
+    "id": "usr-vol-304",
+    "name": "Deepa Nambiar",
+    "email": "deepa.n@example.com",
+    "phone": "+91 98765 43222",
+    "role": "volunteer",
+    "status": "active",
+    "profileImage": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80",
+    "profile": {
+      "bio": "Social Worker & Evening food distribution volunteer",
+      "address": "Begumpet",
+      "city": "Hyderabad",
+      "state": "Telangana",
+      "pincode": "500016"
+    },
+    "createdAt": "2026-02-02T11:15:00Z"
+  },
+  {
+    "id": "usr-vol-305",
+    "name": "Karthik Menon",
+    "email": "karthik.m@example.com",
+    "phone": "+91 98765 43223",
+    "role": "volunteer",
+    "status": "inactive",
+    "profileImage": "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=150&q=80",
+    "profile": {
+      "bio": "On sabbatical from volunteering",
+      "address": "Hitec City",
+      "city": "Hyderabad",
+      "state": "Telangana",
+      "pincode": "500081"
+    },
+    "createdAt": "2026-01-08T10:00:00Z"
+  },
+  {
+    "id": "usr-admin-401",
+    "name": "System Admin",
+    "email": "admin@annasathi.org",
+    "phone": "+91 98765 43213",
+    "role": "admin",
+    "status": "active",
+    "profileImage": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80",
+    "profile": {
+      "bio": "Chief Platform Administrator, AnnaSathi AI Network",
+      "address": "Cyber Towers, Hitec City",
+      "city": "Hyderabad",
+      "state": "Telangana",
+      "pincode": "500081"
+    },
+    "createdAt": "2026-01-01T00:00:00Z"
+  }
+]

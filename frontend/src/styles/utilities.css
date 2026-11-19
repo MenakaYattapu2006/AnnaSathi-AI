@@ -1,0 +1,19 @@
+/* src/styles/utilities.css */
+@layer utilities {
+  /* Hide native scrollbars while keeping scrollability */
+  .scrollbar-hide {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none;    /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;           /* Chrome, Safari, Opera */
+  }
+
+  /* Multi‑line truncation helper (2 lines) */
+  .truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
