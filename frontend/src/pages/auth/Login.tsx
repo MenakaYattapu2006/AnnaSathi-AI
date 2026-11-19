@@ -61,18 +61,24 @@ const Login: React.FC = () => {
       {/* Global Header Bar */}
       <header className="w-full border-b border-slate-200/80 bg-white/70 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3 no-underline">
-            <div className="w-9 h-9 rounded-lg bg-brand-900 flex items-center justify-center text-white font-bold tracking-wider shadow-sm">
-              AS
+          <Link to="/" className="flex items-center gap-2.5 no-underline group">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-900 via-emerald-800 to-teal-700 flex items-center justify-center text-white shadow-sm ring-1 ring-emerald-900/10 transition-transform group-hover:scale-105">
+              <svg
+                className="w-5 h-5 text-emerald-300"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" fill="currentColor" fillOpacity="0.25" />
+                <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+              </svg>
             </div>
-            <div className="flex flex-col">
-              <span className="text-base font-bold tracking-tight text-slate-900 leading-none">
-                AnnaSathi AI
-              </span>
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700/80 mt-0.5">
-                Enterprise Logistics Portal
-              </span>
-            </div>
+            <span className="text-lg font-bold tracking-tight text-slate-900">
+              AnnaSathi AI
+            </span>
           </Link>
 
           <div className="flex items-center gap-4 text-xs font-medium text-slate-600">
