@@ -9,8 +9,6 @@ import {
   Mail,
   ArrowRight,
   ShieldCheck,
-  Radio,
-  Sparkles,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -50,12 +48,6 @@ const Login: React.FC = () => {
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleFillAdmin = () => {
-    setEmail('admin@annasathi.org');
-    setPassword('Admin@123456');
-    setError(null);
   };
 
   return (
@@ -100,21 +92,6 @@ const Login: React.FC = () => {
       {/* Main Content Layout */}
       <main className="flex-grow flex items-center justify-center px-4 sm:px-6 py-12 relative z-10">
         <div className="w-full max-w-md">
-          {/* Quick Admin Helper Pill */}
-          <div className="mb-4 flex items-center justify-between px-3.5 py-2 rounded-xl bg-white/80 border border-slate-200/80 shadow-xs backdrop-blur-xs text-xs text-slate-600">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-emerald-700" />
-              <span className="font-medium text-slate-700">Database Ready</span>
-            </div>
-            <button
-              type="button"
-              onClick={handleFillAdmin}
-              className="px-2.5 py-1 rounded-md bg-brand-900 text-white font-semibold text-[11px] hover:bg-emerald-800 transition-colors shadow-xs"
-            >
-              Fill Admin
-            </button>
-          </div>
-
           {/* Premium Auth Card */}
           <div className="bg-white rounded-2xl border border-slate-200/90 shadow-premium p-8 sm:p-10 relative overflow-hidden">
             {/* Accent Top Bar */}
@@ -172,7 +149,7 @@ const Login: React.FC = () => {
                       setEmail(e.target.value);
                       setError(null);
                     }}
-                    placeholder="admin@annasathi.org"
+                    placeholder="name@example.com"
                     className="block w-full pl-10 pr-3.5 py-2.5 text-sm text-slate-900 border border-slate-300 rounded-lg focus:border-brand-900 focus:ring-2 focus:ring-brand-900/20 bg-slate-50/40 hover:bg-white transition-all placeholder:text-slate-400 outline-none"
                   />
                 </div>
@@ -238,22 +215,6 @@ const Login: React.FC = () => {
                   Register as a Partner
                 </Link>
               </p>
-            </div>
-          </div>
-
-          {/* Trust Badges Under Card */}
-          <div className="mt-8 grid grid-cols-3 gap-2 text-center text-[11px] text-slate-500">
-            <div className="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-md bg-white/70 border border-slate-200/60 shadow-xs">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
-              <span>ISO 27001</span>
-            </div>
-            <div className="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-md bg-white/70 border border-slate-200/60 shadow-xs">
-              <Radio className="w-3.5 h-3.5 text-emerald-700" />
-              <span>Live Telemetry</span>
-            </div>
-            <div className="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-md bg-white/70 border border-slate-200/60 shadow-xs">
-              <Lock className="w-3.5 h-3.5 text-emerald-700" />
-              <span>TLS 256-Bit</span>
             </div>
           </div>
         </div>

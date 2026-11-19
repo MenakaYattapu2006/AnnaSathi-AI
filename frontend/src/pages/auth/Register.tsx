@@ -11,7 +11,6 @@ import {
   User,
   Building2,
   ShieldCheck,
-  Radio,
   ArrowRight,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -336,22 +335,6 @@ const Register: React.FC = () => {
                   Sign in with existing credentials
                 </Link>
               </p>
-            </div>
-          </div>
-
-          {/* Trust Badges Under Card */}
-          <div className="mt-8 grid grid-cols-3 gap-2 text-center text-[11px] text-slate-500">
-            <div className="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-md bg-white/70 border border-slate-200/60 shadow-xs">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
-              <span>ISO 27001</span>
-            </div>
-            <div className="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-md bg-white/70 border border-slate-200/60 shadow-xs">
-              <Radio className="w-3.5 h-3.5 text-emerald-700" />
-              <span>Live Telemetry</span>
-            </div>
-            <div className="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-md bg-white/70 border border-slate-200/60 shadow-xs">
-              <Lock className="w-3.5 h-3.5 text-emerald-700" />
-              <span>TLS 256-Bit</span>
             </div>
           </div>
         </div>
