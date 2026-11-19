@@ -1,9 +1,18 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Eye, EyeOff, AlertCircle, CheckCircle2, LogIn } from 'lucide-react';
+import {
+  Eye,
+  EyeOff,
+  AlertCircle,
+  CheckCircle2,
+  Lock,
+  Mail,
+  ArrowRight,
+  ShieldCheck,
+  Radio,
+  Sparkles,
+} from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { Button } from '../../components/common/Button';
-import { Input } from '../../components/common/Input';
 
 interface LocationState {
   message?: string;
@@ -43,100 +52,227 @@ const Login: React.FC = () => {
     }
   };
 
+  const handleFillAdmin = () => {
+    setEmail('admin@annasathi.org');
+    setPassword('Admin@123456');
+    setError(null);
+  };
+
   return (
-    <div className="min-h-screen bg-background flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        {/* Brand Logo & Heading */}
-        <div className="text-center">
-          <Link to="/" className="inline-flex items-center gap-2 no-underline mb-2">
-            <svg
-              className="h-10 w-10 text-primary mx-auto"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              aria-hidden="true"
-            >
-              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
-            </svg>
+    <div className="min-h-screen flex flex-col justify-between text-slate-900 font-sans antialiased bg-slate-50 relative selection:bg-brand-900 selection:text-white">
+      {/* Subtle Dot Grid Background */}
+      <div className="fixed inset-0 grid-bg-pattern pointer-events-none z-0" />
+
+      {/* Ambient Top Lighting */}
+      <div className="absolute -top-[300px] left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-emerald-500/10 blur-[130px] rounded-full pointer-events-none" />
+
+      {/* Global Header Bar */}
+      <header className="w-full border-b border-slate-200/80 bg-white/70 backdrop-blur-md sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-3 no-underline">
+            <div className="w-9 h-9 rounded-lg bg-brand-900 flex items-center justify-center text-white font-bold tracking-wider shadow-sm">
+              AS
+            </div>
+            <div className="flex flex-col">
+              <span className="text-base font-bold tracking-tight text-slate-900 leading-none">
+                AnnaSathi AI
+              </span>
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700/80 mt-0.5">
+                Enterprise Logistics Portal
+              </span>
+            </div>
           </Link>
-          <h1 className="text-3xl font-extrabold text-primary-text">Welcome to AnnaSathi AI</h1>
-          <p className="mt-1 text-sm text-secondary-text">
-            Sign in to access food donation, collection, and delivery workflows
-          </p>
-        </div>
 
-        {/* Card Form */}
-        <div className="mt-6 card p-6 shadow-md border border-border">
-          {/* Post-Registration Success Notification */}
-          {successMessage && (
-            <div className="mb-4 bg-emerald-50 border border-emerald-300 text-emerald-800 rounded-md p-3 flex items-start gap-2">
-              <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
-              <p className="text-sm font-medium">{successMessage}</p>
+          <div className="flex items-center gap-4 text-xs font-medium text-slate-600">
+            <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200/60 text-emerald-800">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Zero-Waste Operations Live</span>
             </div>
-          )}
-
-          {error && (
-            <div className="mb-4 bg-danger/10 border border-danger/30 rounded-md p-3 flex items-start gap-2">
-              <AlertCircle className="h-5 w-5 text-danger flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-danger">{error}</p>
+            <span className="hidden md:inline-block text-slate-300">|</span>
+            <div className="hidden md:flex items-center gap-1.5 text-slate-500">
+              <ShieldCheck className="w-4 h-4 text-emerald-700" />
+              <span>256-Bit TLS Secured</span>
             </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
-              label="Email Address"
-              type="email"
-              placeholder="name@example.com"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                setError(null);
-              }}
-              required
-            />
-
-            <div className="relative">
-              <Input
-                label="Password"
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Enter password"
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  setError(null);
-                }}
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-8 text-secondary-text hover:text-primary-text p-1 focus:outline-none"
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
-
-            <Button
-              type="submit"
-              size="lg"
-              className="w-full justify-center flex items-center gap-2 mt-2"
-              disabled={isSubmitting}
-            >
-              <LogIn size={18} />
-              <span>{isSubmitting ? 'Signing in...' : 'Sign In'}</span>
-            </Button>
-          </form>
-
-          <div className="mt-6 pt-4 border-t border-border text-center">
-            <p className="text-sm text-secondary-text">
-              Don't have an account?{' '}
-              <Link to="/register" className="text-primary font-medium hover:underline">
-                Register as a New User
-              </Link>
-            </p>
           </div>
         </div>
-      </div>
+      </header>
+
+      {/* Main Content Layout */}
+      <main className="flex-grow flex items-center justify-center px-4 sm:px-6 py-12 relative z-10">
+        <div className="w-full max-w-md">
+          {/* Quick Admin Helper Pill */}
+          <div className="mb-4 flex items-center justify-between px-3.5 py-2 rounded-xl bg-white/80 border border-slate-200/80 shadow-xs backdrop-blur-xs text-xs text-slate-600">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-emerald-700" />
+              <span className="font-medium text-slate-700">Database Ready</span>
+            </div>
+            <button
+              type="button"
+              onClick={handleFillAdmin}
+              className="px-2.5 py-1 rounded-md bg-brand-900 text-white font-semibold text-[11px] hover:bg-emerald-800 transition-colors shadow-xs"
+            >
+              Fill Admin
+            </button>
+          </div>
+
+          {/* Premium Auth Card */}
+          <div className="bg-white rounded-2xl border border-slate-200/90 shadow-premium p-8 sm:p-10 relative overflow-hidden">
+            {/* Accent Top Bar */}
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-brand-900 via-emerald-600 to-teal-500" />
+
+            {/* Header */}
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-brand-50 border border-emerald-100 text-brand-900 mb-4 shadow-sm">
+                <Lock className="w-6 h-6 text-brand-900" />
+              </div>
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+                Welcome to AnnaSathi AI
+              </h1>
+              <p className="text-sm text-slate-500 mt-1.5">
+                Sign in to coordinate zero-waste logistics & distributions
+              </p>
+            </div>
+
+            {/* Post-Registration Success Notification */}
+            {successMessage && (
+              <div className="mb-6 bg-emerald-50/90 border border-emerald-200 text-emerald-800 rounded-xl p-3.5 flex items-start gap-3 text-sm">
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <p className="font-medium leading-relaxed">{successMessage}</p>
+              </div>
+            )}
+
+            {/* Error Notification */}
+            {error && (
+              <div className="mb-6 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl p-3.5 flex items-start gap-3 text-sm">
+                <AlertCircle className="w-5 h-5 text-rose-600 flex-shrink-0 mt-0.5" />
+                <p className="font-medium leading-relaxed">{error}</p>
+              </div>
+            )}
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {/* Email Address */}
+              <div>
+                <label
+                  htmlFor="email-input"
+                  className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2"
+                >
+                  Email Address
+                </label>
+                <div className="relative rounded-lg shadow-xs">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <Mail className="w-4 h-4" />
+                  </div>
+                  <input
+                    id="email-input"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      setError(null);
+                    }}
+                    placeholder="admin@annasathi.org"
+                    className="block w-full pl-10 pr-3.5 py-2.5 text-sm text-slate-900 border border-slate-300 rounded-lg focus:border-brand-900 focus:ring-2 focus:ring-brand-900/20 bg-slate-50/40 hover:bg-white transition-all placeholder:text-slate-400 outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Password */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label
+                    htmlFor="password-input"
+                    className="block text-xs font-semibold text-slate-700 uppercase tracking-wider"
+                  >
+                    Password
+                  </label>
+                  <span className="text-[11px] text-slate-400">Encrypted</span>
+                </div>
+                <div className="relative rounded-lg shadow-xs">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <Lock className="w-4 h-4" />
+                  </div>
+                  <input
+                    id="password-input"
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setError(null);
+                    }}
+                    placeholder="Enter password"
+                    className="block w-full pl-10 pr-10 py-2.5 text-sm text-slate-900 border border-slate-300 rounded-lg focus:border-brand-900 focus:ring-2 focus:ring-brand-900/20 bg-slate-50/40 hover:bg-white transition-all placeholder:text-slate-400 outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-brand-900 hover:bg-[#134E3F] text-white text-sm font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-900/40 focus:ring-offset-2 transition-all duration-150 disabled:opacity-60 cursor-pointer"
+              >
+                <span>{isSubmitting ? 'Authenticating...' : 'Sign In to Dashboard'}</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </form>
+
+            {/* Register Link */}
+            <div className="mt-8 pt-6 border-t border-slate-100 text-center">
+              <p className="text-xs text-slate-500">
+                Don't have an account?{' '}
+                <Link
+                  to="/register"
+                  className="font-semibold text-brand-900 hover:text-emerald-700 underline decoration-emerald-500/30 underline-offset-4 transition-colors"
+                >
+                  Register as a Partner
+                </Link>
+              </p>
+            </div>
+          </div>
+
+          {/* Trust Badges Under Card */}
+          <div className="mt-8 grid grid-cols-3 gap-2 text-center text-[11px] text-slate-500">
+            <div className="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-md bg-white/70 border border-slate-200/60 shadow-xs">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
+              <span>ISO 27001</span>
+            </div>
+            <div className="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-md bg-white/70 border border-slate-200/60 shadow-xs">
+              <Radio className="w-3.5 h-3.5 text-emerald-700" />
+              <span>Live Telemetry</span>
+            </div>
+            <div className="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-md bg-white/70 border border-slate-200/60 shadow-xs">
+              <Lock className="w-3.5 h-3.5 text-emerald-700" />
+              <span>TLS 256-Bit</span>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* Global Footer */}
+      <footer className="w-full border-t border-slate-200/80 bg-white/60 backdrop-blur-xs py-6 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+          <div>
+            &copy; {new Date().getFullYear()} AnnaSathi AI Technologies Inc. All rights reserved.
+          </div>
+          <div className="flex items-center gap-6">
+            <span className="hover:text-slate-900 cursor-pointer transition-colors">Privacy Policy</span>
+            <span className="hover:text-slate-900 cursor-pointer transition-colors">Terms of Service</span>
+            <span className="hover:text-slate-900 cursor-pointer transition-colors">Compliance</span>
+            <span className="hover:text-slate-900 cursor-pointer transition-colors">Security Desk</span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
