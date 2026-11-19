@@ -3,9 +3,16 @@
  * Connects frontend to the Node.js/Express REST backend with session cookies and graceful fallbacks.
  */
 
+import type { Donation } from '../types/donation';
+import type { NGO } from '../types/ngo';
+import type { Volunteer } from '../types/volunteer';
+import type { Assignment } from '../types/assignment';
+import type { Notification } from '../types/notification';
+import type { User } from '../types/user';
+
 const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:5000/api/v1';
 
-class ApiClientError extends Error {
+export class ApiClientError extends Error {
   status: number;
   details?: any;
 
@@ -17,12 +24,181 @@ class ApiClientError extends Error {
   }
 }
 
+function getCsrfToken(): string | null {
+  if (typeof document === 'undefined') return null;
+  const match = document.cookie.match(/(?:^|;\s*)annasathi_csrf=([^;]+)/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Normalization Mappers: Bridge Supabase Schema to Frontend Types
+// ─────────────────────────────────────────────────────────────
+
+export function mapDonationFromDb(row: any): Donation {
+  if (!row) return row;
+  return {
+    id: row.id,
+    donorId: row.donor_id || row.donorId,
+    foodName: row.food_name || row.foodName || '',
+    category: row.category,
+    quantity: Number(row.quantity),
+    unit: row.unit,
+    numberOfServings: row.number_of_servings != null ? Number(row.number_of_servings) : row.numberOfServings,
+    dietaryType: row.dietary_type || row.dietaryType || 'veg',
+    preparationTime: row.preparation_time || row.preparationTime || '',
+    expiryTime: row.expiry_time || row.expiryTime || '',
+    pickupAddress: row.pickupAddress || {
+      street: row.street || row.pickup_address || '',
+      city: row.city || '',
+      state: row.state || 'Telangana',
+      pincode: row.pincode || '',
+      latitude: Number(row.latitude) || 17.385,
+      longitude: Number(row.longitude) || 78.4867,
+      landmark: row.landmark || '',
+    },
+    matchedNgoId: row.matched_ngo_id || row.matchedNgoId,
+    urgencyScore: Number(row.urgency_score ?? row.urgencyScore ?? 50),
+    urgencyLevel: row.urgency_level || row.urgencyLevel || 'medium',
+    status: row.status,
+    specialInstructions: row.special_instructions || row.specialInstructions,
+    imageUrl: row.image_url || row.imageUrl,
+    createdAt: row.created_at || row.createdAt || new Date().toISOString(),
+    updatedAt: row.updated_at || row.updatedAt || new Date().toISOString(),
+  };
+}
+
+export function mapNgoFromDb(row: any): NGO {
+  if (!row) return row;
+  return {
+    id: row.id,
+    userId: row.user_id || row.userId,
+    organizationName: row.organization_name || row.organizationName || '',
+    registrationNumber: row.registration_number || row.darpan_id || row.registrationNumber || '',
+    contactPerson: row.contact_person || row.contact_name || row.contactPerson || '',
+    contactPhone: row.contact_phone || row.contactPhone || '',
+    contactEmail: row.contact_email || row.contactEmail || '',
+    description: row.description || '',
+    address: row.address || {
+      street: row.street || '',
+      city: row.city || '',
+      state: row.state || 'Telangana',
+      pincode: row.pincode || '',
+      latitude: Number(row.latitude) || 17.385,
+      longitude: Number(row.longitude) || 78.4867,
+    },
+    serviceArea: row.service_areas || row.serviceArea || [],
+    foodRequirements: row.requirements || row.foodRequirements || [],
+    capacity: {
+      maxDailyMeals: Number(row.max_daily_meals ?? row.capacity?.maxDailyMeals ?? 100),
+      currentAvailableCapacity: Number(row.current_available_capacity ?? row.capacity?.currentAvailableCapacity ?? 100),
+      hasColdStorage: Boolean(row.has_cold_storage ?? row.capacity?.hasColdStorage),
+    },
+    verificationStatus: (row.verification_status || row.verificationStatus || 'pending').toLowerCase() as any,
+    verifiedAt: row.verified_at || row.verifiedAt,
+    rejectionReason: row.verification_notes || row.rejectionReason,
+    createdAt: row.created_at || row.createdAt || new Date().toISOString(),
+  };
+}
+
+export function mapVolunteerFromDb(row: any): Volunteer {
+  if (!row) return row;
+  return {
+    id: row.id,
+    userId: row.user_id || row.userId,
+    name: row.name || '',
+    phone: row.phone || '',
+    email: row.email || '',
+    vehicleType: row.vehicle_type || row.vehicleType || 'two_wheeler',
+    serviceArea: row.service_areas || row.serviceArea || [],
+    availability: row.availability || 'available',
+    status: row.status || 'active',
+    currentLocation: (row.current_latitude && row.current_longitude) ? {
+      latitude: Number(row.current_latitude),
+      longitude: Number(row.current_longitude),
+      lastUpdated: row.location_updated_at || new Date().toISOString(),
+    } : undefined,
+    totalDeliveriesCompleted: Number(row.total_deliveries_completed || 0),
+    rating: Number(row.rating || 5.0),
+    assignedTaskIds: row.assignedTaskIds || [],
+    createdAt: row.created_at || row.createdAt || new Date().toISOString(),
+  };
+}
+
+export function mapAssignmentFromDb(row: any): Assignment {
+  if (!row) return row;
+  return {
+    id: row.id,
+    donationId: row.donation_id || row.donationId,
+    volunteerId: row.volunteer_id || row.volunteerId,
+    ngoId: row.ngo_id || row.ngoId,
+    status: row.status,
+    pickup: row.pickup || {
+      address: row.pickup_address || '',
+      contactPerson: row.pickup_contact_person || '',
+      contactPhone: row.pickup_contact_phone || '',
+      estimatedPickupTime: row.estimated_pickup_time || '',
+      actualPickupTime: row.actual_pickup_time,
+      verificationOtp: row.verification_otp,
+    },
+    delivery: row.delivery || {
+      ngoName: row.delivery_ngo_name || row.destination_ngo_name || '',
+      address: row.delivery_address || '',
+      contactPerson: row.delivery_contact_person || '',
+      contactPhone: row.delivery_contact_phone || '',
+      estimatedDeliveryTime: row.estimated_delivery_time || '',
+      actualDeliveryTime: row.actual_delivery_time,
+      recipientSignatureName: row.recipient_signature_name,
+    },
+    assignedAt: row.assigned_at || row.assignedAt || new Date().toISOString(),
+    pickedUpAt: row.picked_up_at || row.pickedUpAt,
+    deliveredAt: row.actual_delivery_time || row.deliveredAt,
+    notes: row.notes,
+  };
+}
+
+export function mapNotificationFromDb(row: any): Notification {
+  if (!row) return row;
+  return {
+    id: row.id,
+    recipientId: row.recipient_id || row.recipientId,
+    title: row.title,
+    message: row.message,
+    type: row.type,
+    status: row.status,
+    relatedEntityId: row.related_entity_id || row.relatedEntityId,
+    createdAt: row.created_at || row.createdAt || new Date().toISOString(),
+    readAt: row.read_at || row.readAt,
+  };
+}
+
+export function mapUserFromDb(row: any): User {
+  if (!row) return row;
+  return {
+    id: row.id,
+    email: row.email,
+    name: row.name,
+    role: row.role,
+    phone: row.phone || '',
+    status: row.is_active === false ? 'suspended' : (row.status || 'active'),
+    createdAt: row.created_at || row.createdAt || new Date().toISOString(),
+  };
+}
+
 async function request<T = any>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
   const headers = new Headers(options.headers || {});
 
   if (!(options.body instanceof FormData) && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json');
+  }
+
+  // Attach Double-Submit CSRF Token for mutating requests
+  const method = (options.method || 'GET').toUpperCase();
+  if (!['GET', 'HEAD', 'OPTIONS'].includes(method)) {
+    const csrfToken = getCsrfToken();
+    if (csrfToken && !headers.has('X-CSRF-Token')) {
+      headers.set('X-CSRF-Token', csrfToken);
+    }
   }
 
   const config: RequestInit = {

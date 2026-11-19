@@ -22,25 +22,26 @@ import {
   User,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient, mapDonationFromDb, mapNgoFromDb } from '../../lib/apiClient';
 import { mockDataService } from '../../lib/mockDataService';
+import { Loading } from '../../components/common/Loading';
+import type { NGO } from '../../types/ngo';
 import type { Donation, FoodCategory, UrgencyLevel } from '../../types/donation';
+
+const isProduction = Boolean((import.meta as any).env?.PROD);
 
 const AvailableDonations: React.FC = () => {
   const { user } = useAuth();
-  const ngo = user ? mockDataService.getNGOByUserId(user.id) : undefined;
+  const [ngo, setNgo] = useState<NGO | null>(null);
+  const [donations, setDonations] = useState<Donation[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedDonation, setSelectedDonation] = useState<Donation | null>(null);
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
   const verificationStatus = ngo?.verificationStatus || 'pending';
   const isVerified = verificationStatus === 'verified';
   const isPending = verificationStatus === 'pending';
   const isRejected = verificationStatus === 'rejected';
-
-  // State
-  const [donations, setDonations] = useState<Donation[]>(() =>
-    user ? mockDataService.getAvailableDonationsForNGO(user.id) : []
-  );
-  const [selectedDonation, setSelectedDonation] = useState<Donation | null>(null);
-  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(
-    null
-  );
 
   // Search & Filter state
   const [searchQuery, setSearchQuery] = useState('');
@@ -48,44 +49,111 @@ const AvailableDonations: React.FC = () => {
   const [urgencyFilter, setUrgencyFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'urgency' | 'newest' | 'expiry'>('urgency');
 
-  const refreshDonations = () => {
+  const refreshDonations = async () => {
+    setIsLoading(true);
+    try {
+      const ngoRes = await apiClient.ngo.getMe().catch(() => null);
+      if (ngoRes?.ngo) {
+        setNgo(mapNgoFromDb(ngoRes.ngo));
+      }
+
+      const donRes = await apiClient.ngo.getAvailableDonations();
+      if (donRes?.donations) {
+        setDonations(donRes.donations.map(mapDonationFromDb));
+        setIsLoading(false);
+        return;
+      }
+    } catch (err: any) {
+      if (isProduction) {
+        setFeedback({ type: 'error', message: err.message || 'Failed to load donations from server.' });
+        setIsLoading(false);
+        return;
+      }
+    }
+
     if (user) {
+      setNgo(mockDataService.getNGOByUserId(user.id) || null);
       setDonations(mockDataService.getAvailableDonationsForNGO(user.id));
     }
+    setIsLoading(false);
   };
 
-  const handleAcceptDonation = (donationId: string) => {
+  React.useEffect(() => {
+    refreshDonations();
+  }, [user]);
+
+  const handleAcceptDonation = async (donationId: string) => {
     if (!user) return;
     setFeedback(null);
 
-    // Call service-level action function
-    const result = mockDataService.acceptDonation(donationId, user.id);
+    try {
+      try {
+        const response = await apiClient.ngo.acceptDonation(donationId);
+        if (response?.success) {
+          setFeedback({
+            type: 'success',
+            message: `Successfully accepted donation! It is now recorded under Accepted Donations.`,
+          });
+          refreshDonations();
+          return;
+        }
+      } catch (apiErr: any) {
+        if (isProduction) {
+          setFeedback({ type: 'error', message: apiErr.message || 'Server error: Unable to accept donation.' });
+          return;
+        }
+      }
 
-    if (!result.success) {
-      setFeedback({ type: 'error', message: result.error || 'Failed to accept donation.' });
-    } else {
-      setFeedback({
-        type: 'success',
-        message: `Successfully accepted "${result.donation?.foodName}". The donation is now recorded under Accepted Donations.`,
-      });
-      refreshDonations();
+      // Local mock fallback for dev offline
+      const result = mockDataService.acceptDonation(donationId, user.id);
+      if (!result.success) {
+        setFeedback({ type: 'error', message: result.error || 'Failed to accept donation.' });
+      } else {
+        setFeedback({
+          type: 'success',
+          message: `Successfully accepted "${result.donation?.foodName}". The donation is now recorded under Accepted Donations.`,
+        });
+        refreshDonations();
+      }
+    } catch (err: any) {
+      setFeedback({ type: 'error', message: err.message || 'Failed to accept donation.' });
     }
   };
 
-  const handleDeclineDonation = (donationId: string) => {
+  const handleDeclineDonation = async (donationId: string) => {
     if (!user) return;
     setFeedback(null);
 
-    const result = mockDataService.rejectDonation(donationId, user.id, 'Declined by NGO from available listings');
+    try {
+      try {
+        const response = await apiClient.ngo.rejectDonation(donationId, 'Declined by NGO');
+        if (response?.success) {
+          setFeedback({
+            type: 'success',
+            message: 'You have declined this food listing. It has been removed from your available listings.',
+          });
+          refreshDonations();
+          return;
+        }
+      } catch (apiErr: any) {
+        if (isProduction) {
+          setFeedback({ type: 'error', message: apiErr.message || 'Server error: Unable to decline donation.' });
+          return;
+        }
+      }
 
-    if (!result.success) {
-      setFeedback({ type: 'error', message: result.error || 'Failed to decline donation.' });
-    } else {
-      setFeedback({
-        type: 'success',
-        message: 'You have declined this food listing. It has been removed from your available listings.',
-      });
-      refreshDonations();
+      const result = mockDataService.rejectDonation(donationId, user.id, 'Declined by NGO from available listings');
+      if (!result.success) {
+        setFeedback({ type: 'error', message: result.error || 'Failed to decline donation.' });
+      } else {
+        setFeedback({
+          type: 'success',
+          message: 'You have declined this food listing. It has been removed from your available listings.',
+        });
+        refreshDonations();
+      }
+    } catch (err: any) {
+      setFeedback({ type: 'error', message: err.message || 'Failed to decline donation.' });
     }
   };
 
@@ -293,7 +361,11 @@ const AvailableDonations: React.FC = () => {
       </Card>
 
       {/* Available Donations List */}
-      {filteredDonations.length === 0 ? (
+      {isLoading ? (
+        <Card className="p-12">
+          <Loading message="Discovering available surplus food donations..." />
+        </Card>
+      ) : filteredDonations.length === 0 ? (
         <Card className="p-8">
           <EmptyState
             icon={<Search size={48} className="text-secondary-text" />}

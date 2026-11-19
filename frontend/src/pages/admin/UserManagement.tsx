@@ -20,8 +20,12 @@ import { Button } from '../../components/common/Button';
 import { Modal } from '../../components/common/Modal';
 import { EmptyState } from '../../components/common/EmptyState';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient, mapUserFromDb } from '../../lib/apiClient';
 import { mockDataService } from '../../lib/mockDataService';
+import { Loading } from '../../components/common/Loading';
 import type { User, UserRole, UserStatus } from '../../types';
+
+const isProduction = Boolean((import.meta as any).env?.PROD);
 
 export const UserManagement: React.FC = () => {
   const { user: currentAdmin } = useAuth();
@@ -36,8 +40,27 @@ export const UserManagement: React.FC = () => {
   } | null>(null);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-  const loadUsers = () => {
+  const [isLoading, setIsLoading] = useState(true);
+
+  const loadUsers = async () => {
+    setIsLoading(true);
+    try {
+      const response = await apiClient.admin.listUsers();
+      if (response?.data?.users) {
+        setUsers(response.data.users.map(mapUserFromDb));
+        setIsLoading(false);
+        return;
+      }
+    } catch (err: any) {
+      if (isProduction) {
+        setFeedback({ type: 'error', message: err.message || 'Failed to load user accounts from server.' });
+        setIsLoading(false);
+        return;
+      }
+    }
+
     setUsers(mockDataService.getUsers());
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -56,24 +79,47 @@ export const UserManagement: React.FC = () => {
     });
   }, [users, searchQuery, roleFilter, statusFilter]);
 
-  const handleStatusChange = () => {
+  const handleStatusChange = async () => {
     if (!confirmStatusModal || !currentAdmin) return;
     const { targetUser, newStatus } = confirmStatusModal;
-    const result = mockDataService.updateUserStatus(targetUser.id, newStatus, currentAdmin.id);
 
-    if (result.success) {
-      setFeedback({
-        type: 'success',
-        message: `Account status for ${targetUser.name} updated to "${newStatus}".`,
-      });
-      loadUsers();
-    } else {
-      setFeedback({
-        type: 'error',
-        message: result.error || 'Failed to update user status.',
-      });
+    try {
+      try {
+        const response = await apiClient.admin.updateUserStatus(targetUser.id, newStatus === 'active');
+        if (response?.success) {
+          setFeedback({
+            type: 'success',
+            message: `Account status for ${targetUser.name} updated to "${newStatus}".`,
+          });
+          setConfirmStatusModal(null);
+          loadUsers();
+          return;
+        }
+      } catch (apiErr: any) {
+        if (isProduction) {
+          setFeedback({ type: 'error', message: apiErr.message || 'Server error: Failed to update user status.' });
+          return;
+        }
+      }
+
+      const result = mockDataService.updateUserStatus(targetUser.id, newStatus, currentAdmin.id);
+      if (result.success) {
+        setFeedback({
+          type: 'success',
+          message: `Account status for ${targetUser.name} updated to "${newStatus}".`,
+        });
+        loadUsers();
+      } else {
+        setFeedback({
+          type: 'error',
+          message: result.error || 'Failed to update user status.',
+        });
+      }
+    } catch (err: any) {
+      setFeedback({ type: 'error', message: err.message || 'Failed to update user status.' });
+    } finally {
+      setConfirmStatusModal(null);
     }
-    setConfirmStatusModal(null);
   };
 
   const columns: TableColumn<User>[] = [

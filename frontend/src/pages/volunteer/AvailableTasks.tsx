@@ -19,20 +19,21 @@ import {
   User,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient, mapAssignmentFromDb } from '../../lib/apiClient';
 import { mockDataService } from '../../lib/mockDataService';
+import { Loading } from '../../components/common/Loading';
 import type { Assignment } from '../../types/assignment';
+
+const isProduction = Boolean((import.meta as any).env?.PROD);
 
 const AvailableTasks: React.FC = () => {
   const { user } = useAuth();
   const volunteer = user ? mockDataService.getVolunteerByUserId(user.id) : undefined;
 
-  const [availableTasks, setAvailableTasks] = useState<Assignment[]>(() =>
-    mockDataService.getAvailableAssignments()
-  );
+  const [availableTasks, setAvailableTasks] = useState<Assignment[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
-  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(
-    null
-  );
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // Search & Filter state
   const [searchQuery, setSearchQuery] = useState('');
@@ -40,28 +41,68 @@ const AvailableTasks: React.FC = () => {
   const [urgencyFilter, setUrgencyFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'urgency' | 'expiry' | 'newest'>('urgency');
 
-  const refreshTasks = () => {
+  const refreshTasks = async () => {
+    setIsLoading(true);
+    try {
+      const response = await apiClient.volunteer.getAvailableTasks();
+      if (response?.tasks) {
+        setAvailableTasks(response.tasks.map(mapAssignmentFromDb));
+        setIsLoading(false);
+        return;
+      }
+    } catch (err: any) {
+      if (isProduction) {
+        setFeedback({ type: 'error', message: err.message || 'Failed to load available tasks from server.' });
+        setIsLoading(false);
+        return;
+      }
+    }
+
     setAvailableTasks(mockDataService.getAvailableAssignments());
+    setIsLoading(false);
   };
 
-  const handleAcceptTask = (assignmentId: string) => {
+  React.useEffect(() => {
+    refreshTasks();
+  }, [user]);
+
+  const handleAcceptTask = async (assignmentId: string) => {
     if (!user) return;
     setFeedback(null);
 
-    const result = mockDataService.acceptAssignment(assignmentId, user.id);
+    try {
+      try {
+        const response = await apiClient.volunteer.acceptAssignment(assignmentId);
+        if (response?.success) {
+          setFeedback({
+            type: 'success',
+            message: `Task claimed successfully! The delivery is now registered in your Assigned Tasks.`,
+          });
+          refreshTasks();
+          return;
+        }
+      } catch (apiErr: any) {
+        if (isProduction) {
+          setFeedback({ type: 'error', message: apiErr.message || 'Server error: Failed to accept assignment.' });
+          return;
+        }
+      }
 
-    if (!result.success) {
-      setFeedback({
-        type: 'error',
-        message: result.error || 'Failed to claim task. It may have already been accepted.',
-      });
+      const result = mockDataService.acceptAssignment(assignmentId, user.id);
+      if (!result.success) {
+        setFeedback({
+          type: 'error',
+          message: result.error || 'Failed to claim task. It may have already been accepted.',
+        });
+      } else {
+        setFeedback({
+          type: 'success',
+          message: `Task claimed successfully! The delivery is now registered in your Assigned Tasks.`,
+        });
+      }
       refreshTasks();
-    } else {
-      setFeedback({
-        type: 'success',
-        message: `Task claimed successfully! The delivery is now registered in your Assigned Tasks.`,
-      });
-      refreshTasks();
+    } catch (err: any) {
+      setFeedback({ type: 'error', message: err.message || 'Failed to claim task.' });
     }
   };
 

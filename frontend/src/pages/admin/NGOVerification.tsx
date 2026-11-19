@@ -21,8 +21,12 @@ import { Button } from '../../components/common/Button';
 import { Modal } from '../../components/common/Modal';
 import { EmptyState } from '../../components/common/EmptyState';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient, mapNgoFromDb } from '../../lib/apiClient';
 import { mockDataService } from '../../lib/mockDataService';
+import { Loading } from '../../components/common/Loading';
 import type { NGO, NGOStatus } from '../../types';
+
+const isProduction = Boolean((import.meta as any).env?.PROD);
 
 export const NGOVerification: React.FC = () => {
   const { user: currentAdmin } = useAuth();
@@ -35,8 +39,27 @@ export const NGOVerification: React.FC = () => {
   const [verifyConfirmNgo, setVerifyConfirmNgo] = useState<NGO | null>(null);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-  const loadNgos = () => {
+  const [isLoading, setIsLoading] = useState(true);
+
+  const loadNgos = async () => {
+    setIsLoading(true);
+    try {
+      const response = await apiClient.admin.listNGOs();
+      if (response?.data) {
+        setNgos(response.data.map(mapNgoFromDb));
+        setIsLoading(false);
+        return;
+      }
+    } catch (err: any) {
+      if (isProduction) {
+        setFeedback({ type: 'error', message: err.message || 'Failed to load NGOs from server.' });
+        setIsLoading(false);
+        return;
+      }
+    }
+
     setNgos(mockDataService.getNGOs());
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -65,45 +88,94 @@ export const NGOVerification: React.FC = () => {
     });
   }, [ngos, activeTab, searchQuery]);
 
-  const handleVerify = (ngo: NGO) => {
+  const handleVerify = async (ngo: NGO) => {
     if (!currentAdmin) return;
-    const result = mockDataService.verifyNGO(ngo.id, currentAdmin.id);
-    if (result.success) {
-      setFeedback({
-        type: 'success',
-        message: `Successfully verified NGO: ${ngo.organizationName}. Organization can now receive donations.`,
-      });
-      loadNgos();
-    } else {
-      setFeedback({
-        type: 'error',
-        message: result.error || 'Failed to verify organization.',
-      });
+    try {
+      try {
+        const response = await apiClient.admin.reviewNGOVerification(ngo.id, 'VERIFIED');
+        if (response?.success) {
+          setFeedback({
+            type: 'success',
+            message: `Successfully verified NGO: ${ngo.organizationName}. Organization can now receive donations.`,
+          });
+          loadNgos();
+          setVerifyConfirmNgo(null);
+          return;
+        }
+      } catch (apiErr: any) {
+        if (isProduction) {
+          setFeedback({ type: 'error', message: apiErr.message || 'Server error: Failed to verify NGO.' });
+          setVerifyConfirmNgo(null);
+          return;
+        }
+      }
+
+      const result = mockDataService.verifyNGO(ngo.id, currentAdmin.id);
+      if (result.success) {
+        setFeedback({
+          type: 'success',
+          message: `Successfully verified NGO: ${ngo.organizationName}. Organization can now receive donations.`,
+        });
+        loadNgos();
+      } else {
+        setFeedback({
+          type: 'error',
+          message: result.error || 'Failed to verify organization.',
+        });
+      }
+    } catch (err: any) {
+      setFeedback({ type: 'error', message: err.message || 'Failed to verify organization.' });
+    } finally {
+      setVerifyConfirmNgo(null);
     }
-    setVerifyConfirmNgo(null);
   };
 
-  const handleReject = () => {
+  const handleReject = async () => {
     if (!rejectingNgo || !currentAdmin) return;
     if (!rejectionReason.trim()) {
       setFeedback({ type: 'error', message: 'A rejection reason is required.' });
       return;
     }
-    const result = mockDataService.rejectNGO(rejectingNgo.id, currentAdmin.id, rejectionReason.trim());
-    if (result.success) {
-      setFeedback({
-        type: 'success',
-        message: `Rejected application for ${rejectingNgo.organizationName}. Reason recorded.`,
-      });
-      loadNgos();
-    } else {
-      setFeedback({
-        type: 'error',
-        message: result.error || 'Failed to reject organization.',
-      });
+
+    try {
+      try {
+        const response = await apiClient.admin.reviewNGOVerification(rejectingNgo.id, 'REJECTED', rejectionReason.trim());
+        if (response?.success) {
+          setFeedback({
+            type: 'success',
+            message: `Rejected application for ${rejectingNgo.organizationName}. Reason recorded.`,
+          });
+          loadNgos();
+          setRejectingNgo(null);
+          setRejectionReason('');
+          return;
+        }
+      } catch (apiErr: any) {
+        if (isProduction) {
+          setFeedback({ type: 'error', message: apiErr.message || 'Server error: Failed to reject NGO.' });
+          return;
+        }
+      }
+
+      const result = mockDataService.rejectNGO(rejectingNgo.id, currentAdmin.id, rejectionReason.trim());
+      if (result.success) {
+        setFeedback({
+          type: 'success',
+          message: `Rejected application for ${rejectingNgo.organizationName}. Reason recorded.`,
+        });
+        loadNgos();
+      } else {
+        setFeedback({
+          type: 'error',
+          message: result.error || 'Failed to reject organization.',
+        });
+      }
+    } catch (err: any) {
+      setFeedback({ type: 'error', message: err.message || 'Failed to reject organization.' });
+    } finally {
+      setRejectingNgo(null);
+      setRejectionReason('');
     }
-    setRejectingNgo(null);
-    setRejectionReason('');
   };
 
   const columns: TableColumn<NGO>[] = [

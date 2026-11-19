@@ -13,8 +13,11 @@ import {
   Calendar,
   XCircle,
 } from 'lucide-react';
+import { apiClient, mapDonationFromDb } from '../../lib/apiClient';
 import { mockDataService } from '../../lib/mockDataService';
 import type { Donation, DonationStatus } from '../../types/donation';
+
+const isProduction = Boolean((import.meta as any).env?.PROD);
 
 interface DonationDetailsModalProps {
   donation: Donation | null;
@@ -67,17 +70,42 @@ export const DonationDetailsModal: React.FC<DonationDetailsModalProps> = ({
     setConfirmCancelOpen(true);
   };
 
-  const handleConfirmCancel = () => {
+  const handleConfirmCancel = async () => {
     if (!currentUserId) return;
-    const result = mockDataService.cancelDonation(donation.id, currentUserId);
-    if (!result.success) {
-      setCancelError(result.error || 'Failed to cancel donation.');
-    } else if (result.donation) {
-      setConfirmCancelOpen(false);
-      if (onDonationCancelled) {
-        onDonationCancelled(result.donation);
+    setCancelError(null);
+
+    try {
+      try {
+        const response = await apiClient.donations.cancel(donation.id);
+        if (response?.donation) {
+          const mapped = mapDonationFromDb(response.donation);
+          setConfirmCancelOpen(false);
+          if (onDonationCancelled) {
+            onDonationCancelled(mapped);
+          }
+          onClose();
+          return;
+        }
+      } catch (apiErr: any) {
+        if (isProduction) {
+          setCancelError(apiErr.message || 'Server error: Failed to cancel donation.');
+          return;
+        }
       }
-      onClose();
+
+      // Local mock fallback for development offline mode
+      const result = mockDataService.cancelDonation(donation.id, currentUserId);
+      if (!result.success) {
+        setCancelError(result.error || 'Failed to cancel donation.');
+      } else if (result.donation) {
+        setConfirmCancelOpen(false);
+        if (onDonationCancelled) {
+          onDonationCancelled(result.donation);
+        }
+        onClose();
+      }
+    } catch (err: any) {
+      setCancelError(err.message || 'An unexpected error occurred while canceling.');
     }
   };
 

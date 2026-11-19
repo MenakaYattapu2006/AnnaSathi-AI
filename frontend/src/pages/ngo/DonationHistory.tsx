@@ -19,32 +19,61 @@ import {
   Truck,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient, mapDonationFromDb } from '../../lib/apiClient';
 import { mockDataService } from '../../lib/mockDataService';
 import type { Donation } from '../../types/donation';
+
+const isProduction = Boolean((import.meta as any).env?.PROD);
 
 const NGODonationHistory: React.FC = () => {
   const { user } = useAuth();
   const ngo = user ? mockDataService.getNGOByUserId(user.id) : undefined;
 
-  const [historyDonations, setHistoryDonations] = useState<Donation[]>(() =>
-    user ? mockDataService.getNGODonationHistory(user.id) : []
-  );
+  const [historyDonations, setHistoryDonations] = useState<Donation[]>([]);
   const [selectedDonation, setSelectedDonation] = useState<Donation | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Search & Filter state
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'DELIVERED' | 'RECEIPT_CONFIRMED'>('all');
   const [sortBy, setSortBy] = useState<'newest' | 'oldest'>('newest');
 
-  const refreshHistory = () => {
+  const refreshHistory = async () => {
+    setIsLoading(true);
+    try {
+      const response = await apiClient.ngo.getAcceptedDonations();
+      if (response?.donations) {
+        const mapped: Donation[] = response.donations
+          .map(mapDonationFromDb)
+          .filter((d: Donation) => d.status === 'DELIVERED' || d.status === 'RECEIPT_CONFIRMED');
+        setHistoryDonations(mapped);
+        setIsLoading(false);
+        return;
+      }
+    } catch {
+      if (isProduction) {
+        setIsLoading(false);
+        return;
+      }
+    }
+
     if (user) {
       setHistoryDonations(mockDataService.getNGODonationHistory(user.id));
     }
+    setIsLoading(false);
   };
 
-  const handleConfirmReceipt = (donationId: string, notes?: string) => {
+  React.useEffect(() => {
+    refreshHistory();
+  }, [user]);
+
+  const handleConfirmReceipt = async (donationId: string, notes?: string) => {
     if (!user) return;
-    mockDataService.confirmDonationReceipt(donationId, user.id, notes);
+    try {
+      await apiClient.ngo.confirmReceipt(donationId, notes);
+    } catch {
+      mockDataService.confirmDonationReceipt(donationId, user.id, notes);
+    }
     refreshHistory();
   };
 

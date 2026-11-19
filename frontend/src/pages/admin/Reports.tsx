@@ -16,8 +16,11 @@ import { PageHeader } from '../../components/common/PageHeader';
 import { Card } from '../../components/common/Card';
 import { Badge } from '../../components/common/Badge';
 import { Button } from '../../components/common/Button';
+import { apiClient, mapDonationFromDb, mapNgoFromDb, mapUserFromDb } from '../../lib/apiClient';
 import { mockDataService } from '../../lib/mockDataService';
 import type { Donation, NGO, Volunteer, User } from '../../types';
+
+const isProduction = Boolean((import.meta as any).env?.PROD);
 
 export const Reports: React.FC = () => {
   const [donations, setDonations] = useState<Donation[]>([]);
@@ -26,10 +29,37 @@ export const Reports: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
-    setDonations(mockDataService.getDonations());
-    setNgos(mockDataService.getNGOs());
-    setVolunteers(mockDataService.getVolunteers());
-    setUsers(mockDataService.getUsers());
+    let isMounted = true;
+    async function loadData() {
+      try {
+        const [donRes, ngoRes, userRes] = await Promise.all([
+          apiClient.admin.listDonations(),
+          apiClient.admin.listNGOs(),
+          apiClient.admin.listUsers(),
+        ]);
+
+        if (isMounted) {
+          if (donRes?.data?.donations) setDonations(donRes.data.donations.map(mapDonationFromDb));
+          if (ngoRes?.data) setNgos(ngoRes.data.map(mapNgoFromDb));
+          if (userRes?.data?.users) setUsers(userRes.data.users.map(mapUserFromDb));
+          return;
+        }
+      } catch {
+        if (isProduction) return;
+      }
+
+      if (isMounted) {
+        setDonations(mockDataService.getDonations());
+        setNgos(mockDataService.getNGOs());
+        setVolunteers(mockDataService.getVolunteers());
+        setUsers(mockDataService.getUsers());
+      }
+    }
+
+    loadData();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const stats = useMemo(() => {

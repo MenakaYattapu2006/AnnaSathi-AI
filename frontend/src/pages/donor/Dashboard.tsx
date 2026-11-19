@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { PageHeader } from '../../components/common/PageHeader';
 import { DashboardStatCard } from '../../components/common/DashboardStatCard';
@@ -21,8 +21,11 @@ import {
   XCircle,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient, mapDonationFromDb } from '../../lib/apiClient';
 import { mockDataService } from '../../lib/mockDataService';
 import type { Donation, DonationStatus } from '../../types/donation';
+
+const isProduction = Boolean((import.meta as any).env?.PROD);
 
 const statusBadgeMap: Record<DonationStatus, { variant: 'success' | 'warning' | 'info' | 'neutral' | 'danger'; label: string }> = {
   CREATED: { variant: 'neutral', label: 'Created' },
@@ -39,10 +42,35 @@ const DonorDashboard: React.FC = () => {
   const { user } = useAuth();
   const [selectedDonation, setSelectedDonation] = useState<Donation | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [donorDonations, setDonorDonations] = useState<Donation[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Retrieve actual donation records for this donor
-  const donorDonations = useMemo(() => {
-    return user ? mockDataService.getDonationsByDonor(user.id) : [];
+  // Retrieve actual live donation records for this donor
+  useEffect(() => {
+    let isMounted = true;
+    async function loadData() {
+      try {
+        const res = await apiClient.donations.getAll();
+        if (res?.donations && isMounted) {
+          setDonorDonations(res.donations.map(mapDonationFromDb));
+          setIsLoading(false);
+          return;
+        }
+      } catch {
+        if (isProduction) {
+          if (isMounted) setIsLoading(false);
+          return;
+        }
+      }
+      if (user && isMounted) {
+        setDonorDonations(mockDataService.getDonationsByDonor(user.id));
+      }
+      if (isMounted) setIsLoading(false);
+    }
+    loadData();
+    return () => {
+      isMounted = false;
+    };
   }, [user]);
 
   // Dynamically calculate actual counts from the donor's records

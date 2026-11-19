@@ -19,8 +19,13 @@ import {
   PackageCheck,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient, mapDonationFromDb, mapNgoFromDb } from '../../lib/apiClient';
 import { mockDataService } from '../../lib/mockDataService';
+import { Loading } from '../../components/common/Loading';
+import type { NGO } from '../../types/ngo';
 import type { Donation, DonationStatus } from '../../types/donation';
+
+const isProduction = Boolean((import.meta as any).env?.PROD);
 
 const statusBadgeMap: Record<
   DonationStatus,
@@ -38,40 +43,86 @@ const statusBadgeMap: Record<
 
 const AcceptedDonations: React.FC = () => {
   const { user } = useAuth();
-  const ngo = user ? mockDataService.getNGOByUserId(user.id) : undefined;
-
-  const [donations, setDonations] = useState<Donation[]>(() =>
-    user ? mockDataService.getAcceptedDonationsForNGO(user.id) : []
-  );
+  const [ngo, setNgo] = useState<NGO | undefined>(undefined);
+  const [donations, setDonations] = useState<Donation[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedDonation, setSelectedDonation] = useState<Donation | null>(null);
-  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(
-    null
-  );
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // Search & Filter state
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'newest' | 'urgency'>('newest');
 
-  const refreshDonations = () => {
+  const refreshDonations = async () => {
+    setIsLoading(true);
+    try {
+      const [ngoRes, response] = await Promise.all([
+        apiClient.ngo.getMe().catch(() => null),
+        apiClient.ngo.getAcceptedDonations(),
+      ]);
+
+      if (ngoRes?.ngo) {
+        setNgo(mapNgoFromDb(ngoRes.ngo));
+      }
+      if (response?.donations) {
+        setDonations(response.donations.map(mapDonationFromDb));
+        setIsLoading(false);
+        return;
+      }
+    } catch (err: any) {
+      if (isProduction) {
+        setFeedback({ type: 'error', message: err.message || 'Failed to load accepted donations from server.' });
+        setIsLoading(false);
+        return;
+      }
+    }
+
     if (user) {
+      setNgo(mockDataService.getNGOByUserId(user.id));
       setDonations(mockDataService.getAcceptedDonationsForNGO(user.id));
     }
+    setIsLoading(false);
   };
 
-  const handleConfirmReceipt = (donationId: string, notes?: string) => {
+  React.useEffect(() => {
+    refreshDonations();
+  }, [user]);
+
+  const handleConfirmReceipt = async (donationId: string, notes?: string) => {
     if (!user) return;
     setFeedback(null);
 
-    const result = mockDataService.confirmDonationReceipt(donationId, user.id, notes);
-    if (!result.success) {
-      setFeedback({ type: 'error', message: result.error || 'Failed to confirm receipt.' });
-    } else {
-      setFeedback({
-        type: 'success',
-        message: `Successfully confirmed receipt of "${result.donation?.foodName}". Receipt has been recorded in distribution history.`,
-      });
-      refreshDonations();
+    try {
+      try {
+        const response = await apiClient.ngo.confirmReceipt(donationId, notes);
+        if (response?.success) {
+          setFeedback({
+            type: 'success',
+            message: `Successfully confirmed receipt! Donation has been recorded in distribution history.`,
+          });
+          refreshDonations();
+          return;
+        }
+      } catch (apiErr: any) {
+        if (isProduction) {
+          setFeedback({ type: 'error', message: apiErr.message || 'Server error: Failed to confirm receipt.' });
+          return;
+        }
+      }
+
+      const result = mockDataService.confirmDonationReceipt(donationId, user.id, notes);
+      if (!result.success) {
+        setFeedback({ type: 'error', message: result.error || 'Failed to confirm receipt.' });
+      } else {
+        setFeedback({
+          type: 'success',
+          message: `Successfully confirmed receipt of "${result.donation?.foodName}". Receipt has been recorded in distribution history.`,
+        });
+        refreshDonations();
+      }
+    } catch (err: any) {
+      setFeedback({ type: 'error', message: err.message || 'Failed to confirm receipt.' });
     }
   };
 
@@ -203,7 +254,11 @@ const AcceptedDonations: React.FC = () => {
       </Card>
 
       {/* List of Accepted Donations */}
-      {filteredDonations.length === 0 ? (
+      {isLoading ? (
+        <Card className="p-12">
+          <Loading message="Loading accepted food donations from server..." />
+        </Card>
+      ) : filteredDonations.length === 0 ? (
         <Card className="p-8">
           <EmptyState
             icon={<PackageCheck size={48} className="text-secondary-text" />}

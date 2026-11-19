@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { PageHeader } from '../../components/common/PageHeader';
 import { Card } from '../../components/common/Card';
 import { Badge } from '../../components/common/Badge';
@@ -16,13 +16,43 @@ import {
   XCircle,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient, mapDonationFromDb } from '../../lib/apiClient';
 import { mockDataService } from '../../lib/mockDataService';
+import type { Donation } from '../../types/donation';
+
+const isProduction = Boolean((import.meta as any).env?.PROD);
 
 const Impact: React.FC = () => {
   const { user } = useAuth();
 
-  const donorDonations = useMemo(() => {
-    return user ? mockDataService.getDonationsByDonor(user.id) : [];
+  const [donorDonations, setDonorDonations] = useState<Donation[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadData() {
+      try {
+        const res = await apiClient.donations.getAll();
+        if (res?.donations && isMounted) {
+          setDonorDonations(res.donations.map(mapDonationFromDb));
+          setIsLoading(false);
+          return;
+        }
+      } catch {
+        if (isProduction) {
+          if (isMounted) setIsLoading(false);
+          return;
+        }
+      }
+      if (user && isMounted) {
+        setDonorDonations(mockDataService.getDonationsByDonor(user.id));
+      }
+      if (isMounted) setIsLoading(false);
+    }
+    loadData();
+    return () => {
+      isMounted = false;
+    };
   }, [user]);
 
   // Actual impact calculations segregated by status

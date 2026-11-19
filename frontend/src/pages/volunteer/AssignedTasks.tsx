@@ -17,8 +17,12 @@ import {
   Package,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient, mapAssignmentFromDb } from '../../lib/apiClient';
 import { mockDataService } from '../../lib/mockDataService';
+import { Loading } from '../../components/common/Loading';
 import type { Assignment, AssignmentStatus } from '../../types/assignment';
+
+const isProduction = Boolean((import.meta as any).env?.PROD);
 
 const statusBadgeMap: Record<
   AssignmentStatus,
@@ -37,52 +41,112 @@ const AssignedTasks: React.FC = () => {
   const { user } = useAuth();
   const volunteer = user ? mockDataService.getVolunteerByUserId(user.id) : undefined;
 
-  const [myTasks, setMyTasks] = useState<Assignment[]>(() =>
-    user ? mockDataService.getAssignmentsByVolunteer(user.id) : []
-  );
+  const [myTasks, setMyTasks] = useState<Assignment[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
-  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(
-    null
-  );
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // Status Filter Tabs
   const [activeTab, setActiveTab] = useState<'all' | 'pending_pickup' | 'in_transit' | 'delivered'>('all');
 
-  const refreshTasks = () => {
+  const refreshTasks = async () => {
+    setIsLoading(true);
+    try {
+      const response = await apiClient.volunteer.getAssignedTasks();
+      if (response?.tasks) {
+        setMyTasks(response.tasks.map(mapAssignmentFromDb));
+        setIsLoading(false);
+        return;
+      }
+    } catch (err: any) {
+      if (isProduction) {
+        setFeedback({ type: 'error', message: err.message || 'Failed to load assigned tasks from server.' });
+        setIsLoading(false);
+        return;
+      }
+    }
+
     if (user) {
       setMyTasks(mockDataService.getAssignmentsByVolunteer(user.id));
     }
+    setIsLoading(false);
   };
 
-  const handlePickup = (assignmentId: string, notes?: string) => {
+  React.useEffect(() => {
+    refreshTasks();
+  }, [user]);
+
+  const handlePickup = async (assignmentId: string, notes?: string) => {
     if (!user) return;
     setFeedback(null);
 
-    const result = mockDataService.pickupAssignment(assignmentId, user.id, notes);
-    if (!result.success) {
-      setFeedback({ type: 'error', message: result.error || 'Failed to update pickup status.' });
-    } else {
-      setFeedback({
-        type: 'success',
-        message: 'Food marked as picked up! Status updated to Picked Up (In Transit).',
-      });
-      refreshTasks();
+    try {
+      try {
+        const response = await apiClient.volunteer.pickupAssignment(assignmentId);
+        if (response?.success) {
+          setFeedback({
+            type: 'success',
+            message: 'Food marked as picked up! Status updated to Picked Up (In Transit).',
+          });
+          refreshTasks();
+          return;
+        }
+      } catch (apiErr: any) {
+        if (isProduction) {
+          setFeedback({ type: 'error', message: apiErr.message || 'Server error: Failed to record pickup.' });
+          return;
+        }
+      }
+
+      const result = mockDataService.pickupAssignment(assignmentId, user.id, notes);
+      if (!result.success) {
+        setFeedback({ type: 'error', message: result.error || 'Failed to update pickup status.' });
+      } else {
+        setFeedback({
+          type: 'success',
+          message: 'Food marked as picked up! Status updated to Picked Up (In Transit).',
+        });
+        refreshTasks();
+      }
+    } catch (err: any) {
+      setFeedback({ type: 'error', message: err.message || 'Failed to update pickup status.' });
     }
   };
 
-  const handleDeliver = (assignmentId: string, deliveryNotes?: string) => {
+  const handleDeliver = async (assignmentId: string, deliveryNotes?: string) => {
     if (!user) return;
     setFeedback(null);
 
-    const result = mockDataService.deliverAssignment(assignmentId, user.id, deliveryNotes);
-    if (!result.success) {
-      setFeedback({ type: 'error', message: result.error || 'Failed to update delivery status.' });
-    } else {
-      setFeedback({
-        type: 'success',
-        message: 'Delivery confirmed! The food has been delivered to the NGO shelter.',
-      });
-      refreshTasks();
+    try {
+      try {
+        const response = await apiClient.volunteer.deliverAssignment(assignmentId, deliveryNotes);
+        if (response?.success) {
+          setFeedback({
+            type: 'success',
+            message: 'Delivery marked as complete! Awaiting NGO final receipt confirmation.',
+          });
+          refreshTasks();
+          return;
+        }
+      } catch (apiErr: any) {
+        if (isProduction) {
+          setFeedback({ type: 'error', message: apiErr.message || 'Server error: Failed to record delivery.' });
+          return;
+        }
+      }
+
+      const result = mockDataService.deliverAssignment(assignmentId, user.id, deliveryNotes);
+      if (!result.success) {
+        setFeedback({ type: 'error', message: result.error || 'Failed to update delivery status.' });
+      } else {
+        setFeedback({
+          type: 'success',
+          message: 'Delivery marked as complete! Awaiting NGO final receipt confirmation.',
+        });
+        refreshTasks();
+      }
+    } catch (err: any) {
+      setFeedback({ type: 'error', message: err.message || 'Failed to update delivery status.' });
     }
   };
 

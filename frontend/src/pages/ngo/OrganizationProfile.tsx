@@ -20,8 +20,11 @@ import {
   Refrigerator,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient, mapNgoFromDb } from '../../lib/apiClient';
 import { mockDataService } from '../../lib/mockDataService';
 import type { NGO } from '../../types/ngo';
+
+const isProduction = Boolean((import.meta as any).env?.PROD);
 
 const AVAILABLE_CATEGORIES = [
   { id: 'cooked_meals', label: 'Cooked Meals' },
@@ -64,6 +67,43 @@ const OrganizationProfile: React.FC = () => {
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
+  React.useEffect(() => {
+    let isMounted = true;
+    async function fetchNgo() {
+      try {
+        const res = await apiClient.ngo.getMe();
+        if (res?.ngo && isMounted) {
+          const mapped = mapNgoFromDb(res.ngo);
+          setNgo(mapped);
+          setFormData({
+            organizationName: mapped.organizationName,
+            contactPerson: mapped.contactPerson,
+            contactEmail: mapped.contactEmail,
+            contactPhone: mapped.contactPhone,
+            description: mapped.description || '',
+            street: mapped.address.street,
+            city: mapped.address.city,
+            state: mapped.address.state,
+            pincode: mapped.address.pincode,
+            serviceArea: mapped.serviceArea ? mapped.serviceArea.join(', ') : '',
+            maxDailyMeals: mapped.capacity.maxDailyMeals,
+            hasColdStorage: mapped.capacity.hasColdStorage,
+            acceptedCategories: mapped.foodRequirements?.map((r) => r.category) || ['cooked_meals'],
+          });
+        }
+      } catch {
+        if (!isProduction && user && isMounted) {
+          const mock = mockDataService.getNGOByUserId(user.id);
+          if (mock) setNgo(mock);
+        }
+      }
+    }
+    fetchNgo();
+    return () => {
+      isMounted = false;
+    };
+  }, [user]);
+
   if (!user || !ngo) {
     return (
       <div className="p-6">
@@ -102,49 +142,65 @@ const OrganizationProfile: React.FC = () => {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setFeedback(null);
-    if (!validateForm()) return;
+    if (!validateForm() || !ngo) return;
 
     const parsedAreas = formData.serviceArea
       .split(',')
       .map((s) => s.trim())
       .filter(Boolean);
 
-    const updates: Partial<NGO> = {
+    const updates = {
       organizationName: formData.organizationName.trim(),
       contactPerson: formData.contactPerson.trim(),
       contactEmail: formData.contactEmail.trim(),
       contactPhone: formData.contactPhone.trim(),
       description: formData.description.trim(),
-      address: {
-        ...ngo.address,
-        street: formData.street.trim(),
-        city: formData.city.trim(),
-        state: formData.state.trim(),
-        pincode: formData.pincode.trim(),
-      },
-      serviceArea: parsedAreas,
-      capacity: {
-        ...ngo.capacity,
-        maxDailyMeals: Number(formData.maxDailyMeals),
-        hasColdStorage: formData.hasColdStorage,
-      },
+      street: formData.street.trim(),
+      city: formData.city.trim(),
+      state: formData.state.trim(),
+      pincode: formData.pincode.trim(),
+      serviceAreas: parsedAreas,
+      maxDailyMeals: Number(formData.maxDailyMeals),
+      hasColdStorage: formData.hasColdStorage,
     };
 
-    const result = mockDataService.updateNGOProfile(ngo.id, user.id, updates);
-
-    if (!result.success) {
-      setFeedback({ type: 'error', message: result.error || 'Failed to update profile.' });
-    } else {
-      setFeedback({
-        type: 'success',
-        message: 'Organization profile updated and persisted successfully.',
-      });
-      if (result.ngo) {
-        setNgo(result.ngo);
+    try {
+      try {
+        const response = await apiClient.ngo.updateMe(updates);
+        if (response?.success) {
+          setFeedback({
+            type: 'success',
+            message: 'Organization profile updated and persisted successfully to live database.',
+          });
+          const fresh = await apiClient.ngo.getMe().catch(() => null);
+          if (fresh?.ngo) setNgo(mapNgoFromDb(fresh.ngo));
+          setIsEditing(false);
+          return;
+        }
+      } catch (apiErr: any) {
+        if (isProduction) {
+          setFeedback({ type: 'error', message: apiErr.message || 'Server error: Failed to update profile.' });
+          return;
+        }
       }
-      setIsEditing(false);
+
+      const result = mockDataService.updateNGOProfile(ngo.id, user.id, updates as any);
+      if (!result.success) {
+        setFeedback({ type: 'error', message: result.error || 'Failed to update profile.' });
+      } else {
+        setFeedback({
+          type: 'success',
+          message: 'Organization profile updated and persisted successfully.',
+        });
+        if (result.ngo) {
+          setNgo(result.ngo);
+        }
+        setIsEditing(false);
+      }
+    } catch (err: any) {
+      setFeedback({ type: 'error', message: err.message || 'Failed to update profile.' });
     }
   };
 

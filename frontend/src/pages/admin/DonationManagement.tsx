@@ -22,8 +22,12 @@ import { Modal } from '../../components/common/Modal';
 import { EmptyState } from '../../components/common/EmptyState';
 import { DonationProgressTracker } from '../../components/donor/DonationProgressTracker';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient, mapDonationFromDb } from '../../lib/apiClient';
 import { mockDataService } from '../../lib/mockDataService';
+import { Loading } from '../../components/common/Loading';
 import type { Donation, DonationStatus, FoodCategory, UrgencyLevel } from '../../types';
+
+const isProduction = Boolean((import.meta as any).env?.PROD);
 
 export const DonationManagement: React.FC = () => {
   const { user: currentAdmin } = useAuth();
@@ -39,8 +43,27 @@ export const DonationManagement: React.FC = () => {
   const [cancelReason, setCancelReason] = useState('');
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-  const loadDonations = () => {
+  const [isLoading, setIsLoading] = useState(true);
+
+  const loadDonations = async () => {
+    setIsLoading(true);
+    try {
+      const response = await apiClient.admin.listDonations();
+      if (response?.data?.donations) {
+        setDonations(response.data.donations.map(mapDonationFromDb));
+        setIsLoading(false);
+        return;
+      }
+    } catch (err: any) {
+      if (isProduction) {
+        setFeedback({ type: 'error', message: err.message || 'Failed to load donations from server.' });
+        setIsLoading(false);
+        return;
+      }
+    }
+
     setDonations(mockDataService.getDonations());
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -70,34 +93,57 @@ export const DonationManagement: React.FC = () => {
       });
   }, [donations, searchQuery, statusFilter, categoryFilter, urgencyFilter, sortBy]);
 
-  const handleAdminCancel = () => {
+  const handleAdminCancel = async () => {
     if (!cancellingDonation || !currentAdmin) return;
     if (!cancelReason.trim()) {
       setFeedback({ type: 'error', message: 'A specific reason is required for administrative cancellation.' });
       return;
     }
 
-    const result = mockDataService.adminCancelDonation(
-      cancellingDonation.id,
-      currentAdmin.id,
-      cancelReason.trim()
-    );
+    try {
+      try {
+        const response = await apiClient.donations.cancel(cancellingDonation.id, cancelReason.trim());
+        if (response?.success) {
+          setFeedback({
+            type: 'success',
+            message: `Donation #${cancellingDonation.id} (${cancellingDonation.foodName}) cancelled administratively.`,
+          });
+          loadDonations();
+          setCancellingDonation(null);
+          setCancelReason('');
+          return;
+        }
+      } catch (apiErr: any) {
+        if (isProduction) {
+          setFeedback({ type: 'error', message: apiErr.message || 'Server error: Failed to cancel donation.' });
+          return;
+        }
+      }
 
-    if (result.success) {
-      setFeedback({
-        type: 'success',
-        message: `Donation #${cancellingDonation.id} (${cancellingDonation.foodName}) cancelled administratively.`,
-      });
-      loadDonations();
-    } else {
-      setFeedback({
-        type: 'error',
-        message: result.error || 'Failed to cancel donation.',
-      });
+      const result = mockDataService.adminCancelDonation(
+        cancellingDonation.id,
+        currentAdmin.id,
+        cancelReason.trim()
+      );
+
+      if (result.success) {
+        setFeedback({
+          type: 'success',
+          message: `Donation #${cancellingDonation.id} (${cancellingDonation.foodName}) cancelled administratively.`,
+        });
+        loadDonations();
+      } else {
+        setFeedback({
+          type: 'error',
+          message: result.error || 'Failed to cancel donation.',
+        });
+      }
+    } catch (err: any) {
+      setFeedback({ type: 'error', message: err.message || 'Failed to cancel donation.' });
+    } finally {
+      setCancellingDonation(null);
+      setCancelReason('');
     }
-
-    setCancellingDonation(null);
-    setCancelReason('');
   };
 
   const columns: TableColumn<Donation>[] = [

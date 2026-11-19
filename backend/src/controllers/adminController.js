@@ -21,7 +21,7 @@ export const getSystemStats = async (req, res, next) => {
     );
 
     const assignmentStats = await query(
-      `SELECT status, count(*)::int as count FROM volunteer_assignments GROUP BY status`
+      `SELECT status, count(*)::int as count FROM assignments GROUP BY status`
     );
 
     const totalMealsRescued = await query(
@@ -30,7 +30,7 @@ export const getSystemStats = async (req, res, next) => {
     );
 
     const activeDeliveries = await query(
-      `SELECT count(*)::int as count FROM volunteer_assignments WHERE status IN ('ASSIGNED', 'PICKED_UP')`
+      `SELECT count(*)::int as count FROM assignments WHERE status IN ('assigned', 'in_transit_to_pickup', 'picked_up', 'in_transit_to_drop')`
     );
 
     res.status(200).json({
@@ -119,9 +119,9 @@ export const updateUserStatus = async (req, res, next) => {
 
     // Log admin audit action
     await query(
-      `INSERT INTO audit_logs (user_id, action, resource_type, resource_id, metadata)
-       VALUES ($1, $2, $3, $4, $5)`,
-      [req.user.id, is_active ? 'USER_ACTIVATED' : 'USER_SUSPENDED', 'users', id, JSON.stringify({ is_active })]
+      `INSERT INTO admin_activity_logs (admin_id, action_type, target_id, target_type, description, metadata)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [req.user.id, is_active ? 'USER_ACTIVATED' : 'USER_SUSPENDED', id, 'users', `Admin updated user status to ${is_active ? 'Active' : 'Suspended'}`, JSON.stringify({ is_active })]
     );
 
     res.status(200).json({
@@ -206,9 +206,9 @@ export const reviewNGOVerification = async (req, res, next) => {
 
       // Audit log
       await client.query(
-        `INSERT INTO audit_logs (user_id, action, resource_type, resource_id, metadata)
-         VALUES ($1, $2, $3, $4, $5)`,
-        [req.user.id, `NGO_${status}`, 'ngos', id, JSON.stringify({ notes })]
+        `INSERT INTO admin_activity_logs (admin_id, action_type, target_id, target_type, description, metadata)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [req.user.id, `NGO_${status}`, id, 'ngos', `Admin reviewed NGO verification: ${status}`, JSON.stringify({ notes })]
       );
 
       return updatedNGO.rows[0];
@@ -281,19 +281,18 @@ export const listAllDonations = async (req, res, next) => {
 export const getActiveDeliveriesTelemetry = async (req, res, next) => {
   try {
     const activeAssignments = await query(
-      `SELECT a.id as assignment_id, a.status as assignment_status, a.created_at,
-              d.id as donation_id, d.title as donation_title, d.food_category, d.quantity, d.unit,
-              d.pickup_address, d.pickup_latitude, d.pickup_longitude,
-              d.delivery_latitude, d.delivery_longitude,
-              v.id as volunteer_id, u.name as volunteer_name, u.phone as volunteer_phone,
-              vl.latitude as current_latitude, vl.longitude as current_longitude, vl.updated_at as location_updated_at
-       FROM volunteer_assignments a
+      `SELECT a.id as assignment_id, a.status as assignment_status, a.assigned_at as created_at,
+              d.id as donation_id, d.food_name as donation_title, d.category as food_category, d.quantity, d.unit,
+              a.pickup_address, d.latitude as pickup_latitude, d.longitude as pickup_longitude,
+              n.latitude as delivery_latitude, n.longitude as delivery_longitude,
+              v.id as volunteer_id, v.name as volunteer_name, v.phone as volunteer_phone,
+              v.current_latitude, v.current_longitude, v.location_updated_at
+       FROM assignments a
        JOIN donations d ON a.donation_id = d.id
-       JOIN volunteers v ON a.volunteer_id = v.id
-       JOIN users u ON v.user_id = u.id
-       LEFT JOIN volunteer_locations vl ON vl.volunteer_id = v.id
-       WHERE a.status IN ('ASSIGNED', 'PICKED_UP')
-       ORDER BY a.created_at DESC`
+       JOIN ngos n ON a.ngo_id = n.id
+       LEFT JOIN volunteers v ON a.volunteer_id = v.id
+       WHERE a.status IN ('assigned', 'in_transit_to_pickup', 'picked_up', 'in_transit_to_drop')
+       ORDER BY a.assigned_at DESC`
     );
 
     res.status(200).json({
@@ -313,8 +312,8 @@ export const getAuditLogs = async (req, res, next) => {
 
     const result = await query(
       `SELECT l.*, u.name as user_name, u.email as user_email, u.role as user_role
-       FROM audit_logs l
-       LEFT JOIN users u ON l.user_id = u.id
+       FROM admin_activity_logs l
+       LEFT JOIN users u ON l.admin_id = u.id
        ORDER BY l.created_at DESC
        LIMIT $1 OFFSET $2`,
       [limit, offset]

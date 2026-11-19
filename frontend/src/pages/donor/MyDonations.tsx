@@ -19,8 +19,12 @@ import {
   ArrowUpDown,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient, mapDonationFromDb } from '../../lib/apiClient';
 import { mockDataService } from '../../lib/mockDataService';
+import { Loading } from '../../components/common/Loading';
 import type { Donation, DonationStatus, FoodCategory, UrgencyLevel } from '../../types/donation';
+
+const isProduction = Boolean((import.meta as any).env?.PROD);
 
 const statusBadgeMap: Record<DonationStatus, { variant: 'success' | 'warning' | 'info' | 'neutral' | 'danger'; label: string }> = {
   CREATED: { variant: 'neutral', label: 'Created' },
@@ -38,6 +42,8 @@ const MyDonations: React.FC = () => {
   const location = useLocation();
 
   const [donations, setDonations] = useState<Donation[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -49,10 +55,28 @@ const MyDonations: React.FC = () => {
   const [bannerMessage, setBannerMessage] = useState<string | null>(null);
 
   // Load donations strictly for authenticated donor
-  const reloadDonations = () => {
+  const reloadDonations = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await apiClient.donations.getAll();
+      if (response?.donations) {
+        setDonations(response.donations.map(mapDonationFromDb));
+        setIsLoading(false);
+        return;
+      }
+    } catch (err: any) {
+      if (isProduction) {
+        setError(err.message || 'Unable to load food donations from server.');
+        setIsLoading(false);
+        return;
+      }
+    }
+
     if (user) {
       setDonations(mockDataService.getDonationsByDonor(user.id));
     }
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -199,8 +223,19 @@ const MyDonations: React.FC = () => {
         </div>
       </Card>
 
+      {/* Server Error Alert */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+          <strong>Error loading donations:</strong> {error}
+        </div>
+      )}
+
       {/* Donations List / Cards */}
-      {filteredDonations.length === 0 ? (
+      {isLoading ? (
+        <Card className="p-12">
+          <Loading message="Loading food donation records from server..." />
+        </Card>
+      ) : filteredDonations.length === 0 ? (
         <Card className="p-8">
           <EmptyState
             icon={<Package size={56} className="text-primary" />}

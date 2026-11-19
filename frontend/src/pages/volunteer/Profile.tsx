@@ -19,8 +19,11 @@ import {
   Calendar,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient, mapVolunteerFromDb } from '../../lib/apiClient';
 import { mockDataService } from '../../lib/mockDataService';
 import type { Volunteer, VolunteerAvailability } from '../../types/volunteer';
+
+const isProduction = Boolean((import.meta as any).env?.PROD);
 
 const VEHICLE_OPTIONS: { id: 'two_wheeler' | 'four_wheeler' | 'van' | 'none'; label: string }[] = [
   { id: 'two_wheeler', label: 'Two-Wheeler (Motorcycle / Scooter)' },
@@ -57,6 +60,36 @@ const VolunteerProfile: React.FC = () => {
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
+  React.useEffect(() => {
+    let isMounted = true;
+    async function loadVolunteer() {
+      try {
+        const res = await apiClient.volunteer.getMe();
+        if (res?.volunteer && isMounted) {
+          const mapped = mapVolunteerFromDb(res.volunteer);
+          setVolunteer(mapped);
+          setFormData({
+            name: mapped.name,
+            email: mapped.email,
+            phone: mapped.phone,
+            vehicleType: mapped.vehicleType,
+            availability: mapped.availability,
+            serviceArea: mapped.serviceArea ? mapped.serviceArea.join(', ') : '',
+          });
+        }
+      } catch {
+        if (!isProduction && user && isMounted) {
+          const mock = mockDataService.getVolunteerByUserId(user.id);
+          if (mock) setVolunteer(mock);
+        }
+      }
+    }
+    loadVolunteer();
+    return () => {
+      isMounted = false;
+    };
+  }, [user]);
+
   if (!user || !volunteer) {
     return (
       <div className="p-6">
@@ -79,37 +112,63 @@ const VolunteerProfile: React.FC = () => {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setFeedback(null);
-    if (!validate()) return;
+    if (!validate() || !volunteer) return;
 
     const parsedAreas = formData.serviceArea
       .split(',')
       .map((s) => s.trim())
       .filter(Boolean);
 
-    const updates: Partial<Volunteer> = {
+    const updates = {
       name: formData.name.trim(),
       email: formData.email.trim(),
       phone: formData.phone.trim(),
       vehicleType: formData.vehicleType,
       availability: formData.availability,
-      serviceArea: parsedAreas,
+      serviceAreas: parsedAreas,
     };
 
-    const result = mockDataService.updateVolunteerProfile(volunteer.id, user.id, updates);
+    try {
+      try {
+        const [updateRes, availRes] = await Promise.all([
+          apiClient.volunteer.updateMe(updates),
+          apiClient.volunteer.updateAvailability(formData.availability),
+        ]);
 
-    if (!result.success) {
-      setFeedback({ type: 'error', message: result.error || 'Failed to update profile.' });
-    } else {
-      setFeedback({
-        type: 'success',
-        message: 'Volunteer profile updated and persisted successfully.',
-      });
-      if (result.volunteer) {
-        setVolunteer(result.volunteer);
+        if (updateRes?.success || availRes?.success) {
+          setFeedback({
+            type: 'success',
+            message: 'Volunteer profile updated and persisted successfully to live database.',
+          });
+          const fresh = await apiClient.volunteer.getMe().catch(() => null);
+          if (fresh?.volunteer) setVolunteer(mapVolunteerFromDb(fresh.volunteer));
+          setIsEditing(false);
+          return;
+        }
+      } catch (apiErr: any) {
+        if (isProduction) {
+          setFeedback({ type: 'error', message: apiErr.message || 'Server error: Failed to update profile.' });
+          return;
+        }
       }
-      setIsEditing(false);
+
+      const result = mockDataService.updateVolunteerProfile(volunteer.id, user.id, updates as any);
+      if (!result.success) {
+        setFeedback({ type: 'error', message: result.error || 'Failed to update profile.' });
+      } else {
+        setFeedback({
+          type: 'success',
+          message: 'Volunteer profile updated and persisted successfully.',
+        });
+        if (result.volunteer) {
+          setVolunteer(result.volunteer);
+        }
+        setIsEditing(false);
+      }
+    } catch (err: any) {
+      setFeedback({ type: 'error', message: err.message || 'Failed to update profile.' });
     }
   };
 
@@ -242,6 +301,48 @@ const VolunteerProfile: React.FC = () => {
               <span className="text-primary-text font-medium">
                 {new Date(volunteer.createdAt).toLocaleDateString()}
               </span>
+            </div>
+
+            <div className="pt-3 border-t border-border">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full text-xs flex items-center justify-center gap-1.5"
+                onClick={() => {
+                  if (!navigator.geolocation) {
+                    setFeedback({ type: 'error', message: 'Geolocation is not supported by your browser.' });
+                    return;
+                  }
+                  navigator.geolocation.getCurrentPosition(
+                    async (position) => {
+                      try {
+                        await apiClient.volunteer.updateLocation({
+                          latitude: position.coords.latitude,
+                          longitude: position.coords.longitude,
+                          speed: position.coords.speed || 0,
+                          heading: position.coords.heading || 0,
+                        });
+                        setFeedback({
+                          type: 'success',
+                          message: `Location shared successfully (${position.coords.latitude.toFixed(4)}, ${position.coords.longitude.toFixed(4)}).`,
+                        });
+                      } catch {
+                        setFeedback({ type: 'error', message: 'Failed to update live coordinates on server.' });
+                      }
+                    },
+                    (geoErr) => {
+                      setFeedback({
+                        type: 'error',
+                        message: `Location consent not granted: ${geoErr.message}`,
+                      });
+                    },
+                    { enableHighAccuracy: true }
+                  );
+                }}
+              >
+                <MapPin size={14} className="text-primary" />
+                <span>Update GPS Location (Consent-Based)</span>
+              </Button>
             </div>
           </div>
         </Card>

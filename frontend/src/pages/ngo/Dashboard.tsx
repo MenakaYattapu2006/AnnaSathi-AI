@@ -24,8 +24,12 @@ import {
   FileCheck,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient, mapNgoFromDb, mapDonationFromDb } from '../../lib/apiClient';
 import { mockDataService } from '../../lib/mockDataService';
+import type { NGO } from '../../types/ngo';
 import type { Donation, DonationStatus } from '../../types/donation';
+
+const isProduction = Boolean((import.meta as any).env?.PROD);
 
 const statusBadgeMap: Record<
   DonationStatus,
@@ -45,25 +49,80 @@ const NGODashboard: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const ngo = user ? mockDataService.getNGOByUserId(user.id) : undefined;
+  const [ngo, setNgo] = useState<NGO | null>(null);
+  const [selectedDonation, setSelectedDonation] = useState<Donation | null>(null);
+  const [stats, setStats] = useState({
+    availableDonationsCount: 0,
+    acceptedDonationsCount: 0,
+    activeVolunteerAssignmentsCount: 0,
+    completedDeliveriesCount: 0,
+    receiptConfirmedCount: 0,
+    totalMealsReceived: 0,
+    categoryDistribution: [] as { category: string; count: number }[],
+    recentDonations: [] as Donation[],
+  });
+  const [isLoading, setIsLoading] = useState(true);
+
   const verificationStatus = ngo?.verificationStatus || 'pending';
 
-  // Selected donation for viewing in details modal
-  const [selectedDonation, setSelectedDonation] = useState<Donation | null>(null);
+  useEffect(() => {
+    let isMounted = true;
+    async function loadData() {
+      try {
+        const ngoRes = await apiClient.ngo.getMe().catch(() => null);
+        if (ngoRes?.ngo && isMounted) {
+          setNgo(mapNgoFromDb(ngoRes.ngo));
+        }
 
-  // Compute live statistics filtered strictly for this NGO
-  const stats = user
-    ? mockDataService.getNGODashboardStats(user.id)
-    : {
-        availableDonationsCount: 0,
-        acceptedDonationsCount: 0,
-        activeVolunteerAssignmentsCount: 0,
-        completedDeliveriesCount: 0,
-        receiptConfirmedCount: 0,
-        totalMealsReceived: 0,
-        categoryDistribution: [],
-        recentDonations: [],
-      };
+        const [availRes, acceptedRes] = await Promise.all([
+          apiClient.ngo.getAvailableDonations().catch(() => ({ donations: [] })),
+          apiClient.ngo.getAcceptedDonations().catch(() => ({ donations: [] })),
+        ]);
+
+        if (isMounted && acceptedRes?.donations) {
+          const acceptedList: Donation[] = acceptedRes.donations.map(mapDonationFromDb);
+          const availCount = (availRes?.donations || []).length;
+          const activeVolCount = acceptedList.filter(
+            (d) => d.status === 'VOLUNTEER_ASSIGNED' || d.status === 'PICKED_UP'
+          ).length;
+          const completedCount = acceptedList.filter((d) => d.status === 'DELIVERED').length;
+          const confirmedCount = acceptedList.filter((d) => d.status === 'RECEIPT_CONFIRMED').length;
+          const totalMeals = acceptedList
+            .filter((d) => d.status === 'DELIVERED' || d.status === 'RECEIPT_CONFIRMED')
+            .reduce((sum, d) => sum + (d.numberOfServings || (d.unit === 'meals' ? d.quantity : d.quantity * 2)), 0);
+
+          setStats({
+            availableDonationsCount: availCount,
+            acceptedDonationsCount: acceptedList.length,
+            activeVolunteerAssignmentsCount: activeVolCount,
+            completedDeliveriesCount: completedCount,
+            receiptConfirmedCount: confirmedCount,
+            totalMealsReceived: totalMeals,
+            categoryDistribution: [],
+            recentDonations: acceptedList.slice(0, 5),
+          });
+          setIsLoading(false);
+          return;
+        }
+      } catch {
+        if (isProduction) {
+          if (isMounted) setIsLoading(false);
+          return;
+        }
+      }
+
+      if (user && isMounted) {
+        setNgo(mockDataService.getNGOByUserId(user.id) || null);
+        setStats(mockDataService.getNGODashboardStats(user.id));
+      }
+      if (isMounted) setIsLoading(false);
+    }
+
+    loadData();
+    return () => {
+      isMounted = false;
+    };
+  }, [user]);
 
   const orgDisplayName =
     ngo?.organizationName || user?.profile?.organizationName || user?.name || 'Partner Organization';

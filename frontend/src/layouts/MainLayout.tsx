@@ -1,11 +1,16 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Outlet, useNavigate, NavLink } from 'react-router-dom';
-import { Bell, LogOut, Menu, X, ChevronDown } from 'lucide-react';
+import { Bell, LogOut, Menu, X, ChevronDown, Check, CheckCheck } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import type { UserRole } from '../contexts/AuthContext';
 import { getNavItems, ROLE_LABELS } from '../routes/navigation';
 import { Sidebar } from '../components/common/Sidebar';
 import { Badge } from '../components/common/Badge';
+import { apiClient, mapNotificationFromDb } from '../lib/apiClient';
+import { mockDataService } from '../lib/mockDataService';
+import type { Notification } from '../types/notification';
+
+const isProduction = Boolean((import.meta as any).env?.PROD);
 
 const ALL_ROLES: UserRole[] = ['donor', 'ngo', 'volunteer', 'admin'];
 
@@ -20,6 +25,61 @@ export const MainLayout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [roleMenuOpen, setRoleMenuOpen] = useState(false);
   const roleMenuRef = useRef<HTMLDivElement>(null);
+
+  const [notifMenuOpen, setNotifMenuOpen] = useState(false);
+  const notifMenuRef = useRef<HTMLDivElement>(null);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  const loadNotifications = useCallback(async () => {
+    try {
+      const res = await apiClient.notifications.getAll();
+      if (res?.notifications) {
+        setNotifications(res.notifications.map(mapNotificationFromDb));
+        return;
+      }
+    } catch {
+      if (isProduction) return;
+    }
+    if (user) {
+      setNotifications(mockDataService.getNotificationsByUser(user.id));
+    }
+  }, [user]);
+
+  useEffect(() => {
+    loadNotifications();
+  }, [loadNotifications]);
+
+  const handleMarkRead = async (id: string) => {
+    try {
+      await apiClient.notifications.markRead(id);
+    } catch {
+      // offline dev fallback
+    }
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, status: 'read' as const } : n))
+    );
+  };
+
+  const handleMarkAllRead = async () => {
+    try {
+      await apiClient.notifications.markAllRead();
+    } catch {
+      // offline dev fallback
+    }
+    setNotifications((prev) => prev.map((n) => ({ ...n, status: 'read' as const })));
+  };
+
+  // Close notifications dropdown on outside click
+  useEffect(() => {
+    if (!notifMenuOpen) return;
+    const handleClick = (e: MouseEvent) => {
+      if (notifMenuRef.current && !notifMenuRef.current.contains(e.target as Node)) {
+        setNotifMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [notifMenuOpen]);
 
   // Close role dropdown on outside click
   useEffect(() => {
@@ -139,13 +199,73 @@ export const MainLayout: React.FC = () => {
           </div>
 
           {/* Notifications */}
-          <button
-            className="text-white/80 hover:text-white relative"
-            aria-label="Notifications"
-          >
-            <Bell size={20} />
-            <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-accent" />
-          </button>
+          <div className="relative" ref={notifMenuRef}>
+            <button
+              onClick={() => {
+                setNotifMenuOpen((prev) => !prev);
+                loadNotifications();
+              }}
+              className="text-white/80 hover:text-white relative p-1 rounded-md focus:outline-none"
+              aria-label="Notifications"
+            >
+              <Bell size={20} />
+              {notifications.filter((n) => n.status === 'unread').length > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-accent text-[10px] font-bold text-white flex items-center justify-center">
+                  {notifications.filter((n) => n.status === 'unread').length}
+                </span>
+              )}
+            </button>
+
+            {notifMenuOpen && (
+              <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-surface rounded-lg shadow-xl border border-border py-2 z-50 text-left">
+                <div className="px-4 py-2 border-b border-border flex items-center justify-between">
+                  <span className="font-semibold text-xs text-primary-text uppercase tracking-wider">
+                    Notifications
+                  </span>
+                  {notifications.some((n) => n.status === 'unread') && (
+                    <button
+                      onClick={handleMarkAllRead}
+                      className="text-xs text-primary hover:underline flex items-center gap-1"
+                    >
+                      <CheckCheck size={14} />
+                      <span>Mark all as read</span>
+                    </button>
+                  )}
+                </div>
+
+                <div className="max-h-80 overflow-y-auto divide-y divide-border/60">
+                  {notifications.length === 0 ? (
+                    <div className="p-4 text-center text-xs text-secondary-text">
+                      No notifications yet
+                    </div>
+                  ) : (
+                    notifications.slice(0, 10).map((n) => (
+                      <div
+                        key={n.id}
+                        onClick={() => handleMarkRead(n.id)}
+                        className={`p-3 text-xs hover:bg-background/80 transition-colors cursor-pointer ${
+                          n.status === 'unread' ? 'bg-primary/5 font-medium' : 'text-secondary-text'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="font-semibold text-primary-text">{n.title}</p>
+                          {n.status === 'unread' && (
+                            <span className="h-2 w-2 rounded-full bg-primary flex-shrink-0 mt-1" />
+                          )}
+                        </div>
+                        <p className="text-secondary-text text-[11px] mt-0.5 line-clamp-2">
+                          {n.message}
+                        </p>
+                        <span className="text-[10px] text-secondary-text/80 mt-1 block">
+                          {new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* User name (desktop) */}
           <span className="text-white text-sm font-medium hidden md:inline">{user.name}</span>

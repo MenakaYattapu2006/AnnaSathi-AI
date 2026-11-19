@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { PageHeader } from '../../components/common/PageHeader';
 import { Badge } from '../../components/common/Badge';
 import { Button } from '../../components/common/Button';
@@ -8,8 +8,11 @@ import { EmptyState } from '../../components/common/EmptyState';
 import { DonationDetailsModal } from '../../components/donor/DonationDetailsModal';
 import { History, Eye, Calendar, Building2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient, mapDonationFromDb } from '../../lib/apiClient';
 import { mockDataService } from '../../lib/mockDataService';
 import type { Donation, DonationStatus } from '../../types/donation';
+
+const isProduction = Boolean((import.meta as any).env?.PROD);
 
 const statusBadgeMap: Record<DonationStatus, { variant: 'success' | 'warning' | 'info' | 'neutral' | 'danger'; label: string }> = {
   CREATED: { variant: 'neutral', label: 'Created' },
@@ -26,11 +29,38 @@ const DonorDonationHistory: React.FC = () => {
   const { user } = useAuth();
   const [selectedDonation, setSelectedDonation] = useState<Donation | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [donations, setDonations] = useState<Donation[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadData() {
+      try {
+        const res = await apiClient.donations.getAll();
+        if (res?.donations && isMounted) {
+          setDonations(res.donations.map(mapDonationFromDb));
+          setIsLoading(false);
+          return;
+        }
+      } catch {
+        if (isProduction) {
+          if (isMounted) setIsLoading(false);
+          return;
+        }
+      }
+      if (user && isMounted) {
+        setDonations(mockDataService.getDonationsByDonor(user.id));
+      }
+      if (isMounted) setIsLoading(false);
+    }
+    loadData();
+    return () => {
+      isMounted = false;
+    };
+  }, [user]);
 
   const historyDonations = useMemo(() => {
-    if (!user) return [];
-    return mockDataService
-      .getDonationsByDonor(user.id)
+    return donations
       .filter(
         (d) =>
           d.status === 'DELIVERED' ||
@@ -38,7 +68,7 @@ const DonorDonationHistory: React.FC = () => {
           d.status === 'CANCELLED'
       )
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  }, [user]);
+  }, [donations]);
 
   const columns: TableColumn<Donation>[] = [
     {
@@ -68,10 +98,11 @@ const DonorDonationHistory: React.FC = () => {
     {
       header: 'Recipient NGO',
       accessor: (row) => {
-        const ngo = row.matchedNgoId ? mockDataService.getNGOById(row.matchedNgoId) : undefined;
+        const ngoName = (row as any).matched_ngo_name;
+        const ngo = (!ngoName && row.matchedNgoId) ? mockDataService.getNGOById(row.matchedNgoId) : undefined;
         return (
           <span className="text-xs text-secondary-text font-medium">
-            {ngo ? ngo.organizationName : row.status === 'CANCELLED' ? 'None (Cancelled)' : 'Community Distribution'}
+            {ngoName || (ngo ? ngo.organizationName : row.status === 'CANCELLED' ? 'None (Cancelled)' : 'Community Distribution')}
           </span>
         );
       },

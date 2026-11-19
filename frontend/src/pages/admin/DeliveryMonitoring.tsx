@@ -20,8 +20,11 @@ import { Button } from '../../components/common/Button';
 import { Modal } from '../../components/common/Modal';
 import { EmptyState } from '../../components/common/EmptyState';
 import { DeliveryMap } from '../../components/common/DeliveryMap';
+import { apiClient, mapAssignmentFromDb, mapDonationFromDb } from '../../lib/apiClient';
 import { mockDataService } from '../../lib/mockDataService';
 import type { Assignment, AssignmentStatus, Donation } from '../../types';
+
+const isProduction = Boolean((import.meta as any).env?.PROD);
 
 export const DeliveryMonitoring: React.FC = () => {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
@@ -30,9 +33,36 @@ export const DeliveryMonitoring: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<'all' | 'available' | 'active' | 'delivered' | 'cancelled'>('all');
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
 
-  const loadData = () => {
+  const [isLoading, setIsLoading] = useState(true);
+
+  const loadData = async () => {
+    setIsLoading(true);
+    try {
+      const [telemetryRes, donRes] = await Promise.all([
+        apiClient.admin.getTelemetry(),
+        apiClient.admin.listDonations(),
+      ]);
+
+      if (telemetryRes?.data) {
+        setAssignments(telemetryRes.data.map(mapAssignmentFromDb));
+      }
+      if (donRes?.data?.donations) {
+        setDonations(donRes.data.donations.map(mapDonationFromDb));
+      }
+      if (telemetryRes?.data || donRes?.data?.donations) {
+        setIsLoading(false);
+        return;
+      }
+    } catch {
+      if (isProduction) {
+        setIsLoading(false);
+        return;
+      }
+    }
+
     setAssignments(mockDataService.getAssignments());
     setDonations(mockDataService.getDonations());
+    setIsLoading(false);
   };
 
   useEffect(() => {

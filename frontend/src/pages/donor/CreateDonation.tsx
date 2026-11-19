@@ -7,8 +7,11 @@ import { Card } from '../../components/common/Card';
 import { Badge } from '../../components/common/Badge';
 import { Sparkles, CheckCircle2, Flame } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient, mapDonationFromDb } from '../../lib/apiClient';
 import { mockDataService } from '../../lib/mockDataService';
 import type { FoodCategory, QuantityUnit, Donation } from '../../types/donation';
+
+const isProduction = Boolean((import.meta as any).env?.PROD);
 
 const FOOD_CATEGORIES: { value: FoodCategory; label: string }[] = [
   { value: 'cooked_meals', label: 'Cooked Meals (Catering / Banquet / Buffet)' },
@@ -115,13 +118,56 @@ const CreateDonation: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate() || !user) return;
 
     setIsSubmitting(true);
+    setErrors((prev) => {
+      const copy = { ...prev };
+      delete copy.submit;
+      return copy;
+    });
+
+    const donationPayload = {
+      foodName: foodName.trim(),
+      category,
+      quantity: Number(quantity),
+      unit,
+      numberOfServings: unit === 'meals' ? Number(quantity) : undefined,
+      dietaryType,
+      preparationTime: new Date(preparationTime).toISOString(),
+      expiryTime: new Date(expiryTime).toISOString(),
+      pickupAddress: {
+        street: street.trim(),
+        city: city.trim(),
+        state: 'Telangana',
+        pincode: pincode.trim() || '500001',
+        latitude: 17.4156,
+        longitude: 78.4357,
+        landmark: landmark.trim() || undefined,
+      },
+      specialInstructions: specialInstructions.trim() || undefined,
+      imageUrl: imageUrl.trim() || undefined,
+    };
 
     try {
+      try {
+        const response = await apiClient.donations.create(donationPayload);
+        if (response?.donation) {
+          navigate('/donor/my-donations', {
+            state: { newDonationCreated: true, donationId: response.donation.id },
+          });
+          return;
+        }
+      } catch (apiErr: any) {
+        if (isProduction) {
+          setErrors({ submit: apiErr.message || 'Server error: Unable to create donation.' });
+          return;
+        }
+      }
+
+      // Local fallback in non-production mode if backend is offline
       const urgency = mockDataService.calculateUrgency(
         category,
         new Date(preparationTime).toISOString(),
@@ -131,35 +177,16 @@ const CreateDonation: React.FC = () => {
       const newDonation: Donation = {
         id: `don-${Date.now().toString(36)}`,
         donorId: user.id,
-        foodName: foodName.trim(),
-        category,
-        quantity: Number(quantity),
-        unit,
-        numberOfServings: unit === 'meals' ? Number(quantity) : undefined,
-        dietaryType,
-        preparationTime: new Date(preparationTime).toISOString(),
-        expiryTime: new Date(expiryTime).toISOString(),
-        pickupAddress: {
-          street: street.trim(),
-          city: city.trim(),
-          state: 'Telangana',
-          pincode: pincode.trim() || '500001',
-          latitude: 17.4156,
-          longitude: 78.4357,
-          landmark: landmark.trim() || undefined,
-        },
+        ...donationPayload,
         urgencyScore: urgency.score,
         urgencyLevel: urgency.level,
         status: 'CREATED',
-        specialInstructions: specialInstructions.trim() || undefined,
-        imageUrl: imageUrl.trim() || undefined,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
 
       mockDataService.createDonation(newDonation);
 
-      // Redirect to donor's listings with success feedback
       navigate('/donor/my-donations', {
         state: { newDonationCreated: true, donationId: newDonation.id },
       });
@@ -185,6 +212,11 @@ const CreateDonation: React.FC = () => {
       />
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        {errors.submit && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
+            <span className="font-semibold">Submission Error:</span> {errors.submit}
+          </div>
+        )}
         {/* Section 1: Food Details */}
         <Card className="p-6">
           <h2 className="text-lg font-bold text-primary-text mb-4">1. Food Information</h2>

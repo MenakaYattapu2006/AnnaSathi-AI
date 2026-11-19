@@ -19,17 +19,106 @@ import { Card } from '../../components/common/Card';
 import { Badge } from '../../components/common/Badge';
 import { Button } from '../../components/common/Button';
 import { DashboardStatCard } from '../../components/common/DashboardStatCard';
+import { apiClient } from '../../lib/apiClient';
 import { mockDataService } from '../../lib/mockDataService';
 import type { AdminDashboardStats, AdminActivityLogEntry } from '../../types';
+
+const isProduction = Boolean((import.meta as any).env?.PROD);
 
 export const AdminDashboard: React.FC = () => {
   const [stats, setStats] = useState<AdminDashboardStats | null>(null);
   const [activityLogs, setActivityLogs] = useState<AdminActivityLogEntry[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const data = mockDataService.getAdminDashboardStats();
-    setStats(data);
-    setActivityLogs(mockDataService.getAdminActivityLogs().slice(0, 5));
+    let isMounted = true;
+    async function loadAdminData() {
+      try {
+        const [statsRes, logsRes] = await Promise.all([
+          apiClient.admin.getStats(),
+          apiClient.admin.getAuditLogs({ limit: 5 }),
+        ]);
+
+        if (statsRes?.data && isMounted) {
+          const userRows = statsRes.data.users || [];
+          const totalUsers = userRows.reduce((sum: number, u: any) => sum + Number(u.count), 0);
+          const totalDonors = userRows.find((u: any) => u.role === 'donor')?.count || 0;
+          const totalNGOs = userRows.find((u: any) => u.role === 'ngo')?.count || 0;
+          const totalVolunteers = userRows.find((u: any) => u.role === 'volunteer')?.count || 0;
+
+          const ngoRows = statsRes.data.ngos || [];
+          const pendingNGOs = ngoRows.find((n: any) => n.verification_status === 'pending')?.count || 0;
+          const verifiedNGOs = ngoRows.find((n: any) => n.verification_status === 'verified')?.count || 0;
+
+          const donRows = statsRes.data.donations || [];
+          const totalDonations = donRows.reduce((sum: number, d: any) => sum + Number(d.count), 0);
+          const availableDonations = donRows
+            .filter((d: any) => d.status === 'CREATED' || d.status === 'NGO_MATCHED')
+            .reduce((sum: number, d: any) => sum + Number(d.count), 0);
+          const acceptedDonations = donRows
+            .filter((d: any) => d.status === 'NGO_ACCEPTED' || d.status === 'VOLUNTEER_ASSIGNED')
+            .reduce((sum: number, d: any) => sum + Number(d.count), 0);
+          const completedDeliveries = donRows
+            .filter((d: any) => d.status === 'DELIVERED' || d.status === 'RECEIPT_CONFIRMED')
+            .reduce((sum: number, d: any) => sum + Number(d.count), 0);
+
+          setStats({
+            totalUsers,
+            totalDonors,
+            totalNGOs,
+            totalVolunteers,
+            pendingNGOs,
+            verifiedNGOs,
+            rejectedNGOs: ngoRows.find((n: any) => n.verification_status === 'rejected')?.count || 0,
+            totalDonations,
+            availableDonations,
+            acceptedDonations,
+            completedDeliveries,
+            activeDeliveries: Number(statsRes.data.activeDeliveriesCount || 0),
+            receiptConfirmedDonations: donRows.find((d: any) => d.status === 'RECEIPT_CONFIRMED')?.count || 0,
+            cancelledDonations: donRows.find((d: any) => d.status === 'CANCELLED')?.count || 0,
+            donationStatusDistribution: donRows.map((d: any) => ({ status: d.status, count: Number(d.count) })),
+            userRoleDistribution: userRows.map((u: any) => ({ role: u.role, count: Number(u.count) })),
+            foodCategoryDistribution: [],
+            ngoVerificationDistribution: ngoRows.map((n: any) => ({ status: n.verification_status, count: Number(n.count) })),
+            recentDonations: [],
+            recentUsers: [],
+          });
+
+          if (logsRes?.data) {
+            setActivityLogs(
+              logsRes.data.map((l: any) => ({
+                id: l.id,
+                adminId: l.admin_id,
+                actionType: (l.action_type?.toLowerCase() || 'admin_action') as any,
+                targetType: (l.target_type || 'user') as any,
+                targetId: l.target_id || '',
+                description: l.description,
+                timestamp: l.created_at,
+              }))
+            );
+          }
+          setIsLoading(false);
+          return;
+        }
+      } catch {
+        if (isProduction) {
+          if (isMounted) setIsLoading(false);
+          return;
+        }
+      }
+
+      if (isMounted) {
+        setStats(mockDataService.getAdminDashboardStats());
+        setActivityLogs(mockDataService.getAdminActivityLogs().slice(0, 5));
+        setIsLoading(false);
+      }
+    }
+
+    loadAdminData();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   if (!stats) return null;

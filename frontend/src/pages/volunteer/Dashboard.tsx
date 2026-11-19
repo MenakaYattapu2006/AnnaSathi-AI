@@ -23,8 +23,12 @@ import {
   Package,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient, mapVolunteerFromDb, mapAssignmentFromDb, mapDonationFromDb } from '../../lib/apiClient';
 import { mockDataService } from '../../lib/mockDataService';
+import type { Volunteer } from '../../types/volunteer';
 import type { Assignment, AssignmentStatus } from '../../types/assignment';
+
+const isProduction = Boolean((import.meta as any).env?.PROD);
 
 const statusBadgeMap: Record<
   AssignmentStatus,
@@ -43,20 +47,69 @@ const VolunteerDashboard: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const volunteer = user ? mockDataService.getVolunteerByUserId(user.id) : undefined;
+  const [volunteer, setVolunteer] = useState<Volunteer | null>(null);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
+  const [stats, setStats] = useState({
+    availableTasksCount: 0,
+    activeTasksCount: 0,
+    completedTasksCount: 0,
+    totalMealsDelivered: 0,
+    recentAssignments: [] as Assignment[],
+    statusDistribution: [] as any[],
+  });
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Compute live statistics filtered strictly for this authenticated volunteer
-  const stats = user
-    ? mockDataService.getVolunteerDashboardStats(user.id)
-    : {
-        availableTasksCount: 0,
-        activeTasksCount: 0,
-        completedTasksCount: 0,
-        totalMealsDelivered: 0,
-        recentAssignments: [],
-        statusDistribution: [],
-      };
+  useEffect(() => {
+    let isMounted = true;
+    async function loadData() {
+      try {
+        const volRes = await apiClient.volunteer.getMe().catch(() => null);
+        if (volRes?.volunteer && isMounted) {
+          setVolunteer(mapVolunteerFromDb(volRes.volunteer));
+        }
+
+        const [availRes, myTasksRes] = await Promise.all([
+          apiClient.volunteer.getAvailableTasks().catch(() => ({ tasks: [] })),
+          apiClient.volunteer.getAssignedTasks().catch(() => ({ tasks: [] })),
+        ]);
+
+        if (isMounted && myTasksRes?.tasks) {
+          const myTasks: Assignment[] = myTasksRes.tasks.map(mapAssignmentFromDb);
+          const activeCount = myTasks.filter((t) =>
+            ['assigned', 'in_transit_to_pickup', 'picked_up', 'in_transit_to_drop'].includes(t.status)
+          ).length;
+          const completedCount = myTasks.filter((t) => t.status === 'delivered').length;
+
+          setStats({
+            availableTasksCount: (availRes?.tasks || []).length,
+            activeTasksCount: activeCount,
+            completedTasksCount: completedCount,
+            totalMealsDelivered: (volRes?.volunteer?.total_deliveries_completed || 0) * 50,
+            recentAssignments: myTasks.slice(0, 5),
+            statusDistribution: [],
+          });
+          setIsLoading(false);
+          return;
+        }
+      } catch {
+        if (isProduction) {
+          if (isMounted) setIsLoading(false);
+          return;
+        }
+      }
+
+      if (user && isMounted) {
+        setVolunteer(mockDataService.getVolunteerByUserId(user.id) || null);
+        setStats(mockDataService.getVolunteerDashboardStats(user.id));
+      }
+      if (isMounted) setIsLoading(false);
+    }
+
+    loadData();
+    return () => {
+      isMounted = false;
+    };
+  }, [user]);
 
   // Find active task currently in progress
   const activeTask = stats.recentAssignments.find((a) =>
@@ -64,7 +117,7 @@ const VolunteerDashboard: React.FC = () => {
   );
 
   const activeDonation = activeTask
-    ? mockDataService.getDonationById(activeTask.donationId)
+    ? ((activeTask as any).donation || mockDataService.getDonationById(activeTask.donationId))
     : undefined;
 
   const vehicleLabelMap: Record<string, string> = {

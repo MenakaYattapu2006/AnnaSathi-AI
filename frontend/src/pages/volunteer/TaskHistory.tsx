@@ -19,21 +19,50 @@ import {
   FileCheck,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiClient, mapAssignmentFromDb } from '../../lib/apiClient';
 import { mockDataService } from '../../lib/mockDataService';
+import { Loading } from '../../components/common/Loading';
 import type { Assignment } from '../../types/assignment';
+
+const isProduction = Boolean((import.meta as any).env?.PROD);
 
 const VolunteerTaskHistory: React.FC = () => {
   const { user } = useAuth();
   const volunteer = user ? mockDataService.getVolunteerByUserId(user.id) : undefined;
 
-  const [historyTasks, setHistoryTasks] = useState<Assignment[]>(() =>
-    user ? mockDataService.getVolunteerDeliveryHistory(user.id) : []
-  );
+  const [historyTasks, setHistoryTasks] = useState<Assignment[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
 
   // Search & Filter state
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'newest' | 'oldest'>('newest');
+
+  const refreshHistory = async () => {
+    setIsLoading(true);
+    try {
+      const response = await apiClient.volunteer.getHistory();
+      if (response?.history) {
+        setHistoryTasks(response.history.map(mapAssignmentFromDb));
+        setIsLoading(false);
+        return;
+      }
+    } catch {
+      if (isProduction) {
+        setIsLoading(false);
+        return;
+      }
+    }
+
+    if (user) {
+      setHistoryTasks(mockDataService.getVolunteerDeliveryHistory(user.id));
+    }
+    setIsLoading(false);
+  };
+
+  React.useEffect(() => {
+    refreshHistory();
+  }, [user]);
 
   // Filter and sort completed delivery history
   const filteredTasks = useMemo(() => {
