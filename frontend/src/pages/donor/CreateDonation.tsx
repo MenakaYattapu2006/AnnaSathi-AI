@@ -253,10 +253,10 @@ const CreateDonation: React.FC = () => {
     urgencyPreview.level === 'critical'
       ? 'danger'
       : urgencyPreview.level === 'high'
-      ? 'warning'
-      : urgencyPreview.level === 'medium'
-      ? 'info'
-      : 'neutral';
+        ? 'warning'
+        : urgencyPreview.level === 'medium'
+          ? 'info'
+          : 'neutral';
 
   return (
     <div className="max-w-4xl mx-auto">

@@ -45,8 +45,10 @@ export const config = {
     serviceSecret: process.env.AI_SERVICE_SECRET || 'internal-ai-service-shared-secret-key',
     provider: process.env.AI_PROVIDER || 'gemini',
     geminiApiKey: process.env.GEMINI_API_KEY || '',
+    geminiModel: process.env.GEMINI_MODEL || 'gemini-flash-lite-latest',
     nvidiaNimApiKey: process.env.NVIDIA_NIM_API_KEY || '',
     nvidiaNimBaseUrl: process.env.NVIDIA_NIM_BASE_URL || 'https://integrate.api.nvidia.com/v1',
+    nvidiaNimModel: process.env.NVIDIA_NIM_MODEL || 'nvidia/nemotron-3.5-lightning-30b-a3b',
   },
 
   // Cookie Settings
