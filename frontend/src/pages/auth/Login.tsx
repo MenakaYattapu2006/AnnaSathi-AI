@@ -10,10 +10,10 @@ const Login: React.FC = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState('ravi@example.com');
-  const [password, setPassword] = useState('demo@donor123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [selectedDemoRole, setSelectedDemoRole] = useState<string>('donor');
+  const [selectedDemoRole, setSelectedDemoRole] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -64,39 +64,36 @@ const Login: React.FC = () => {
           </p>
         </div>
 
-        {/* Demo Mode Notice Banner */}
+        {/* Administrator Quick-Access & Clean State Notice */}
         <div className="mt-6 bg-surface-container-low border border-primary/20 rounded-lg p-3 text-left">
-          <div className="flex items-start gap-2">
-            <Sparkles className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="text-xs font-semibold text-primary-text uppercase tracking-wide">
-                Demonstration Mode
-              </p>
-              <p className="text-xs text-secondary-text mt-0.5">
-                Click any role below to autofill verified demonstration credentials.
-              </p>
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start gap-2">
+              <Sparkles className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs font-semibold text-primary-text uppercase tracking-wide">
+                  Clean Database State
+                </p>
+                <p className="text-xs text-secondary-text mt-0.5">
+                  Register fresh Donor, NGO, or Volunteer accounts via{' '}
+                  <Link to="/register" className="text-primary font-semibold hover:underline">
+                    Create Account
+                  </Link>
+                  . Use Administrator to verify newly registered NGOs.
+                </p>
+              </div>
             </div>
-          </div>
-
-          {/* Quick Demo Role Selector Pills */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3">
-            {DEMO_ACCOUNTS.map((account) => {
-              const isSelected = selectedDemoRole === account.role && email === account.email;
-              return (
-                <button
-                  key={account.role}
-                  type="button"
-                  onClick={() => handleSelectDemoAccount(account)}
-                  className={`px-2.5 py-1.5 rounded-md text-xs font-medium border text-center transition-all ${
-                    isSelected
-                      ? 'bg-primary text-white border-primary shadow-sm'
-                      : 'bg-surface text-primary-text border-border hover:border-primary/50'
-                  }`}
-                >
-                  <span className="capitalize block font-semibold">{account.role}</span>
-                </button>
-              );
-            })}
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedDemoRole('admin');
+                setEmail('admin@annasathi.org');
+                setPassword('demo@admin123');
+                setError(null);
+              }}
+              className="px-2.5 py-1 text-xs font-semibold rounded border border-primary bg-primary text-white hover:bg-primary/90 whitespace-nowrap shadow-sm"
+            >
+              Fill Admin
+            </button>
           </div>
         </div>
 
