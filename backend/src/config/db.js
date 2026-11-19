@@ -7,12 +7,13 @@ const { Pool } = pg;
 let pool = null;
 
 if (config.databaseUrl) {
+  const isSupabase = config.databaseUrl.includes('supabase');
   pool = new Pool({
     connectionString: config.databaseUrl,
-    ssl: config.isProduction ? { rejectUnauthorized: false } : false,
+    ssl: isSupabase || config.isProduction ? { rejectUnauthorized: false } : false,
     max: 20,
     idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 5000,
+    connectionTimeoutMillis: 10000,
   });
 
   pool.on('error', (err) => {

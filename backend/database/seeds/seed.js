@@ -8,10 +8,11 @@ import pg from 'pg';
 import argon2 from 'argon2';
 import dotenv from 'dotenv';
 
-dotenv.config();
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.join(__dirname, '../../.env') });
+dotenv.config();
 
 const { Pool } = pg;
 
@@ -24,9 +25,10 @@ export async function runSeeds(customConnectionString) {
     return { success: false, reason: 'NO_DATABASE_URL' };
   }
 
+  const isSupabase = connectionString.includes('supabase');
   const pool = new Pool({
     connectionString,
-    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    ssl: isSupabase || process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
   });
 
   const client = await pool.connect();
