@@ -16,4 +16,10 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+
+  /* Enterprise Radial Grid Pattern */
+  .grid-bg-pattern {
+    background-image: radial-gradient(rgba(19, 78, 63, 0.08) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
 }

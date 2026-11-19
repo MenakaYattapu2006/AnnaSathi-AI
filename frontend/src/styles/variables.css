@@ -1,38 +1,49 @@
 /* src/styles/variables.css */
 :root {
-  /* Material 3 Brand & Theme Colors */
-  --color-primary: #00362a;
-  --color-primary-container: #134e3f;
-  --color-on-primary: #ffffff;
-  --color-on-primary-container: #86beab;
+  /* Enterprise Theme & Brand Palette */
+  --color-brand-900: #0F392B;
+  --color-brand-950: #08251C;
+  --color-brand-800: #166534;
+  --color-brand-700: #15803d;
+  --color-brand-600: #16a34a;
+  --color-brand-500: #22c55e;
+  --color-brand-100: #dcfce9;
+  --color-brand-50: #f0fdf7;
+  --color-accent-emerald: #134E3F;
+  --color-accent-sage: #E6F4EA;
 
-  --color-secondary: #006c49;
-  --color-secondary-container: #6cf8bb;
+  --color-primary: #0F392B;
+  --color-primary-container: #134E3F;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #E6F4EA;
+
+  --color-secondary: #16a34a;
+  --color-secondary-container: #dcfce9;
   --color-on-secondary: #ffffff;
-  --color-on-secondary-container: #00714d;
+  --color-on-secondary-container: #166534;
 
   --color-tertiary: #5b1604;
   --color-tertiary-container: #792c17;
 
-  --color-background: #f0fdf3;
-  --color-surface: #f0fdf3;
-  --color-surface-dim: #d0ddd4;
+  --color-background: #f8fafc;
+  --color-surface: #ffffff;
+  --color-surface-dim: #f1f5f9;
   --color-surface-container-lowest: #ffffff;
-  --color-surface-container-low: #eaf7ed;
-  --color-surface-container: #e4f1e7;
-  --color-surface-container-high: #dfebe2;
-  --color-surface-container-highest: #d9e6dc;
+  --color-surface-container-low: #f8fafc;
+  --color-surface-container: #f1f5f9;
+  --color-surface-container-high: #e2e8f0;
+  --color-surface-container-highest: #cbd5e1;
 
-  --color-on-surface: #131e18;
-  --color-on-surface-variant: #404945;
-  --color-on-background: #131e18;
-  --color-outline: #707975;
-  --color-outline-variant: #bfc9c3;
+  --color-on-surface: #0f172a;
+  --color-on-surface-variant: #475569;
+  --color-on-background: #0f172a;
+  --color-outline: #94a3b8;
+  --color-outline-variant: #cbd5e1;
 
-  --color-primary-text: #131e18;
-  --color-secondary-text: #404945;
-  --color-border: #bfc9c3;
-  --color-accent: #006c49;
+  --color-primary-text: #0f172a;
+  --color-secondary-text: #64748b;
+  --color-border: #e2e8f0;
+  --color-accent: #134E3F;
 
   /* Spacing */
   --space-0: 0;
