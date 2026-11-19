@@ -3,7 +3,7 @@
   /* Global font family */
   html, body {
     @apply font-sans antialiased;
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
   }
 
   /* Headings */
