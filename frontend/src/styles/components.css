@@ -98,3 +98,138 @@
     @apply flex justify-end p-4 border-t border-border;
   }
 }
+
+/* ==========================================================================
+   Universal Enterprise Dark Mode Overrides
+   Ensures standard inputs, select, tables, modals & cards adapt instantly
+   ========================================================================== */
+.dark body {
+  background-color: #090D10 !important;
+  color: #f8fafc !important;
+}
+
+.dark input:not([type="checkbox"]):not([type="radio"]),
+.dark select,
+.dark textarea {
+  background-color: #131B22 !important;
+  border-color: #1E293B !important;
+  color: #f8fafc !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #64748b !important;
+}
+
+.dark select option {
+  background-color: #11171D;
+  color: #f8fafc;
+}
+
+.dark .card {
+  background-color: #11171D !important;
+  border-color: #1E293B !important;
+  color: #f8fafc !important;
+}
+
+.dark .bg-surface {
+  background-color: #11171D !important;
+}
+
+.dark .bg-surface-container-low,
+.dark .bg-surface-container,
+.dark .bg-surface-container-high,
+.dark .bg-surface-variant {
+  background-color: #131B22 !important;
+}
+
+.dark .bg-surface-container-lowest {
+  background-color: #11171D !important;
+}
+
+.dark .text-primary-text,
+.dark .text-on-surface,
+.dark .text-on-background {
+  color: #f8fafc !important;
+}
+
+.dark .text-secondary-text,
+.dark .text-on-surface-variant {
+  color: #94a3b8 !important;
+}
+
+.dark .text-outline {
+  color: #64748b !important;
+}
+
+.dark .border-border,
+.dark .border-outline-variant {
+  border-color: #1E293B !important;
+}
+
+.dark .border-outline {
+  border-color: #334155 !important;
+}
+
+.dark hr {
+  border-color: #1E293B !important;
+}
+
+.dark .table {
+  border-color: #1E293B !important;
+}
+
+.dark .thead {
+  background-color: #131B22 !important;
+}
+
+.dark .th {
+  color: #94a3b8 !important;
+  background-color: #131B22 !important;
+}
+
+.dark .td {
+  color: #e2e8f0 !important;
+}
+
+.dark .tr {
+  border-color: #1E293B !important;
+}
+
+.dark .tr:hover {
+  background-color: #1A232E !important;
+}
+
+.dark .dashboard-stat {
+  background-color: #11171D !important;
+  border: 1px solid #1E293B !important;
+}
+
+.dark .dashboard-stat-value {
+  color: #ffffff !important;
+}
+
+.dark .dashboard-stat-label {
+  color: #94a3b8 !important;
+}
+
+.dark .modal {
+  background-color: #11171D !important;
+  border: 1px solid #1E293B !important;
+  color: #f8fafc !important;
+}
+
+.dark .modal-header,
+.dark .modal-footer {
+  border-color: #1E293B !important;
+}
+
+.dark .sidebar {
+  background-color: #11171D !important;
+  border-color: #1E293B !important;
+}
+
+.dark .main-content {
+  background-color: #090D10 !important;
+}
+

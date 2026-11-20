@@ -169,7 +169,7 @@ const MyDonations: React.FC = () => {
               placeholder="Search by food name..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-md border border-border bg-white text-primary-text pl-9 pr-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary"
+              className="w-full rounded-md border border-border dark:border-[#1E293B] bg-white dark:bg-[#131B22] text-primary-text dark:text-slate-100 pl-9 pr-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary"
             />
           </div>
 
@@ -178,7 +178,7 @@ const MyDonations: React.FC = () => {
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="w-full rounded-md border border-border bg-white text-primary-text px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary"
+              className="w-full rounded-md border border-border dark:border-[#1E293B] bg-white dark:bg-[#131B22] text-primary-text dark:text-slate-100 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary"
             >
               <option value="all">All Statuses</option>
               <option value="CREATED">Created (Open)</option>
@@ -197,7 +197,7 @@ const MyDonations: React.FC = () => {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full rounded-md border border-border bg-white text-primary-text px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary"
+              className="w-full rounded-md border border-border dark:border-[#1E293B] bg-white dark:bg-[#131B22] text-primary-text dark:text-slate-100 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary"
             >
               <option value="all">All Categories</option>
               <option value="cooked_meals">Cooked Meals</option>
@@ -214,7 +214,7 @@ const MyDonations: React.FC = () => {
             <select
               value={sortOrder}
               onChange={(e) => setSortOrder(e.target.value as 'newest' | 'oldest')}
-              className="w-full rounded-md border border-border bg-white text-primary-text px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary"
+              className="w-full rounded-md border border-border dark:border-[#1E293B] bg-white dark:bg-[#131B22] text-primary-text dark:text-slate-100 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary"
             >
               <option value="newest">Sort: Newest First</option>
               <option value="oldest">Sort: Oldest First</option>

@@ -35,11 +35,11 @@ export const Landing: React.FC = () => {
   const [showLiveMap, setShowLiveMap] = useState<boolean>(false);
 
   return (
-    <div className="bg-[#fafaf9] font-sans text-slate-800 antialiased selection:bg-emerald-100 selection:text-emerald-900 min-h-screen">
+    <div className="bg-[#fafaf9] dark:bg-[#090D10] font-sans text-slate-800 dark:text-slate-100 antialiased selection:bg-emerald-100 selection:text-emerald-900 min-h-screen transition-colors duration-200">
       {/* =========================================================================
           TOP NAVIGATION HEADER
       ========================================================================== */}
-      <header className="fixed top-0 left-0 right-0 w-full z-50 bg-white/90 backdrop-blur-xl border-b border-slate-200/80 shadow-[0_1px_8px_rgba(15,23,42,0.03)]">
+      <header className="fixed top-0 left-0 right-0 w-full z-50 bg-white/90 dark:bg-[#11171D]/90 backdrop-blur-xl border-b border-slate-200/80 dark:border-[#1E293B] shadow-[0_1px_8px_rgba(15,23,42,0.03)] transition-colors">
         <div className="h-20 max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 flex items-center justify-between">
           {/* Logo & Brand Emblem */}
           <div className="flex items-center gap-3">
@@ -63,10 +63,10 @@ export const Landing: React.FC = () => {
                 </svg>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xl font-bold tracking-tight text-[#0f392b]">
+                <span className="text-xl font-bold tracking-tight text-[#0f392b] dark:text-emerald-400">
                   AnnaSathi AI
                 </span>
-                <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60 text-xs font-semibold shadow-xs">
+                <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/40 text-xs font-semibold shadow-xs">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   AI Network
                 </span>
@@ -75,14 +75,14 @@ export const Landing: React.FC = () => {
           </div>
 
           {/* Centered Navigation Pill */}
-          <nav className="hidden lg:flex items-center gap-1 xl:gap-2 px-3 py-1.5 rounded-full bg-slate-100/80 border border-slate-200/60 text-xs font-semibold text-slate-600">
+          <nav className="hidden lg:flex items-center gap-1 xl:gap-2 px-3 py-1.5 rounded-full bg-slate-100/80 dark:bg-[#131B22] border border-slate-200/60 dark:border-[#1E293B] text-xs font-semibold text-slate-600 dark:text-slate-400">
             <a
               href="#hero"
               onClick={() => setActiveTab('home')}
               className={`px-3 py-1.5 transition-all rounded-lg ${
                 activeTab === 'home'
-                  ? 'bg-white text-[#0f392b] font-bold shadow-sm'
-                  : 'hover:text-slate-900 hover:bg-slate-200/60'
+                  ? 'bg-white dark:bg-[#11171D] text-[#0f392b] dark:text-emerald-400 font-bold shadow-sm'
+                  : 'hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-[#1A232E]'
               }`}
             >
               Home
@@ -92,8 +92,8 @@ export const Landing: React.FC = () => {
               onClick={() => setActiveTab('about')}
               className={`px-3 py-1.5 transition-all rounded-lg ${
                 activeTab === 'about'
-                  ? 'bg-white text-[#0f392b] font-bold shadow-sm'
-                  : 'hover:text-slate-900 hover:bg-slate-200/60'
+                  ? 'bg-white dark:bg-[#11171D] text-[#0f392b] dark:text-emerald-400 font-bold shadow-sm'
+                  : 'hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-[#1A232E]'
               }`}
             >
               About Us
@@ -103,8 +103,8 @@ export const Landing: React.FC = () => {
               onClick={() => setActiveTab('how-it-works')}
               className={`px-3 py-1.5 transition-all rounded-lg ${
                 activeTab === 'how-it-works'
-                  ? 'bg-white text-[#0f392b] font-bold shadow-sm'
-                  : 'hover:text-slate-900 hover:bg-slate-200/60'
+                  ? 'bg-white dark:bg-[#11171D] text-[#0f392b] dark:text-emerald-400 font-bold shadow-sm'
+                  : 'hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-[#1A232E]'
               }`}
             >
               How It Works
@@ -114,8 +114,8 @@ export const Landing: React.FC = () => {
               onClick={() => setActiveTab('features')}
               className={`px-3 py-1.5 transition-all rounded-lg ${
                 activeTab === 'features'
-                  ? 'bg-white text-[#0f392b] font-bold shadow-sm'
-                  : 'hover:text-slate-900 hover:bg-slate-200/60'
+                  ? 'bg-white dark:bg-[#11171D] text-[#0f392b] dark:text-emerald-400 font-bold shadow-sm'
+                  : 'hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-[#1A232E]'
               }`}
             >
               Our Features
@@ -125,8 +125,8 @@ export const Landing: React.FC = () => {
               onClick={() => setActiveTab('mission')}
               className={`px-3 py-1.5 transition-all rounded-lg ${
                 activeTab === 'mission'
-                  ? 'bg-white text-[#0f392b] font-bold shadow-sm'
-                  : 'hover:text-slate-900 hover:bg-slate-200/60'
+                  ? 'bg-white dark:bg-[#11171D] text-[#0f392b] dark:text-emerald-400 font-bold shadow-sm'
+                  : 'hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-[#1A232E]'
               }`}
             >
               Our Mission
@@ -136,8 +136,8 @@ export const Landing: React.FC = () => {
               onClick={() => setActiveTab('contact')}
               className={`px-3 py-1.5 transition-all rounded-lg ${
                 activeTab === 'contact'
-                  ? 'bg-white text-[#0f392b] font-bold shadow-sm'
-                  : 'hover:text-slate-900 hover:bg-slate-200/60'
+                  ? 'bg-white dark:bg-[#11171D] text-[#0f392b] dark:text-emerald-400 font-bold shadow-sm'
+                  : 'hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-[#1A232E]'
               }`}
             >
               Contact
@@ -212,43 +212,43 @@ export const Landing: React.FC = () => {
       </header>
 
       {/* Main Container */}
-      <main className="w-full pt-20 bg-[#fafaf9]">
+      <main className="w-full pt-20 bg-[#fafaf9] dark:bg-[#090D10] transition-colors duration-200">
         <div className="flex flex-col w-full">
           {/* =========================================================================
               1. HERO SECTION (#hero)
           ========================================================================== */}
-          <section className="relative overflow-hidden pt-8 pb-20 lg:pt-14 lg:pb-28 bg-[#fafaf9]" id="hero">
+          <section className="relative overflow-hidden pt-8 pb-20 lg:pt-14 lg:pb-28 bg-[#fafaf9] dark:bg-[#090D10] transition-colors duration-200" id="hero">
             {/* Ambient glowing backdrop blurs */}
-            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[700px] h-[360px] bg-emerald-100/50 blur-[130px] pointer-events-none rounded-full -z-10" />
-            <div className="absolute top-1/3 -right-20 w-[420px] h-[420px] bg-slate-100/60 blur-[110px] pointer-events-none rounded-full -z-10" />
+            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[700px] h-[360px] bg-emerald-100/50 dark:bg-emerald-950/20 blur-[130px] pointer-events-none rounded-full -z-10" />
+            <div className="absolute top-1/3 -right-20 w-[420px] h-[420px] bg-slate-100/60 dark:bg-slate-800/10 blur-[110px] pointer-events-none rounded-full -z-10" />
 
             <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-center">
                 {/* Hero Text Content (6 cols) */}
                 <div className="lg:col-span-6 flex flex-col items-start">
                   {/* AI Pill Badge */}
-                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-slate-200/80 shadow-sm mb-6">
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white dark:bg-[#131B22] border border-slate-200/80 dark:border-[#1E293B] shadow-sm mb-6">
                     <span className="w-2 h-2 rounded-full bg-[#15803d] animate-pulse shadow-[0_0_8px_#22c55e]" />
-                    <span className="text-xs font-semibold tracking-wide text-slate-800">
+                    <span className="text-xs font-semibold tracking-wide text-slate-800 dark:text-slate-200">
                       AI-Powered Hunger Prevention &amp; Food Rescue Network
                     </span>
                   </div>
 
                   {/* Main Heading */}
-                  <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#0f392b] tracking-tight leading-[1.15] mb-6">
+                  <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#0f392b] dark:text-white tracking-tight leading-[1.15] mb-6">
                     Bridging the Gap Between{' '}
-                    <span className="bg-gradient-to-r from-[#15803d] to-[#0f392b] bg-clip-text text-transparent">
+                    <span className="bg-gradient-to-r from-[#15803d] to-[#0f392b] dark:to-emerald-400 bg-clip-text text-transparent">
                       Food Waste
                     </span>{' '}
                     and{' '}
-                    <span className="bg-gradient-to-r from-emerald-600 to-amber-700 bg-clip-text text-transparent">
+                    <span className="bg-gradient-to-r from-emerald-600 to-amber-700 dark:to-amber-400 bg-clip-text text-transparent">
                       Hunger
                     </span>
                     .
                   </h1>
 
                   {/* Supporting Description */}
-                  <p className="text-base sm:text-lg text-slate-600 mb-8 max-w-xl leading-relaxed">
+                  <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 mb-8 max-w-xl leading-relaxed">
                     Every meal matters. AnnaSathi AI connects surplus food with people who need it through verified NGOs, dedicated volunteers, and intelligent AI-powered food rescue.
                   </p>
 
@@ -263,7 +263,7 @@ export const Landing: React.FC = () => {
                     </Link>
                     <Link
                       to="/register"
-                      className="inline-flex items-center gap-2 px-6 py-3.5 rounded-lg bg-white border border-slate-200 text-[#0f392b] font-semibold text-sm hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 shadow-sm"
+                      className="inline-flex items-center gap-2 px-6 py-3.5 rounded-lg bg-white dark:bg-[#131B22] border border-slate-200 dark:border-[#1E293B] text-[#0f392b] dark:text-emerald-400 font-semibold text-sm hover:bg-slate-50 dark:hover:bg-[#1A232E] hover:border-slate-300 dark:hover:border-slate-700 transition-all duration-200 shadow-sm"
                     >
                       <HeartHandshake className="w-4 h-4 text-[#15803d]" />
                       <span>Join as Volunteer</span>
@@ -271,7 +271,7 @@ export const Landing: React.FC = () => {
                   </div>
 
                   {/* Trust Subtext */}
-                  <div className="flex items-center gap-2.5 text-slate-600 pt-2">
+                  <div className="flex items-center gap-2.5 text-slate-600 dark:text-slate-400 pt-2">
                     <Leaf className="w-4 h-4 text-[#15803d]" />
                     <span className="text-sm font-medium">
                       Together, let's build a world where no meal goes to waste.
@@ -286,7 +286,7 @@ export const Landing: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setShowLiveMap(!showLiveMap)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-slate-200 text-xs font-semibold text-emerald-800 hover:bg-emerald-50 transition-colors shadow-xs"
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white dark:bg-[#131B22] border border-slate-200 dark:border-[#1E293B] text-xs font-semibold text-emerald-800 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-[#1A232E] transition-colors shadow-xs"
                     >
                       <MapPin className="w-3.5 h-3.5 text-emerald-600" />
                       <span>{showLiveMap ? 'View Photo Showcase' : 'View Live Leaflet GPS'}</span>
@@ -294,7 +294,7 @@ export const Landing: React.FC = () => {
                   </div>
 
                   {showLiveMap ? (
-                    <div className="rounded-2xl overflow-hidden shadow-xl border border-slate-200 bg-white p-3 aspect-[16/11]">
+                    <div className="rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-[#1E293B] bg-white dark:bg-[#11171D] p-3 aspect-[16/11]">
                       <DeliveryMap
                         pickupLocation={{
                           latitude: 17.448294,
@@ -320,7 +320,7 @@ export const Landing: React.FC = () => {
                     </div>
                   ) : (
                     /* Main Hero Image Frame */
-                    <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200/60 bg-slate-100 aspect-[16/11]">
+                    <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200/60 dark:border-[#1E293B] bg-slate-100 dark:bg-[#131B22] aspect-[16/11]">
                       <img
                         alt="Community volunteers packing nutritious meal boxes"
                         className="w-full h-full object-cover"
@@ -331,32 +331,32 @@ export const Landing: React.FC = () => {
                   )}
 
                   {/* Floating Card 1: Top Right (AI Match Verified) */}
-                  <div className="absolute -top-6 -right-2 sm:right-4 bg-white/95 border border-slate-200/80 backdrop-blur-md px-4 py-3 rounded-xl shadow-lg flex items-center gap-3.5 z-20 max-w-xs">
-                    <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0">
+                  <div className="absolute -top-6 -right-2 sm:right-4 bg-white/95 dark:bg-[#11171D]/95 border border-slate-200/80 dark:border-[#1E293B] backdrop-blur-md px-4 py-3 rounded-xl shadow-lg flex items-center gap-3.5 z-20 max-w-xs transition-colors">
+                    <div className="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800/40 flex items-center justify-center shrink-0">
                       <CheckCircle2 className="w-6 h-6 text-[#15803d]" />
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-sm text-[#0f392b] font-bold">AI Match Verified</span>
+                        <span className="text-sm text-[#0f392b] dark:text-white font-bold">AI Match Verified</span>
                         <span className="w-1.5 h-1.5 rounded-full bg-[#15803d]" />
                       </div>
-                      <p className="text-xs text-slate-500 truncate">Hope Kitchen (1.8 km) • 12m ETA</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 truncate">Hope Kitchen (1.8 km) • 12m ETA</p>
                     </div>
                   </div>
 
                   {/* Floating Card 2: Bottom Left (Urgency Score) */}
-                  <div className="absolute -bottom-6 -left-2 sm:left-4 bg-white/95 border border-slate-200/80 backdrop-blur-md px-4 py-3 rounded-xl shadow-lg flex items-center gap-3.5 z-20 max-w-xs">
-                    <div className="w-10 h-10 rounded-lg bg-amber-50 border border-amber-100 flex items-center justify-center shrink-0">
-                      <Clock className="w-6 h-6 text-amber-700" />
+                  <div className="absolute -bottom-6 -left-2 sm:left-4 bg-white/95 dark:bg-[#11171D]/95 border border-slate-200/80 dark:border-[#1E293B] backdrop-blur-md px-4 py-3 rounded-xl shadow-lg flex items-center gap-3.5 z-20 max-w-xs transition-colors">
+                    <div className="w-10 h-10 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-100 dark:border-amber-800/40 flex items-center justify-center shrink-0">
+                      <Clock className="w-6 h-6 text-amber-700 dark:text-amber-400" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-[#0f392b] font-bold">Urgency Score: High</span>
-                        <span className="px-1.5 py-0.5 rounded bg-rose-100 text-rose-800 text-[11px] font-mono font-semibold">
+                        <span className="text-sm text-[#0f392b] dark:text-white font-bold">Urgency Score: High</span>
+                        <span className="px-1.5 py-0.5 rounded bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 text-[11px] font-mono font-semibold">
                           4h left
                         </span>
                       </div>
-                      <p className="text-xs text-slate-500 font-mono">Temp: 63°C • Hot Consumable</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 font-mono">Temp: 63°C • Hot Consumable</p>
                     </div>
                   </div>
 
@@ -375,17 +375,17 @@ export const Landing: React.FC = () => {
           {/* =========================================================================
               2. IMPACT / PLATFORM INTRODUCTION (#impact)
           ========================================================================== */}
-          <section className="py-16 lg:py-24 bg-slate-50 border-y border-slate-200/70 relative" id="impact">
+          <section className="py-16 lg:py-24 bg-slate-50 dark:bg-[#0C1217] border-y border-slate-200/70 dark:border-[#1E293B] relative transition-colors duration-200" id="impact">
             <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
               {/* Section Header */}
               <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-14">
                 <span className="text-xs text-[#15803d] tracking-widest uppercase mb-2 font-bold font-mono">
                   IMPACT OVERVIEW
                 </span>
-                <h2 className="text-3xl sm:text-4xl font-bold text-[#0f392b] tracking-tight mb-4">
+                <h2 className="text-3xl sm:text-4xl font-bold text-[#0f392b] dark:text-white tracking-tight mb-4">
                   Small Actions. Bigger Impact.
                 </h2>
-                <p className="text-base text-slate-600 leading-relaxed">
+                <p className="text-base text-slate-600 dark:text-slate-400 leading-relaxed">
                   One donation can make a difference. AnnaSathi AI brings donors, NGOs, and volunteers together to transform surplus food into meaningful support for communities.
                 </p>
               </div>
@@ -393,96 +393,96 @@ export const Landing: React.FC = () => {
               {/* 4 Stat / Telemetry Metric Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {/* Stat Card 1 */}
-                <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between transition-transform duration-300 hover:-translate-y-1 hover:shadow-md">
+                <div className="bg-white dark:bg-[#11171D] p-6 rounded-2xl border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
                   <div className="flex items-center justify-between mb-4">
-                    <span className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-[#0f392b]">
+                    <span className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-[#1A232E] flex items-center justify-center text-[#0f392b] dark:text-emerald-400">
                       <Building2 className="w-6 h-6" />
                     </span>
-                    <span className="inline-flex items-center gap-1 text-xs text-[#15803d] bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full font-bold font-mono">
+                    <span className="inline-flex items-center gap-1 text-xs text-[#15803d] bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800/40 px-2 py-0.5 rounded-full font-bold font-mono">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#15803d]" /> 100%
                     </span>
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-[#0f392b] tracking-tight mb-1">
+                    <div className="text-2xl font-bold text-[#0f392b] dark:text-white tracking-tight mb-1">
                       Active Donors
                     </div>
-                    <p className="text-xs text-slate-600 mb-3">
+                    <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">
                       Continuous Inflow verified with restaurants, college canteens &amp; banquet partners.
                     </p>
                   </div>
-                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-slate-500 text-xs font-mono">
+                  <div className="pt-3 border-t border-slate-100 dark:border-[#1E293B] flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-mono">
                     <span>Strict KYC Onboarding</span>
                     <CheckCircle2 className="w-4 h-4 text-[#15803d]" />
                   </div>
                 </div>
 
                 {/* Stat Card 2 */}
-                <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between transition-transform duration-300 hover:-translate-y-1 hover:shadow-md">
+                <div className="bg-white dark:bg-[#11171D] p-6 rounded-2xl border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
                   <div className="flex items-center justify-between mb-4">
-                    <span className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-[#0f392b]">
+                    <span className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-[#1A232E] flex items-center justify-center text-[#0f392b] dark:text-emerald-400">
                       <HeartHandshake className="w-6 h-6" />
                     </span>
-                    <span className="inline-flex items-center gap-1 text-xs text-[#15803d] bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full font-bold font-mono">
+                    <span className="inline-flex items-center gap-1 text-xs text-[#15803d] bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800/40 px-2 py-0.5 rounded-full font-bold font-mono">
                       Geo-Routed
                     </span>
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-[#0f392b] tracking-tight mb-1">
+                    <div className="text-2xl font-bold text-[#0f392b] dark:text-white tracking-tight mb-1">
                       Verified NGOs
                     </div>
-                    <p className="text-xs text-slate-600 mb-3">
+                    <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">
                       Vetted distribution partners with capacity-checked shelters and community kitchens.
                     </p>
                   </div>
-                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-slate-500 text-xs font-mono">
+                  <div className="pt-3 border-t border-slate-100 dark:border-[#1E293B] flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-mono">
                     <span>Demand-Matched Daily</span>
                     <MapPin className="w-4 h-4 text-[#15803d]" />
                   </div>
                 </div>
 
                 {/* Stat Card 3 */}
-                <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between transition-transform duration-300 hover:-translate-y-1 hover:shadow-md">
+                <div className="bg-white dark:bg-[#11171D] p-6 rounded-2xl border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
                   <div className="flex items-center justify-between mb-4">
-                    <span className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-[#0f392b]">
+                    <span className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-[#1A232E] flex items-center justify-center text-[#0f392b] dark:text-emerald-400">
                       <Truck className="w-6 h-6" />
                     </span>
-                    <span className="inline-flex items-center gap-1 text-xs text-[#15803d] bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full font-bold font-mono">
+                    <span className="inline-flex items-center gap-1 text-xs text-[#15803d] bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800/40 px-2 py-0.5 rounded-full font-bold font-mono">
                       Real-Time
                     </span>
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-[#0f392b] tracking-tight mb-1">
+                    <div className="text-2xl font-bold text-[#0f392b] dark:text-white tracking-tight mb-1">
                       Dedicated Squads
                     </div>
-                    <p className="text-xs text-slate-600 mb-3">
+                    <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">
                       Community-driven volunteers dispatched instantly for rapid food pickup and handover.
                     </p>
                   </div>
-                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-slate-500 text-xs font-mono">
+                  <div className="pt-3 border-t border-slate-100 dark:border-[#1E293B] flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-mono">
                     <span>Avg. 18 Min Dispatch</span>
                     <Activity className="w-4 h-4 text-[#15803d]" />
                   </div>
                 </div>
 
                 {/* Stat Card 4 */}
-                <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between transition-transform duration-300 hover:-translate-y-1 hover:shadow-md">
+                <div className="bg-white dark:bg-[#11171D] p-6 rounded-2xl border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
                   <div className="flex items-center justify-between mb-4">
-                    <span className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-[#0f392b]">
+                    <span className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-[#1A232E] flex items-center justify-center text-[#0f392b] dark:text-emerald-400">
                       <ShieldCheck className="w-6 h-6" />
                     </span>
-                    <span className="inline-flex items-center gap-1 text-xs text-[#15803d] bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full font-bold font-mono">
+                    <span className="inline-flex items-center gap-1 text-xs text-[#15803d] bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800/40 px-2 py-0.5 rounded-full font-bold font-mono">
                       Audit Trail
                     </span>
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-[#0f392b] tracking-tight mb-1">
+                    <div className="text-2xl font-bold text-[#0f392b] dark:text-white tracking-tight mb-1">
                       Deliveries Tracked
                     </div>
-                    <p className="text-xs text-slate-600 mb-3">
+                    <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">
                       Zero-waste goal with end-to-end digital timestamps, temperature logs, and delivery receipts.
                     </p>
                   </div>
-                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-slate-500 text-xs font-mono">
+                  <div className="pt-3 border-t border-slate-100 dark:border-[#1E293B] flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-mono">
                     <span>Full Lifecycle Safety</span>
                     <FileCheck className="w-4 h-4 text-[#15803d]" />
                   </div>
@@ -494,13 +494,13 @@ export const Landing: React.FC = () => {
           {/* =========================================================================
               3. ABOUT ANNASATHI AI (#about)
           ========================================================================== */}
-          <section className="py-20 lg:py-28 bg-[#fafaf9] relative" id="about">
+          <section className="py-20 lg:py-28 bg-[#fafaf9] dark:bg-[#090D10] relative transition-colors duration-200" id="about">
             <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
               <div className="max-w-3xl mb-14">
                 <span className="text-xs text-[#15803d] tracking-widest uppercase mb-2 font-bold font-mono block">
                   THE CRISIS &amp; OUR SOLUTION
                 </span>
-                <h2 className="text-3xl sm:text-4xl font-bold text-[#0f392b] tracking-tight">
+                <h2 className="text-3xl sm:text-4xl font-bold text-[#0f392b] dark:text-white tracking-tight">
                   Technology with a Purpose. Food with a Future.
                 </h2>
               </div>
@@ -509,38 +509,38 @@ export const Landing: React.FC = () => {
                 {/* Left: Crisis Points + Solution Statement */}
                 <div className="lg:col-span-6 flex flex-col gap-6">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="p-5 rounded-xl bg-white border border-slate-200/80 shadow-sm flex flex-col gap-3">
-                      <span className="w-8 h-8 rounded-lg bg-slate-100 text-[#0f392b] flex items-center justify-center">
+                    <div className="p-5 rounded-xl bg-white dark:bg-[#11171D] border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col gap-3 transition-colors">
+                      <span className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-[#1A232E] text-[#0f392b] dark:text-emerald-400 flex items-center justify-center">
                         <Leaf className="w-4 h-4" />
                       </span>
-                      <p className="text-xs sm:text-sm text-slate-700 leading-snug">
+                      <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-snug">
                         Large quantities of surplus food are wasted every day across banquets, hotels, and college canteens.
                       </p>
                     </div>
 
-                    <div className="p-5 rounded-xl bg-white border border-slate-200/80 shadow-sm flex flex-col gap-3">
-                      <span className="w-8 h-8 rounded-lg bg-slate-100 text-[#0f392b] flex items-center justify-center">
+                    <div className="p-5 rounded-xl bg-white dark:bg-[#11171D] border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col gap-3 transition-colors">
+                      <span className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-[#1A232E] text-[#0f392b] dark:text-emerald-400 flex items-center justify-center">
                         <HeartHandshake className="w-4 h-4" />
                       </span>
-                      <p className="text-xs sm:text-sm text-slate-700 leading-snug">
+                      <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-snug">
                         Many communities and shelter residents still struggle to access fresh, balanced, nutritious meals daily.
                       </p>
                     </div>
 
-                    <div className="p-5 rounded-xl bg-white border border-slate-200/80 shadow-sm flex flex-col gap-3">
-                      <span className="w-8 h-8 rounded-lg bg-slate-100 text-[#0f392b] flex items-center justify-center">
+                    <div className="p-5 rounded-xl bg-white dark:bg-[#11171D] border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col gap-3 transition-colors">
+                      <span className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-[#1A232E] text-[#0f392b] dark:text-emerald-400 flex items-center justify-center">
                         <Radio className="w-4 h-4" />
                       </span>
-                      <p className="text-xs sm:text-sm text-slate-700 leading-snug">
+                      <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-snug">
                         Food donors and humanitarian organizations frequently lack an efficient, real-time bridge to connect.
                       </p>
                     </div>
 
-                    <div className="p-5 rounded-xl bg-white border border-slate-200/80 shadow-sm flex flex-col gap-3">
-                      <span className="w-8 h-8 rounded-lg bg-slate-100 text-[#0f392b] flex items-center justify-center">
+                    <div className="p-5 rounded-xl bg-white dark:bg-[#11171D] border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col gap-3 transition-colors">
+                      <span className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-[#1A232E] text-[#0f392b] dark:text-emerald-400 flex items-center justify-center">
                         <Clock className="w-4 h-4" />
                       </span>
-                      <p className="text-xs sm:text-sm text-slate-700 leading-snug">
+                      <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-snug">
                         Collection and distribution require immediate coordination, temperature tracking, and timely action.
                       </p>
                     </div>
@@ -564,20 +564,20 @@ export const Landing: React.FC = () => {
 
                 {/* Right: Warehouse Image Frame with Telemetry Overlay */}
                 <div className="lg:col-span-6 relative">
-                  <div className="rounded-2xl overflow-hidden shadow-lg border border-slate-200/80 bg-slate-100 aspect-[4/3] relative">
+                  <div className="rounded-2xl overflow-hidden shadow-lg border border-slate-200/80 dark:border-[#1E293B] bg-slate-100 dark:bg-[#131B22] aspect-[4/3] relative">
                     <img
                       alt="Volunteers packing family food boxes in warehouse"
                       className="w-full h-full object-cover"
                       src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVemRBnm5TkJm2BQXOfkXuUpiwDpQwv9gVfXPr1BvoPqnXaQRuvqR9ZiaCwRl-yoyII_eNIqQ-4gTODjuoUwTXqtvrP-LGrCbMXCtoZ2pWaePQzyNrYwAmccQRhiEFgp6ndaW8IgGansdnNnQ-FwF5RMuIug0IB2fsPOiDqEe1bjQJh0Nu5hj0UCWKhA6oqCOQs5CB8YjtgeerajgExO_DDtDQEx7N48pcwZdZhxw"
                     />
-                    <div className="absolute bottom-6 left-6 right-6 bg-white/95 border border-slate-200/80 backdrop-blur-md p-4 rounded-xl shadow-md flex items-center justify-between">
+                    <div className="absolute bottom-6 left-6 right-6 bg-white/95 dark:bg-[#11171D]/95 border border-slate-200/80 dark:border-[#1E293B] backdrop-blur-md p-4 rounded-xl shadow-md flex items-center justify-between transition-colors">
                       <div className="flex items-center gap-3">
                         <span className="w-3 h-3 rounded-full bg-[#15803d] animate-ping" />
                         <div>
-                          <h4 className="text-xs sm:text-sm font-bold text-[#0f392b]">
+                          <h4 className="text-xs sm:text-sm font-bold text-[#0f392b] dark:text-white">
                             Zero-Waste Logistics Engine
                           </h4>
-                          <p className="text-[11px] text-slate-500">
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400">
                             Real-time matching active across metropolitan nodes
                           </p>
                         </div>
@@ -593,16 +593,16 @@ export const Landing: React.FC = () => {
           {/* =========================================================================
               4. HOW IT WORKS (#how-it-works)
           ========================================================================== */}
-          <section className="py-20 lg:py-28 bg-slate-50 border-y border-slate-200/70 relative" id="how-it-works">
+          <section className="py-20 lg:py-28 bg-slate-50 dark:bg-[#0C1217] border-y border-slate-200/70 dark:border-[#1E293B] relative transition-colors duration-200" id="how-it-works">
             <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
               <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-16">
                 <span className="text-xs text-[#15803d] tracking-widest uppercase mb-2 font-bold font-mono">
                   SEAMLESS 7-STEP WORKFLOW
                 </span>
-                <h2 className="text-3xl sm:text-4xl font-bold text-[#0f392b] tracking-tight mb-4">
+                <h2 className="text-3xl sm:text-4xl font-bold text-[#0f392b] dark:text-white tracking-tight mb-4">
                   How Surplus Food Reaches Those in Need
                 </h2>
-                <p className="text-base text-slate-600">
+                <p className="text-base text-slate-600 dark:text-slate-400">
                   From donor notification to shelter receipt, each phase is coordinated with machine precision and community care.
                 </p>
               </div>
@@ -610,134 +610,134 @@ export const Landing: React.FC = () => {
               {/* 7-Step Sequence Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-4">
                 {/* STEP 1 */}
-                <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between group hover:shadow-md hover:border-slate-300 transition-all">
+                <div className="bg-white dark:bg-[#11171D] p-5 rounded-2xl border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col justify-between group hover:shadow-md hover:border-slate-300 dark:hover:border-slate-700 transition-all">
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <span className="w-8 h-8 rounded-full bg-slate-100 text-[#0f392b] font-mono text-xs flex items-center justify-center font-bold">
+                      <span className="w-8 h-8 rounded-full bg-slate-100 dark:bg-[#1A232E] text-[#0f392b] dark:text-emerald-400 font-mono text-xs flex items-center justify-center font-bold">
                         01
                       </span>
                       <Building2 className="w-5 h-5 text-[#15803d]" />
                     </div>
-                    <h3 className="font-bold text-sm text-[#0f392b] mb-1.5">Donate Food</h3>
-                    <p className="text-xs text-slate-600 leading-relaxed">
+                    <h3 className="font-bold text-sm text-[#0f392b] dark:text-white mb-1.5">Donate Food</h3>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                       Donors register, add food details, quantity, prep timestamp, expiry info, and pickup location.
                     </p>
                   </div>
-                  <div className="mt-4 pt-3 border-t border-slate-100 text-right">
-                    <span className="text-[11px] font-mono text-slate-400 group-hover:text-[#15803d] transition-colors">Phase 1</span>
+                  <div className="mt-4 pt-3 border-t border-slate-100 dark:border-[#1E293B] text-right">
+                    <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500 group-hover:text-[#15803d] transition-colors">Phase 1</span>
                   </div>
                 </div>
 
                 {/* STEP 2 */}
-                <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between group hover:shadow-md hover:border-slate-300 transition-all">
+                <div className="bg-white dark:bg-[#11171D] p-5 rounded-2xl border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col justify-between group hover:shadow-md hover:border-slate-300 dark:hover:border-slate-700 transition-all">
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <span className="w-8 h-8 rounded-full bg-slate-100 text-[#0f392b] font-mono text-xs flex items-center justify-center font-bold">
+                      <span className="w-8 h-8 rounded-full bg-slate-100 dark:bg-[#1A232E] text-[#0f392b] dark:text-emerald-400 font-mono text-xs flex items-center justify-center font-bold">
                         02
                       </span>
                       <Sparkles className="w-5 h-5 text-[#15803d]" />
                     </div>
-                    <h3 className="font-bold text-sm text-[#0f392b] mb-1.5">AI Analysis</h3>
-                    <p className="text-xs text-slate-600 leading-relaxed">
+                    <h3 className="font-bold text-sm text-[#0f392b] dark:text-white mb-1.5">AI Analysis</h3>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                       The AI system estimates food urgency and evaluates temperature and storage stability.
                     </p>
                   </div>
-                  <div className="mt-4 pt-3 border-t border-slate-100 text-right">
-                    <span className="text-[11px] font-mono text-slate-400 group-hover:text-[#15803d] transition-colors">Phase 2</span>
+                  <div className="mt-4 pt-3 border-t border-slate-100 dark:border-[#1E293B] text-right">
+                    <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500 group-hover:text-[#15803d] transition-colors">Phase 2</span>
                   </div>
                 </div>
 
                 {/* STEP 3 */}
-                <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between group hover:shadow-md hover:border-slate-300 transition-all">
+                <div className="bg-white dark:bg-[#11171D] p-5 rounded-2xl border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col justify-between group hover:shadow-md hover:border-slate-300 dark:hover:border-slate-700 transition-all">
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <span className="w-8 h-8 rounded-full bg-slate-100 text-[#0f392b] font-mono text-xs flex items-center justify-center font-bold">
+                      <span className="w-8 h-8 rounded-full bg-slate-100 dark:bg-[#1A232E] text-[#0f392b] dark:text-emerald-400 font-mono text-xs flex items-center justify-center font-bold">
                         03
                       </span>
                       <Layers className="w-5 h-5 text-[#15803d]" />
                     </div>
-                    <h3 className="font-bold text-sm text-[#0f392b] mb-1.5">NGO Matching</h3>
-                    <p className="text-xs text-slate-600 leading-relaxed">
+                    <h3 className="font-bold text-sm text-[#0f392b] dark:text-white mb-1.5">NGO Matching</h3>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                       Platform recommends suitable verified NGOs based on proximity, capacity, and dietary criteria.
                     </p>
                   </div>
-                  <div className="mt-4 pt-3 border-t border-slate-100 text-right">
-                    <span className="text-[11px] font-mono text-slate-400 group-hover:text-[#15803d] transition-colors">Phase 3</span>
+                  <div className="mt-4 pt-3 border-t border-slate-100 dark:border-[#1E293B] text-right">
+                    <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500 group-hover:text-[#15803d] transition-colors">Phase 3</span>
                   </div>
                 </div>
 
                 {/* STEP 4 */}
-                <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between group hover:shadow-md hover:border-slate-300 transition-all">
+                <div className="bg-white dark:bg-[#11171D] p-5 rounded-2xl border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col justify-between group hover:shadow-md hover:border-slate-300 dark:hover:border-slate-700 transition-all">
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <span className="w-8 h-8 rounded-full bg-slate-100 text-[#0f392b] font-mono text-xs flex items-center justify-center font-bold">
+                      <span className="w-8 h-8 rounded-full bg-slate-100 dark:bg-[#1A232E] text-[#0f392b] dark:text-emerald-400 font-mono text-xs flex items-center justify-center font-bold">
                         04
                       </span>
                       <HeartHandshake className="w-5 h-5 text-[#15803d]" />
                     </div>
-                    <h3 className="font-bold text-sm text-[#0f392b] mb-1.5">NGO Acceptance</h3>
-                    <p className="text-xs text-slate-600 leading-relaxed">
+                    <h3 className="font-bold text-sm text-[#0f392b] dark:text-white mb-1.5">NGO Acceptance</h3>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                       The NGO reviews donation details and accepts or declines based on current kitchen meal capacity.
                     </p>
                   </div>
-                  <div className="mt-4 pt-3 border-t border-slate-100 text-right">
-                    <span className="text-[11px] font-mono text-slate-400 group-hover:text-[#15803d] transition-colors">Phase 4</span>
+                  <div className="mt-4 pt-3 border-t border-slate-100 dark:border-[#1E293B] text-right">
+                    <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500 group-hover:text-[#15803d] transition-colors">Phase 4</span>
                   </div>
                 </div>
 
                 {/* STEP 5 */}
-                <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between group hover:shadow-md hover:border-slate-300 transition-all">
+                <div className="bg-white dark:bg-[#11171D] p-5 rounded-2xl border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col justify-between group hover:shadow-md hover:border-slate-300 dark:hover:border-slate-700 transition-all">
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <span className="w-8 h-8 rounded-full bg-slate-100 text-[#0f392b] font-mono text-xs flex items-center justify-center font-bold">
+                      <span className="w-8 h-8 rounded-full bg-slate-100 dark:bg-[#1A232E] text-[#0f392b] dark:text-emerald-400 font-mono text-xs flex items-center justify-center font-bold">
                         05
                       </span>
                       <Truck className="w-5 h-5 text-[#15803d]" />
                     </div>
-                    <h3 className="font-bold text-sm text-[#0f392b] mb-1.5">Volunteer Sync</h3>
-                    <p className="text-xs text-slate-600 leading-relaxed">
+                    <h3 className="font-bold text-sm text-[#0f392b] dark:text-white mb-1.5">Volunteer Sync</h3>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                       An available neighborhood volunteer accepts the route delivery task via their live dashboard.
                     </p>
                   </div>
-                  <div className="mt-4 pt-3 border-t border-slate-100 text-right">
-                    <span className="text-[11px] font-mono text-slate-400 group-hover:text-[#15803d] transition-colors">Phase 5</span>
+                  <div className="mt-4 pt-3 border-t border-slate-100 dark:border-[#1E293B] text-right">
+                    <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500 group-hover:text-[#15803d] transition-colors">Phase 5</span>
                   </div>
                 </div>
 
                 {/* STEP 6 */}
-                <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between group hover:shadow-md hover:border-slate-300 transition-all">
+                <div className="bg-white dark:bg-[#11171D] p-5 rounded-2xl border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col justify-between group hover:shadow-md hover:border-slate-300 dark:hover:border-slate-700 transition-all">
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <span className="w-8 h-8 rounded-full bg-slate-100 text-[#0f392b] font-mono text-xs flex items-center justify-center font-bold">
+                      <span className="w-8 h-8 rounded-full bg-slate-100 dark:bg-[#1A232E] text-[#0f392b] dark:text-emerald-400 font-mono text-xs flex items-center justify-center font-bold">
                         06
                       </span>
                       <MapPin className="w-5 h-5 text-[#15803d]" />
                     </div>
-                    <h3 className="font-bold text-sm text-[#0f392b] mb-1.5">Pickup &amp; Transit</h3>
-                    <p className="text-xs text-slate-600 leading-relaxed">
+                    <h3 className="font-bold text-sm text-[#0f392b] dark:text-white mb-1.5">Pickup &amp; Transit</h3>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                       The volunteer collects the sealed meals from donor and transports directly to the destination NGO.
                     </p>
                   </div>
-                  <div className="mt-4 pt-3 border-t border-slate-100 text-right">
-                    <span className="text-[11px] font-mono text-slate-400 group-hover:text-[#15803d] transition-colors">Phase 6</span>
+                  <div className="mt-4 pt-3 border-t border-slate-100 dark:border-[#1E293B] text-right">
+                    <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500 group-hover:text-[#15803d] transition-colors">Phase 6</span>
                   </div>
                 </div>
 
                 {/* STEP 7 */}
-                <div className="bg-white p-5 rounded-2xl border border-emerald-200 shadow-sm flex flex-col justify-between group hover:shadow-md transition-all">
+                <div className="bg-white dark:bg-[#11171D] p-5 rounded-2xl border border-emerald-200 dark:border-emerald-800/40 shadow-sm flex flex-col justify-between group hover:shadow-md transition-all">
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <span className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-800 font-mono text-xs flex items-center justify-center font-bold">
+                      <span className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-mono text-xs flex items-center justify-center font-bold">
                         07
                       </span>
                       <CheckCircle2 className="w-5 h-5 text-[#15803d]" />
                     </div>
-                    <h3 className="font-bold text-sm text-[#0f392b] mb-1.5">Confirmation</h3>
-                    <p className="text-xs text-slate-600 leading-relaxed">
+                    <h3 className="font-bold text-sm text-[#0f392b] dark:text-white mb-1.5">Confirmation</h3>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                       The NGO verifies quality, confirms receipt digitally, and the donation cycle is fully completed.
                     </p>
                   </div>
-                  <div className="mt-4 pt-3 border-t border-slate-100 text-right">
+                  <div className="mt-4 pt-3 border-t border-slate-100 dark:border-[#1E293B] text-right">
                     <span className="text-[11px] font-mono text-[#15803d] font-bold">Completed</span>
                   </div>
                 </div>
@@ -748,16 +748,16 @@ export const Landing: React.FC = () => {
           {/* =========================================================================
               5. OUR FOUR MAIN ROLES (#roles)
           ========================================================================== */}
-          <section className="py-20 lg:py-28 bg-[#fafaf9] relative" id="roles">
+          <section className="py-20 lg:py-28 bg-[#fafaf9] dark:bg-[#090D10] relative transition-colors duration-200" id="roles">
             <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
               <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-16">
                 <span className="text-xs text-[#15803d] tracking-widest uppercase mb-2 font-bold font-mono">
                   ECOSYSTEM STAKEHOLDERS
                 </span>
-                <h2 className="text-3xl sm:text-4xl font-bold text-[#0f392b] tracking-tight mb-4">
+                <h2 className="text-3xl sm:text-4xl font-bold text-[#0f392b] dark:text-white tracking-tight mb-4">
                   Designed for Every Hero in the Network
                 </h2>
-                <p className="text-base text-slate-600 leading-relaxed">
+                <p className="text-base text-slate-600 dark:text-slate-400 leading-relaxed">
                   Whether you prepare surplus food, run a shelter, drive a delivery route, or administer safety, AnnaSathi gives you tailor-made tools.
                 </p>
               </div>
@@ -765,19 +765,19 @@ export const Landing: React.FC = () => {
               {/* 4 Visually Distinct Cards (2x2 Grid) */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* CARD 1: Food Donors */}
-                <div className="bg-white p-8 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
+                <div className="bg-white dark:bg-[#11171D] p-8 rounded-2xl border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col justify-between transition-colors">
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <span className="px-3 py-1 rounded-full bg-slate-100 text-xs text-[#0f392b] font-semibold">
+                      <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-[#1A232E] text-xs text-[#0f392b] dark:text-emerald-400 font-semibold">
                         Donors &amp; Partners
                       </span>
                       <Building2 className="w-6 h-6 text-[#15803d]" />
                     </div>
-                    <h3 className="text-xl font-bold text-[#0f392b] mb-3">Donate Surplus Food</h3>
-                    <p className="text-sm text-slate-600 mb-6 leading-relaxed">
+                    <h3 className="text-xl font-bold text-[#0f392b] dark:text-white mb-3">Donate Surplus Food</h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">
                       Restaurants, hotels, college canteens, event organizers, and individuals can list surplus food and help prevent unnecessary food waste.
                     </p>
-                    <ul className="space-y-3 mb-8 text-sm text-slate-700">
+                    <ul className="space-y-3 mb-8 text-sm text-slate-700 dark:text-slate-300">
                       <li className="flex items-center gap-3">
                         <CheckCircle2 className="w-4 h-4 text-[#15803d] flex-shrink-0" />
                         <span>Create food donations in seconds</span>
@@ -814,19 +814,19 @@ export const Landing: React.FC = () => {
                 </div>
 
                 {/* CARD 2: Verified NGOs */}
-                <div className="bg-white p-8 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
+                <div className="bg-white dark:bg-[#11171D] p-8 rounded-2xl border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col justify-between transition-colors">
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <span className="px-3 py-1 rounded-full bg-slate-100 text-xs text-[#0f392b] font-semibold">
+                      <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-[#1A232E] text-xs text-[#0f392b] dark:text-emerald-400 font-semibold">
                         Community Kitchens &amp; Shelters
                       </span>
                       <HeartHandshake className="w-6 h-6 text-[#15803d]" />
                     </div>
-                    <h3 className="text-xl font-bold text-[#0f392b] mb-3">Receive Food Donations</h3>
-                    <p className="text-sm text-slate-600 mb-6 leading-relaxed">
+                    <h3 className="text-xl font-bold text-[#0f392b] dark:text-white mb-3">Receive Food Donations</h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">
                       Verified NGOs, food banks, shelters, and community kitchens can discover suitable food donations and distribute them to communities in need.
                     </p>
-                    <ul className="space-y-3 mb-8 text-sm text-slate-700">
+                    <ul className="space-y-3 mb-8 text-sm text-slate-700 dark:text-slate-300">
                       <li className="flex items-center gap-3">
                         <CheckCircle2 className="w-4 h-4 text-[#15803d] flex-shrink-0" />
                         <span>Organization registration &amp; instant verification</span>
@@ -855,7 +855,7 @@ export const Landing: React.FC = () => {
                   </div>
                   <Link
                     to="/register"
-                    className="w-full inline-flex items-center justify-center gap-2 py-3 px-6 rounded-lg bg-slate-100 border border-slate-200 text-[#0f392b] text-sm font-semibold hover:bg-slate-200 transition-colors shadow-sm"
+                    className="w-full inline-flex items-center justify-center gap-2 py-3 px-6 rounded-lg bg-slate-100 dark:bg-[#131B22] border border-slate-200 dark:border-[#1E293B] text-[#0f392b] dark:text-emerald-400 text-sm font-semibold hover:bg-slate-200 dark:hover:bg-[#1A232E] transition-colors shadow-sm"
                   >
                     <span>Register Your NGO</span>
                     <ArrowRight className="w-4 h-4" />
@@ -863,19 +863,19 @@ export const Landing: React.FC = () => {
                 </div>
 
                 {/* CARD 3: Volunteers */}
-                <div className="bg-white p-8 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
+                <div className="bg-white dark:bg-[#11171D] p-8 rounded-2xl border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col justify-between transition-colors">
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <span className="px-3 py-1 rounded-full bg-slate-100 text-xs text-[#0f392b] font-semibold">
+                      <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-[#1A232E] text-xs text-[#0f392b] dark:text-emerald-400 font-semibold">
                         Rescue Logistics
                       </span>
                       <Truck className="w-6 h-6 text-[#15803d]" />
                     </div>
-                    <h3 className="text-xl font-bold text-[#0f392b] mb-3">Make a Difference</h3>
-                    <p className="text-sm text-slate-600 mb-6 leading-relaxed">
+                    <h3 className="text-xl font-bold text-[#0f392b] dark:text-white mb-3">Make a Difference</h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">
                       Volunteers help transport surplus food from donors to verified NGOs and play an indispensable role in completing the rescue process.
                     </p>
-                    <ul className="space-y-3 mb-8 text-sm text-slate-700">
+                    <ul className="space-y-3 mb-8 text-sm text-slate-700 dark:text-slate-300">
                       <li className="flex items-center gap-3">
                         <CheckCircle2 className="w-4 h-4 text-[#15803d] flex-shrink-0" />
                         <span>Rapid volunteer registration &amp; ID check</span>
@@ -904,7 +904,7 @@ export const Landing: React.FC = () => {
                   </div>
                   <Link
                     to="/register"
-                    className="w-full inline-flex items-center justify-center gap-2 py-3 px-6 rounded-lg bg-slate-100 border border-slate-200 text-[#0f392b] text-sm font-semibold hover:bg-slate-200 transition-colors shadow-sm"
+                    className="w-full inline-flex items-center justify-center gap-2 py-3 px-6 rounded-lg bg-slate-100 dark:bg-[#131B22] border border-slate-200 dark:border-[#1E293B] text-[#0f392b] dark:text-emerald-400 text-sm font-semibold hover:bg-slate-200 dark:hover:bg-[#1A232E] transition-colors shadow-sm"
                   >
                     <span>Become a Volunteer</span>
                     <ArrowRight className="w-4 h-4" />
@@ -912,19 +912,19 @@ export const Landing: React.FC = () => {
                 </div>
 
                 {/* CARD 4: Administration */}
-                <div className="bg-white p-8 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
+                <div className="bg-white dark:bg-[#11171D] p-8 rounded-2xl border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col justify-between transition-colors">
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <span className="px-3 py-1 rounded-full bg-slate-100 text-xs text-[#0f392b] font-semibold">
+                      <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-[#1A232E] text-xs text-[#0f392b] dark:text-emerald-400 font-semibold">
                         Governance &amp; Security
                       </span>
                       <ShieldCheck className="w-6 h-6 text-[#15803d]" />
                     </div>
-                    <h3 className="text-xl font-bold text-[#0f392b] mb-3">Responsible Management</h3>
-                    <p className="text-sm text-slate-600 mb-6 leading-relaxed">
+                    <h3 className="text-xl font-bold text-[#0f392b] dark:text-white mb-3">Responsible Management</h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">
                       Authorized platform administrators maintain network reliability, enforce strict food safety rules, and oversee all active donations.
                     </p>
-                    <ul className="space-y-3 mb-8 text-sm text-slate-700">
+                    <ul className="space-y-3 mb-8 text-sm text-slate-700 dark:text-slate-300">
                       <li className="flex items-center gap-3">
                         <CheckCircle2 className="w-4 h-4 text-[#15803d] flex-shrink-0" />
                         <span>Verify NGOs with government NGO-Darpan records</span>
@@ -953,7 +953,7 @@ export const Landing: React.FC = () => {
                   </div>
                   <Link
                     to="/login"
-                    className="w-full inline-flex items-center justify-center gap-2 py-3 px-6 rounded-lg bg-[#0f392b] text-white text-sm font-semibold hover:bg-emerald-950 transition-colors shadow-sm"
+                    className="w-full inline-flex items-center justify-center gap-2 py-3 px-6 rounded-lg bg-[#0f392b] dark:bg-emerald-700 text-white text-sm font-semibold hover:bg-emerald-950 dark:hover:bg-emerald-600 transition-colors shadow-sm"
                   >
                     <span>Admin Login</span>
                     <Lock className="w-4 h-4" />
@@ -966,16 +966,16 @@ export const Landing: React.FC = () => {
           {/* =========================================================================
               6. AI-POWERED FEATURES (#ai-features)
           ========================================================================== */}
-          <section className="py-20 lg:py-28 bg-slate-50 border-y border-slate-200/70 relative" id="ai-features">
+          <section className="py-20 lg:py-28 bg-slate-50 dark:bg-[#0C1217] border-y border-slate-200/70 dark:border-[#1E293B] relative transition-colors duration-200" id="ai-features">
             <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
               <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-16">
                 <span className="text-xs text-[#15803d] tracking-widest uppercase mb-2 font-bold font-mono">
                   INTELLIGENT INNOVATION
                 </span>
-                <h2 className="text-3xl sm:text-4xl font-bold text-[#0f392b] tracking-tight mb-4">
+                <h2 className="text-3xl sm:text-4xl font-bold text-[#0f392b] dark:text-white tracking-tight mb-4">
                   Powered by AI. Driven by Humanity.
                 </h2>
-                <p className="text-base text-slate-600 leading-relaxed">
+                <p className="text-base text-slate-600 dark:text-slate-400 leading-relaxed">
                   AnnaSathi AI combines state-of-the-art predictive intelligence with real-world logistics to make zero-waste food distribution smarter, faster, and reliable.
                 </p>
               </div>
@@ -983,129 +983,129 @@ export const Landing: React.FC = () => {
               {/* 5 Bento Style Feature Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {/* FEATURE 1 */}
-                <div className="bg-white p-7 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between group hover:shadow-md hover:border-slate-300 transition-all">
+                <div className="bg-white dark:bg-[#11171D] p-7 rounded-2xl border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col justify-between group hover:shadow-md hover:border-slate-300 dark:hover:border-slate-700 transition-all">
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <span className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-[#0f392b] group-hover:bg-[#15803d] group-hover:text-white transition-colors">
+                      <span className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-[#1A232E] flex items-center justify-center text-[#0f392b] dark:text-emerald-400 group-hover:bg-[#15803d] group-hover:text-white transition-colors">
                         <Clock className="w-6 h-6" />
                       </span>
-                      <span className="px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-[11px] font-mono text-[#15803d] font-bold">
+                      <span className="px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800/40 text-[11px] font-mono text-[#15803d] dark:text-emerald-400 font-bold">
                         REAL-TIME
                       </span>
                     </div>
-                    <h3 className="text-lg font-bold text-[#0f392b] mb-2.5">
+                    <h3 className="text-lg font-bold text-[#0f392b] dark:text-white mb-2.5">
                       AI Food Urgency Estimation
                     </h3>
-                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                       Analyzes food category, preparation timestamp, temperature, and ambient storage to compute an automated shelf-life urgency score, preventing spoilage before it happens.
                     </p>
                   </div>
-                  <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-mono text-slate-500">
+                  <div className="mt-6 pt-4 border-t border-slate-100 dark:border-[#1E293B] flex items-center justify-between text-xs font-mono text-slate-500 dark:text-slate-400">
                     <span>Thermal &amp; Moisture Sensors</span>
                     <Radio className="w-4 h-4 text-[#15803d]" />
                   </div>
                 </div>
 
                 {/* FEATURE 2 */}
-                <div className="bg-white p-7 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between group hover:shadow-md hover:border-slate-300 transition-all">
+                <div className="bg-white dark:bg-[#11171D] p-7 rounded-2xl border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col justify-between group hover:shadow-md hover:border-slate-300 dark:hover:border-slate-700 transition-all">
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <span className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-[#0f392b] group-hover:bg-[#15803d] group-hover:text-white transition-colors">
+                      <span className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-[#1A232E] flex items-center justify-center text-[#0f392b] dark:text-emerald-400 group-hover:bg-[#15803d] group-hover:text-white transition-colors">
                         <MapPin className="w-6 h-6" />
                       </span>
-                      <span className="px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-[11px] font-mono text-[#15803d] font-bold">
+                      <span className="px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800/40 text-[11px] font-mono text-[#15803d] dark:text-emerald-400 font-bold">
                         ALGORITHMIC
                       </span>
                     </div>
-                    <h3 className="text-lg font-bold text-[#0f392b] mb-2.5">
+                    <h3 className="text-lg font-bold text-[#0f392b] dark:text-white mb-2.5">
                       Intelligent NGO Matching
                     </h3>
-                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                       Optimal algorithmic matching scoring proximity, dietary requirements, vehicle capacity, and real-time shelter dining schedules for zero transit bottlenecking.
                     </p>
                   </div>
-                  <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-mono text-slate-500">
+                  <div className="mt-6 pt-4 border-t border-slate-100 dark:border-[#1E293B] flex items-center justify-between text-xs font-mono text-slate-500 dark:text-slate-400">
                     <span>Optimal Radial Proximity</span>
                     <Activity className="w-4 h-4 text-[#15803d]" />
                   </div>
                 </div>
 
                 {/* FEATURE 3 */}
-                <div className="bg-white p-7 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between group hover:shadow-md hover:border-slate-300 transition-all">
+                <div className="bg-white dark:bg-[#11171D] p-7 rounded-2xl border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col justify-between group hover:shadow-md hover:border-slate-300 dark:hover:border-slate-700 transition-all">
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <span className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-[#0f392b] group-hover:bg-[#15803d] group-hover:text-white transition-colors">
+                      <span className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-[#1A232E] flex items-center justify-center text-[#0f392b] dark:text-emerald-400 group-hover:bg-[#15803d] group-hover:text-white transition-colors">
                         <Activity className="w-6 h-6" />
                       </span>
-                      <span className="px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-[11px] font-mono text-[#15803d] font-bold">
+                      <span className="px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800/40 text-[11px] font-mono text-[#15803d] dark:text-emerald-400 font-bold">
                         PREDICTIVE
                       </span>
                     </div>
-                    <h3 className="text-lg font-bold text-[#0f392b] mb-2.5">
+                    <h3 className="text-lg font-bold text-[#0f392b] dark:text-white mb-2.5">
                       AI Demand Prediction
                     </h3>
-                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                       Predictive models analyzing historical food wastage cycles across banquet peaks to anticipate regional hunger demand and coordinate preemptive volunteer rosters.
                     </p>
                   </div>
-                  <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-mono text-slate-500">
+                  <div className="mt-6 pt-4 border-t border-slate-100 dark:border-[#1E293B] flex items-center justify-between text-xs font-mono text-slate-500 dark:text-slate-400">
                     <span>Time-Series Pattern Analysis</span>
                     <Sparkles className="w-4 h-4 text-[#15803d]" />
                   </div>
                 </div>
 
                 {/* FEATURE 4 */}
-                <div className="bg-white p-7 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between group hover:shadow-md hover:border-slate-300 transition-all lg:col-span-1">
+                <div className="bg-white dark:bg-[#11171D] p-7 rounded-2xl border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col justify-between group hover:shadow-md hover:border-slate-300 dark:hover:border-slate-700 transition-all lg:col-span-1">
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <span className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-[#0f392b] group-hover:bg-[#15803d] group-hover:text-white transition-colors">
+                      <span className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-[#1A232E] flex items-center justify-center text-[#0f392b] dark:text-emerald-400 group-hover:bg-[#15803d] group-hover:text-white transition-colors">
                         <Sparkles className="w-6 h-6" />
                       </span>
-                      <span className="px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-[11px] font-mono text-[#15803d] font-bold">
+                      <span className="px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800/40 text-[11px] font-mono text-[#15803d] dark:text-emerald-400 font-bold">
                         NLP MULTILINGUAL
                       </span>
                     </div>
-                    <h3 className="text-lg font-bold text-[#0f392b] mb-2.5">
+                    <h3 className="text-lg font-bold text-[#0f392b] dark:text-white mb-2.5">
                       AI Chatbot Assistant
                     </h3>
-                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                       Multilingual conversational agent assisting donors with packaging instructions, NGO onboarding queries, and live operational help in vernacular languages.
                     </p>
                   </div>
-                  <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-mono text-slate-500">
+                  <div className="mt-6 pt-4 border-t border-slate-100 dark:border-[#1E293B] flex items-center justify-between text-xs font-mono text-slate-500 dark:text-slate-400">
                     <span>24/7 Contextual Guidance</span>
                     <CheckCircle2 className="w-4 h-4 text-[#15803d]" />
                   </div>
                 </div>
 
                 {/* FEATURE 5 (Spanning 2 columns on lg) */}
-                <div className="bg-white p-7 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between group hover:shadow-md hover:border-slate-300 transition-all lg:col-span-2">
+                <div className="bg-white dark:bg-[#11171D] p-7 rounded-2xl border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col justify-between group hover:shadow-md hover:border-slate-300 dark:hover:border-slate-700 transition-all lg:col-span-2">
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <span className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-[#0f392b] group-hover:bg-[#15803d] group-hover:text-white transition-colors">
+                      <span className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-[#1A232E] flex items-center justify-center text-[#0f392b] dark:text-emerald-400 group-hover:bg-[#15803d] group-hover:text-white transition-colors">
                         <Layers className="w-6 h-6" />
                       </span>
-                      <span className="px-2.5 py-1 rounded-full bg-emerald-100 border border-emerald-200 text-[11px] font-mono text-emerald-900 font-bold">
+                      <span className="px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-[11px] font-mono text-emerald-900 dark:text-emerald-300 font-bold">
                         HIGH AVAILABILITY
                       </span>
                     </div>
-                    <h3 className="text-lg font-bold text-[#0f392b] mb-2.5">
+                    <h3 className="text-lg font-bold text-[#0f392b] dark:text-white mb-2.5">
                       Multi-Provider AI Architecture
                     </h3>
-                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-2xl">
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl">
                       Robust dual-engine infrastructure powered by Google Gemini and NVIDIA NIM with automatic failover and zero latency spikes, ensuring 99.9% uptime for time-critical food rescue operations.
                     </p>
                   </div>
-                  <div className="mt-6 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
+                  <div className="mt-6 pt-4 border-t border-slate-100 dark:border-[#1E293B] flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-3">
-                      <span className="inline-flex items-center gap-1.5 text-xs font-mono text-slate-600 bg-slate-100 px-2.5 py-1 rounded">
+                      <span className="inline-flex items-center gap-1.5 text-xs font-mono text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-[#1A232E] px-2.5 py-1 rounded">
                         <span className="w-1.5 h-1.5 rounded-full bg-[#15803d]" /> Google Gemini Core
                       </span>
-                      <span className="inline-flex items-center gap-1.5 text-xs font-mono text-slate-600 bg-slate-100 px-2.5 py-1 rounded">
+                      <span className="inline-flex items-center gap-1.5 text-xs font-mono text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-[#1A232E] px-2.5 py-1 rounded">
                         <span className="w-1.5 h-1.5 rounded-full bg-[#15803d]" /> NVIDIA NIM Inference
                       </span>
                     </div>
-                    <span className="text-xs font-mono text-[#15803d] font-bold">&lt; 140ms Latency</span>
+                    <span className="text-xs font-mono text-[#15803d] dark:text-emerald-400 font-bold">&lt; 140ms Latency</span>
                   </div>
                 </div>
               </div>
@@ -1115,44 +1115,44 @@ export const Landing: React.FC = () => {
           {/* =========================================================================
               7. REAL-TIME TRACKING AND TRANSPARENCY (#tracking)
           ========================================================================== */}
-          <section className="py-20 lg:py-28 bg-[#fafaf9] relative" id="tracking">
+          <section className="py-20 lg:py-28 bg-[#fafaf9] dark:bg-[#090D10] relative transition-colors duration-200" id="tracking">
             <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
               <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-16">
                 <span className="text-xs text-[#15803d] tracking-widest uppercase mb-2 font-bold font-mono">
                   LIVE OPERATIONS MOCKUP
                 </span>
-                <h2 className="text-3xl sm:text-4xl font-bold text-[#0f392b] tracking-tight mb-4">
+                <h2 className="text-3xl sm:text-4xl font-bold text-[#0f392b] dark:text-white tracking-tight mb-4">
                   Every Donation. Every Journey. Every Impact.
                 </h2>
-                <p className="text-base text-slate-600 leading-relaxed">
+                <p className="text-base text-slate-600 dark:text-slate-400 leading-relaxed">
                   Clear operational visibility including donation status tracking, NGO acceptance updates, volunteer dispatching, live transit progress, digital delivery confirmation, and instant in-app alerts.
                 </p>
               </div>
 
               {/* Live Mockup Board */}
-              <div className="bg-white p-6 sm:p-10 rounded-2xl shadow-md border border-slate-200/80 max-w-5xl mx-auto">
+              <div className="bg-white dark:bg-[#11171D] p-6 sm:p-10 rounded-2xl shadow-md border border-slate-200/80 dark:border-[#1E293B] max-w-5xl mx-auto transition-colors">
                 {/* Header row of the order card */}
-                <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-100">
+                <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-100 dark:border-[#1E293B]">
                   <div className="flex items-center gap-3">
-                    <span className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-[#0f392b] font-bold">
+                    <span className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-[#1A232E] flex items-center justify-center text-[#0f392b] dark:text-emerald-400 font-bold">
                       <Truck className="w-5 h-5" />
                     </span>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="text-base font-bold text-[#0f392b]">Donation #AS-8942</h3>
-                        <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-mono font-bold">
+                        <h3 className="text-base font-bold text-[#0f392b] dark:text-white">Donation #AS-8942</h3>
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-[11px] font-mono font-bold">
                           LIVE IN TRANSIT
                         </span>
                       </div>
-                      <p className="text-xs text-slate-500">The Grand Canteen ➔ Sneha Shelter (4.2 km)</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">The Grand Canteen ➔ Sneha Shelter (4.2 km)</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="text-right">
-                      <span className="text-[11px] font-mono text-slate-400 block">Food Safety Temp</span>
-                      <span className="text-xs sm:text-sm text-[#15803d] font-bold">64°C (Safe Consumable)</span>
+                      <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500 block">Food Safety Temp</span>
+                      <span className="text-xs sm:text-sm text-[#15803d] dark:text-emerald-400 font-bold">64°C (Safe Consumable)</span>
                     </div>
-                    <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#15803d]">
+                    <div className="w-9 h-9 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800/40 flex items-center justify-center text-[#15803d] dark:text-emerald-400">
                       <Radio className="w-4 h-4" />
                     </div>
                   </div>
@@ -1166,57 +1166,57 @@ export const Landing: React.FC = () => {
                       <div className="w-10 h-10 rounded-full bg-[#15803d] text-white flex items-center justify-center mb-2 shadow-sm">
                         <CheckCircle2 className="w-5 h-5" />
                       </div>
-                      <span className="text-xs font-semibold text-[#0f392b]">Created</span>
-                      <span className="text-[11px] font-mono text-slate-400">14:10 IST</span>
+                      <span className="text-xs font-semibold text-[#0f392b] dark:text-white">Created</span>
+                      <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500">14:10 IST</span>
                     </div>
                     {/* Step 2 */}
                     <div className="flex flex-col items-center text-center">
                       <div className="w-10 h-10 rounded-full bg-[#15803d] text-white flex items-center justify-center mb-2 shadow-sm">
                         <CheckCircle2 className="w-5 h-5" />
                       </div>
-                      <span className="text-xs font-semibold text-[#0f392b]">NGO Accepted</span>
-                      <span className="text-[11px] font-mono text-slate-400">14:14 IST</span>
+                      <span className="text-xs font-semibold text-[#0f392b] dark:text-white">NGO Accepted</span>
+                      <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500">14:14 IST</span>
                     </div>
                     {/* Step 3 */}
                     <div className="flex flex-col items-center text-center">
                       <div className="w-10 h-10 rounded-full bg-[#15803d] text-white flex items-center justify-center mb-2 shadow-sm">
                         <CheckCircle2 className="w-5 h-5" />
                       </div>
-                      <span className="text-xs font-semibold text-[#0f392b]">Volunteer Assigned</span>
-                      <span className="text-[11px] font-mono text-slate-400">14:18 IST</span>
+                      <span className="text-xs font-semibold text-[#0f392b] dark:text-white">Volunteer Assigned</span>
+                      <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500">14:18 IST</span>
                     </div>
                     {/* Step 4 (Active) */}
                     <div className="flex flex-col items-center text-center">
-                      <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center mb-2 shadow-[0_0_12px_rgba(22,163,74,0.35)] animate-pulse">
+                      <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 flex items-center justify-center mb-2 shadow-[0_0_12px_rgba(22,163,74,0.35)] animate-pulse">
                         <Truck className="w-5 h-5" />
                       </div>
-                      <span className="text-xs font-bold text-[#15803d]">Picked Up (In Transit)</span>
-                      <span className="text-[11px] font-mono text-slate-400">14:26 IST</span>
+                      <span className="text-xs font-bold text-[#15803d] dark:text-emerald-400">Picked Up (In Transit)</span>
+                      <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500">14:26 IST</span>
                     </div>
                     {/* Step 5 (Pending) */}
                     <div className="flex flex-col items-center text-center opacity-40">
-                      <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center mb-2 text-slate-400">
+                      <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-[#1A232E] flex items-center justify-center mb-2 text-slate-400">
                         <MapPin className="w-5 h-5" />
                       </div>
-                      <span className="text-xs font-semibold text-slate-700">Delivered</span>
-                      <span className="text-[11px] font-mono text-slate-400">Est: 14:40</span>
+                      <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Delivered</span>
+                      <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500">Est: 14:40</span>
                     </div>
                     {/* Step 6 (Pending) */}
                     <div className="flex flex-col items-center text-center opacity-40">
-                      <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center mb-2 text-slate-400">
+                      <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-[#1A232E] flex items-center justify-center mb-2 text-slate-400">
                         <ShieldCheck className="w-5 h-5" />
                       </div>
-                      <span className="text-xs font-semibold text-slate-700">Receipt Confirmed</span>
-                      <span className="text-[11px] font-mono text-slate-400">Awaiting Arrival</span>
+                      <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Receipt Confirmed</span>
+                      <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500">Awaiting Arrival</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Telemetry Details Footer */}
-                <div className="pt-6 border-t border-slate-100 flex flex-wrap items-center justify-between gap-4 bg-slate-50 p-4 rounded-xl">
+                <div className="pt-6 border-t border-slate-100 dark:border-[#1E293B] flex flex-wrap items-center justify-between gap-4 bg-slate-50 dark:bg-[#131B22] p-4 rounded-xl">
                   <div className="flex items-center gap-3">
                     <Leaf className="w-5 h-5 text-[#15803d]" />
-                    <span className="text-xs sm:text-sm text-[#0f392b] font-medium">
+                    <span className="text-xs sm:text-sm text-[#0f392b] dark:text-emerald-300 font-medium">
                       45 wholesome prepared lunch boxes • Packed with eco-friendly containers
                     </span>
                   </div>
@@ -1231,16 +1231,16 @@ export const Landing: React.FC = () => {
           {/* =========================================================================
               8. OUR MISSION (#mission)
           ========================================================================== */}
-          <section className="py-20 lg:py-28 bg-slate-50 border-t border-slate-200/70 relative" id="mission">
+          <section className="py-20 lg:py-28 bg-slate-50 dark:bg-[#0C1217] border-t border-slate-200/70 dark:border-[#1E293B] relative transition-colors duration-200" id="mission">
             <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
               <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-16">
                 <span className="text-xs text-[#15803d] tracking-widest uppercase mb-2 font-bold font-mono">
                   PURPOSE DRIVEN
                 </span>
-                <h2 className="text-3xl sm:text-4xl font-bold text-[#0f392b] tracking-tight mb-4">
+                <h2 className="text-3xl sm:text-4xl font-bold text-[#0f392b] dark:text-white tracking-tight mb-4">
                   Building a Future Where No Food Goes to Waste.
                 </h2>
-                <p className="text-base text-slate-600 leading-relaxed">
+                <p className="text-base text-slate-600 dark:text-slate-400 leading-relaxed">
                   Our mission is to reduce food waste, strengthen communities, and make food redistribution accessible through technology, collaboration, and compassion.
                 </p>
               </div>
@@ -1248,60 +1248,60 @@ export const Landing: React.FC = () => {
               {/* 3 Mission Pillars */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {/* Pillar 1 */}
-                <div className="bg-white p-8 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+                <div className="bg-white dark:bg-[#11171D] p-8 rounded-2xl border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col justify-between hover:shadow-md transition-all">
                   <div>
-                    <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#0f392b] mb-6">
+                    <div className="w-14 h-14 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800/40 flex items-center justify-center text-[#0f392b] dark:text-emerald-400 mb-6">
                       <Leaf className="w-7 h-7 text-[#15803d]" />
                     </div>
-                    <h3 className="text-lg font-bold text-[#0f392b] mb-3">
+                    <h3 className="text-lg font-bold text-[#0f392b] dark:text-white mb-3">
                       Reduce Food Waste
                     </h3>
-                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                       Diverting edible, nutritious sustenance away from municipal landfills into community kitchens, significantly curbing methane emissions and ecological strain.
                     </p>
                   </div>
-                  <div className="mt-6 pt-4 border-t border-slate-100">
-                    <span className="text-xs font-mono text-[#15803d] font-bold">
+                  <div className="mt-6 pt-4 border-t border-slate-100 dark:border-[#1E293B]">
+                    <span className="text-xs font-mono text-[#15803d] dark:text-emerald-400 font-bold">
                       Landfill Diversion Target: 100%
                     </span>
                   </div>
                 </div>
 
                 {/* Pillar 2 */}
-                <div className="bg-white p-8 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+                <div className="bg-white dark:bg-[#11171D] p-8 rounded-2xl border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col justify-between hover:shadow-md transition-all">
                   <div>
-                    <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#0f392b] mb-6">
+                    <div className="w-14 h-14 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800/40 flex items-center justify-center text-[#0f392b] dark:text-emerald-400 mb-6">
                       <HeartHandshake className="w-7 h-7 text-[#15803d]" />
                     </div>
-                    <h3 className="text-lg font-bold text-[#0f392b] mb-3">
+                    <h3 className="text-lg font-bold text-[#0f392b] dark:text-white mb-3">
                       Support Hunger Prevention
                     </h3>
-                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                       Ensuring vulnerable children, elderly, and unhoused citizens receive daily dignified meals prepared with high culinary safety and nutritional integrity.
                     </p>
                   </div>
-                  <div className="mt-6 pt-4 border-t border-slate-100">
-                    <span className="text-xs font-mono text-[#15803d] font-bold">
+                  <div className="mt-6 pt-4 border-t border-slate-100 dark:border-[#1E293B]">
+                    <span className="text-xs font-mono text-[#15803d] dark:text-emerald-400 font-bold">
                       Nutritional Security Focused
                     </span>
                   </div>
                 </div>
 
                 {/* Pillar 3 */}
-                <div className="bg-white p-8 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+                <div className="bg-white dark:bg-[#11171D] p-8 rounded-2xl border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col justify-between hover:shadow-md transition-all">
                   <div>
-                    <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#0f392b] mb-6">
+                    <div className="w-14 h-14 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800/40 flex items-center justify-center text-[#0f392b] dark:text-emerald-400 mb-6">
                       <Users className="w-7 h-7 text-[#15803d]" />
                     </div>
-                    <h3 className="text-lg font-bold text-[#0f392b] mb-3">
+                    <h3 className="text-lg font-bold text-[#0f392b] dark:text-white mb-3">
                       Build Connected Communities
                     </h3>
-                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                       Forging unbreakable civic bonds between hospitality leaders, civil society organizations, and local volunteers who care about neighborhood welfare.
                     </p>
                   </div>
-                  <div className="mt-6 pt-4 border-t border-slate-100">
-                    <span className="text-xs font-mono text-[#15803d] font-bold">
+                  <div className="mt-6 pt-4 border-t border-slate-100 dark:border-[#1E293B]">
+                    <span className="text-xs font-mono text-[#15803d] dark:text-emerald-400 font-bold">
                       Civic Solidarity &amp; Action
                     </span>
                   </div>
@@ -1313,7 +1313,7 @@ export const Landing: React.FC = () => {
           {/* =========================================================================
               9. CALL-TO-ACTION SECTION (#cta)
           ========================================================================== */}
-          <section className="py-20 lg:py-28 bg-[#0f392b] text-white relative overflow-hidden" id="cta">
+          <section className="py-20 lg:py-28 bg-[#0f392b] dark:bg-[#07241b] text-white relative overflow-hidden border-t dark:border-emerald-950" id="cta">
             {/* Ambient Green Glows behind CTA Banner */}
             <div className="absolute -top-32 left-1/4 w-[500px] h-[500px] bg-[#15803d]/20 blur-[130px] rounded-full pointer-events-none" />
             <div className="absolute -bottom-32 right-1/4 w-[500px] h-[500px] bg-emerald-400/10 blur-[130px] rounded-full pointer-events-none" />
@@ -1343,14 +1343,14 @@ export const Landing: React.FC = () => {
                   </Link>
                   <Link
                     to="/register"
-                    className="inline-flex items-center gap-2 px-6 py-3.5 rounded-lg bg-white text-[#0f392b] text-sm font-semibold hover:bg-slate-100 transition-all shadow-sm"
+                    className="inline-flex items-center gap-2 px-6 py-3.5 rounded-lg bg-white dark:bg-[#11171D] border border-transparent dark:border-[#1E293B] text-[#0f392b] dark:text-white text-sm font-semibold hover:bg-slate-100 dark:hover:bg-[#1A232E] transition-all shadow-sm"
                   >
                     <span>Join as NGO</span>
                     <HeartHandshake className="w-4 h-4 text-[#15803d]" />
                   </Link>
                   <Link
                     to="/register"
-                    className="inline-flex items-center gap-2 px-6 py-3.5 rounded-lg bg-emerald-950/80 border border-emerald-800 text-white text-sm font-semibold hover:bg-emerald-900 transition-all shadow-sm"
+                    className="inline-flex items-center gap-2 px-6 py-3.5 rounded-lg bg-emerald-950/80 dark:bg-emerald-900/60 border border-emerald-800 dark:border-emerald-700 text-white text-sm font-semibold hover:bg-emerald-900 transition-all shadow-sm"
                   >
                     <span>Become a Volunteer</span>
                     <Truck className="w-4 h-4" />
@@ -1365,7 +1365,7 @@ export const Landing: React.FC = () => {
       {/* =========================================================================
           GLOBAL FOOTER (#contact)
       ========================================================================== */}
-      <footer className="w-full bg-slate-900 text-slate-200 border-t border-slate-800" id="contact">
+      <footer className="w-full bg-slate-900 dark:bg-[#06090C] text-slate-200 border-t border-slate-800 dark:border-[#1E293B] transition-colors" id="contact">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 pt-16 pb-12">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-y-12 lg:gap-x-12">
             {/* Col 1: Brand & Overview (4 cols) */}
@@ -1379,7 +1379,7 @@ export const Landing: React.FC = () => {
               <p className="text-xs sm:text-sm text-slate-400 max-w-sm leading-relaxed">
                 Connecting surplus food with those who need it through AI, technology, and community collaboration.
               </p>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/80 border border-slate-700/60 w-fit">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/80 dark:bg-[#11171D] border border-slate-700/60 dark:border-[#1E293B] w-fit">
                 <span className="w-2 h-2 rounded-full bg-emerald-400" />
                 <span className="text-xs text-slate-300 font-semibold font-mono">99.8% Surplus Rescue Uptime</span>
               </div>
@@ -1392,16 +1392,16 @@ export const Landing: React.FC = () => {
                 <a href="#hero" className="text-emerald-400 font-semibold hover:underline w-fit">
                   Home
                 </a>
-                <a href="#about" className="text-slate-400 hover:text-white transition-colors w-fit">
+                <a href="#about" className="text-slate-400 hover:text-white dark:hover:text-emerald-300 transition-colors w-fit">
                   About Us
                 </a>
-                <a href="#how-it-works" className="text-slate-400 hover:text-white transition-colors w-fit">
+                <a href="#how-it-works" className="text-slate-400 hover:text-white dark:hover:text-emerald-300 transition-colors w-fit">
                   How It Works
                 </a>
-                <a href="#ai-features" className="text-slate-400 hover:text-white transition-colors w-fit">
+                <a href="#ai-features" className="text-slate-400 hover:text-white dark:hover:text-emerald-300 transition-colors w-fit">
                   Our Features
                 </a>
-                <a href="#mission" className="text-slate-400 hover:text-white transition-colors w-fit">
+                <a href="#mission" className="text-slate-400 hover:text-white dark:hover:text-emerald-300 transition-colors w-fit">
                   Our Mission
                 </a>
               </nav>
@@ -1411,16 +1411,16 @@ export const Landing: React.FC = () => {
             <div className="lg:col-span-3 flex flex-col gap-3">
               <h4 className="text-sm font-bold text-white uppercase tracking-wider">Get Involved</h4>
               <nav className="flex flex-col gap-2.5 text-xs sm:text-sm">
-                <Link to="/register" className="text-slate-400 hover:text-white transition-colors w-fit">
+                <Link to="/register" className="text-slate-400 hover:text-white dark:hover:text-emerald-300 transition-colors w-fit">
                   Become a Donor
                 </Link>
-                <Link to="/register" className="text-slate-400 hover:text-white transition-colors w-fit">
+                <Link to="/register" className="text-slate-400 hover:text-white dark:hover:text-emerald-300 transition-colors w-fit">
                   Register as NGO
                 </Link>
-                <Link to="/register" className="text-slate-400 hover:text-white transition-colors w-fit">
+                <Link to="/register" className="text-slate-400 hover:text-white dark:hover:text-emerald-300 transition-colors w-fit">
                   Become a Volunteer
                 </Link>
-                <Link to="/login" className="text-slate-400 hover:text-white transition-colors w-fit">
+                <Link to="/login" className="text-slate-400 hover:text-white dark:hover:text-emerald-300 transition-colors w-fit">
                   Admin Login
                 </Link>
               </nav>
@@ -1430,16 +1430,16 @@ export const Landing: React.FC = () => {
             <div className="lg:col-span-2 flex flex-col gap-3">
               <h4 className="text-sm font-bold text-white uppercase tracking-wider">Legal &amp; Contact</h4>
               <nav className="flex flex-col gap-2.5 text-xs sm:text-sm">
-                <a href="#contact" className="text-slate-400 hover:text-white transition-colors w-fit">
+                <a href="#contact" className="text-slate-400 hover:text-white dark:hover:text-emerald-300 transition-colors w-fit">
                   Contact Us
                 </a>
-                <a href="mailto:support@annasathi.org" className="text-slate-400 hover:text-white transition-colors w-fit">
+                <a href="mailto:support@annasathi.org" className="text-slate-400 hover:text-white dark:hover:text-emerald-300 transition-colors w-fit">
                   Email Support
                 </a>
-                <span className="text-slate-400 hover:text-white transition-colors cursor-pointer w-fit">
+                <span className="text-slate-400 hover:text-white dark:hover:text-emerald-300 transition-colors cursor-pointer w-fit">
                   Privacy Policy
                 </span>
-                <span className="text-slate-400 hover:text-white transition-colors cursor-pointer w-fit">
+                <span className="text-slate-400 hover:text-white dark:hover:text-emerald-300 transition-colors cursor-pointer w-fit">
                   Terms &amp; Conditions
                 </span>
               </nav>
@@ -1447,16 +1447,16 @@ export const Landing: React.FC = () => {
           </div>
 
           {/* Sub-footer Strip */}
-          <div className="mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 border-t border-slate-800 text-slate-400 text-xs">
+          <div className="mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 border-t border-slate-800 dark:border-[#1E293B] text-slate-400 text-xs">
             <p className="text-center md:text-left">
               &copy; {new Date().getFullYear()} AnnaSathi AI. All Rights Reserved. Together, let's make every meal count.
             </p>
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-1.5 font-mono text-[11px] text-slate-400 bg-slate-800/80 px-2.5 py-1 rounded-md border border-slate-700/60">
+              <div className="flex items-center gap-1.5 font-mono text-[11px] text-slate-400 bg-slate-800/80 dark:bg-[#11171D] px-2.5 py-1 rounded-md border border-slate-700/60 dark:border-[#1E293B]">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
                 <span>ISO 27001 AI SECURE</span>
               </div>
-              <div className="flex items-center gap-1.5 font-mono text-[11px] text-slate-400 bg-slate-800/80 px-2.5 py-1 rounded-md border border-slate-700/60">
+              <div className="flex items-center gap-1.5 font-mono text-[11px] text-slate-400 bg-slate-800/80 dark:bg-[#11171D] px-2.5 py-1 rounded-md border border-slate-700/60 dark:border-[#1E293B]">
                 <Lock className="w-3.5 h-3.5 text-emerald-400" />
                 <span>256-BIT ENCRYPTED</span>
               </div>
