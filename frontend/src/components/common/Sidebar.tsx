@@ -19,6 +19,8 @@ interface SidebarProps {
   className?: string;
   /** Callback when item is clicked (for closing mobile overlay) */
   onItemClick?: () => void;
+  /** Mobile open state */
+  isOpen?: boolean;
 }
 
 /**
@@ -37,7 +39,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <aside
-      className={`flex flex-col w-20 md:w-64 border-r border-slate-200 dark:border-[#1E293B] bg-white dark:bg-[#11171D] flex-shrink-0 min-h-[calc(100vh-4rem)] transition-all duration-200 ${className}`}
+      className={`hidden md:flex flex-col w-20 md:w-64 border-r border-slate-200 dark:border-[#1E293B] bg-white dark:bg-[#11171D] flex-shrink-0 min-h-[calc(100vh-4rem)] transition-all duration-200 ${className}`}
       data-purpose="primary-sidebar"
     >
       {/* Navigation Links */}
