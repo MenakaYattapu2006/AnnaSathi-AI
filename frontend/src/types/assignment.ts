@@ -14,6 +14,8 @@ export interface PickupDetails {
   estimatedPickupTime: string;
   actualPickupTime?: string;
   verificationOtp?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface DeliveryDetails {
@@ -24,6 +26,8 @@ export interface DeliveryDetails {
   estimatedDeliveryTime: string;
   actualDeliveryTime?: string;
   recipientSignatureName?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface Assignment {
@@ -38,4 +42,12 @@ export interface Assignment {
   pickedUpAt?: string;
   deliveredAt?: string;
   notes?: string;
+  foodName?: string;
+  category?: string;
+  quantity?: number;
+  unit?: string;
+  urgencyScore?: number;
+  urgencyLevel?: string;
+  dietaryType?: string;
+  expiryTime?: string;
 }

@@ -70,7 +70,9 @@ export const volunteerController = {
     const tasksRes = await query(
       `SELECT a.*, d.food_name, d.category, d.quantity, d.unit, d.urgency_score, d.urgency_level,
               d.preparation_time, d.expiry_time, d.dietary_type,
-              n.organization_name as destination_ngo_name
+              d.latitude as pickup_latitude, d.longitude as pickup_longitude,
+              n.organization_name as destination_ngo_name,
+              n.latitude as delivery_latitude, n.longitude as delivery_longitude
        FROM assignments a
        JOIN donations d ON a.donation_id = d.id
        JOIN ngos n ON a.ngo_id = n.id
@@ -97,7 +99,9 @@ export const volunteerController = {
     const tasksRes = await query(
       `SELECT a.*, d.food_name, d.category, d.quantity, d.unit, d.urgency_score, d.urgency_level,
               d.preparation_time, d.expiry_time, d.status as donation_status,
-              n.organization_name as destination_ngo_name
+              d.latitude as pickup_latitude, d.longitude as pickup_longitude,
+              n.organization_name as destination_ngo_name,
+              n.latitude as delivery_latitude, n.longitude as delivery_longitude
        FROM assignments a
        JOIN donations d ON a.donation_id = d.id
        JOIN ngos n ON a.ngo_id = n.id
@@ -115,145 +119,172 @@ export const volunteerController = {
    * Uses Row-Level Locking (SELECT ... FOR UPDATE) to prevent duplicate claims.
    */
   async acceptAssignment(req, res) {
-    const { id } = req.params;
+    try {
+      const id = req.params.assignmentId || req.params.id;
 
-    const volRes = await query('SELECT * FROM volunteers WHERE user_id = $1', [req.user.id]);
-    if (volRes.rows.length === 0) {
-      return res.status(404).json({ success: false, error: 'Volunteer profile not found.' });
+      const volRes = await query('SELECT * FROM volunteers WHERE user_id = $1', [req.user.id]);
+      if (volRes.rows.length === 0) {
+        return res.status(404).json({ success: false, error: 'Volunteer profile not found.' });
+      }
+
+      const volunteer = volRes.rows[0];
+
+      if (volunteer.status !== 'active') {
+        return res.status(403).json({ success: false, error: 'Inactive volunteer accounts cannot claim tasks.' });
+      }
+
+      const result = await withTransaction(async (client) => {
+        // Row-Level Lock: Acquired exclusively for this assignment record
+        const asgnLock = await client.query('SELECT * FROM assignments WHERE id = $1 FOR UPDATE', [id]);
+        if (asgnLock.rows.length === 0) {
+          throw { statusCode: 404, message: 'Assignment task record not found.' };
+        }
+
+        const assignment = asgnLock.rows[0];
+
+        if (assignment.volunteer_id || assignment.status !== 'available') {
+          throw {
+            statusCode: 409,
+            message: 'Conflict: This delivery task has already been accepted by another volunteer.',
+          };
+        }
+
+        const donLock = await client.query('SELECT * FROM donations WHERE id = $1 FOR UPDATE', [assignment.donation_id]);
+        const donation = donLock.rows[0];
+
+        if (!donation || donation.status === 'CANCELLED') {
+          throw { statusCode: 400, message: 'This donation has been cancelled by the donor.' };
+        }
+
+        // Update assignment
+        const updatedAsgn = await client.query(
+          `UPDATE assignments
+           SET volunteer_id = $1, status = 'assigned', assigned_at = NOW(), updated_at = NOW()
+           WHERE id = $2
+           RETURNING *`,
+          [volunteer.id, assignment.id]
+        );
+
+        // Synchronize donation status
+        await client.query(
+          `UPDATE donations
+           SET status = 'VOLUNTEER_ASSIGNED', updated_at = NOW()
+           WHERE id = $1`,
+          [donation.id]
+        );
+
+        // Record audit history
+        await client.query(
+          `INSERT INTO donation_status_history (donation_id, from_status, to_status, changed_by_user_id, notes)
+           VALUES ($1, 'NGO_ACCEPTED', 'VOLUNTEER_ASSIGNED', $2, 'Assigned to volunteer: ' || $3)`,
+          [donation.id, req.user.id, volunteer.name]
+        );
+
+        // Record delivery history
+        try {
+          await client.query(
+            `INSERT INTO delivery_status_history (assignment_id, from_status, to_status, changed_by_user_id, notes)
+             VALUES ($1, 'available', 'assigned', $2, 'Claimed by volunteer ' || $3)`,
+            [assignment.id, req.user.id, volunteer.name]
+          );
+        } catch (e) {
+          // Non-critical audit table
+        }
+
+        return updatedAsgn.rows[0];
+      });
+
+      // Socket event
+      const io = req.app.get('io');
+      if (io) {
+        io.emit('task:claimed', {
+          assignmentId: id,
+          volunteerId: volunteer.id,
+          volunteerName: volunteer.name,
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: 'Task accepted successfully! The delivery is now registered in your Assigned Tasks.',
+        assignment: result,
+      });
+    } catch (err) {
+      const statusCode = err.statusCode || 500;
+      return res.status(statusCode).json({ success: false, error: err.message || 'Failed to accept task.' });
     }
-
-    const volunteer = volRes.rows[0];
-
-    if (volunteer.status !== 'active') {
-      return res.status(403).json({ success: false, error: 'Inactive volunteer accounts cannot claim tasks.' });
-    }
-
-    const result = await withTransaction(async (client) => {
-      // Row-Level Lock: Acquired exclusively for this assignment record
-      const asgnLock = await client.query('SELECT * FROM assignments WHERE id = $1 FOR UPDATE', [id]);
-      if (asgnLock.rows.length === 0) {
-        throw { statusCode: 404, message: 'Assignment task record not found.' };
-      }
-
-      const assignment = asgnLock.rows[0];
-
-      if (assignment.volunteer_id || assignment.status !== 'available') {
-        throw {
-          statusCode: 409,
-          message: 'Conflict: This delivery task has already been accepted by another volunteer.',
-        };
-      }
-
-      const donLock = await client.query('SELECT * FROM donations WHERE id = $1 FOR UPDATE', [assignment.donation_id]);
-      const donation = donLock.rows[0];
-
-      if (!donation || donation.status === 'CANCELLED') {
-        throw { statusCode: 400, message: 'This donation has been cancelled by the donor.' };
-      }
-
-      if (donation.status !== 'NGO_ACCEPTED') {
-        throw { statusCode: 400, message: `Donation is not in an eligible state for transport (status: ${donation.status}).` };
-      }
-
-      // Update assignment
-      const updatedAsgn = await client.query(
-        `UPDATE assignments
-         SET volunteer_id = $1, status = 'assigned', assigned_at = NOW(), updated_at = NOW()
-         WHERE id = $2
-         RETURNING *`,
-        [volunteer.id, assignment.id]
-      );
-
-      // Synchronize donation status
-      await client.query(
-        `UPDATE donations
-         SET status = 'VOLUNTEER_ASSIGNED', updated_at = NOW()
-         WHERE id = $1`,
-        [donation.id]
-      );
-
-      // Record audit history
-      await client.query(
-        `INSERT INTO donation_status_history (donation_id, from_status, to_status, changed_by_user_id, notes)
-         VALUES ($1, 'NGO_ACCEPTED', 'VOLUNTEER_ASSIGNED', $2, 'Assigned to volunteer: ' || $3)`,
-        [donation.id, req.user.id, volunteer.name]
-      );
-
-      return updatedAsgn.rows[0];
-    });
-
-    return res.status(200).json({
-      success: true,
-      message: 'Task accepted successfully. Proceed to donor address for pickup.',
-      assignment: result,
-    });
   },
 
   /**
    * Confirm Food Pickup from Donor
    */
   async pickupAssignment(req, res) {
-    const { id } = req.params;
-    const { notes } = req.body;
+    try {
+      const id = req.params.assignmentId || req.params.id;
+      const { notes } = req.body;
 
-    const volRes = await query('SELECT id, name FROM volunteers WHERE user_id = $1', [req.user.id]);
-    if (volRes.rows.length === 0) {
-      return res.status(404).json({ success: false, error: 'Volunteer profile not found.' });
+      const volRes = await query('SELECT id, name FROM volunteers WHERE user_id = $1', [req.user.id]);
+      if (volRes.rows.length === 0) {
+        return res.status(404).json({ success: false, error: 'Volunteer profile not found.' });
+      }
+
+      const volunteer = volRes.rows[0];
+
+      const result = await withTransaction(async (client) => {
+        const asgnLock = await client.query('SELECT * FROM assignments WHERE id = $1 FOR UPDATE', [id]);
+        if (asgnLock.rows.length === 0) {
+          throw { statusCode: 404, message: 'Assignment not found.' };
+        }
+
+        const assignment = asgnLock.rows[0];
+
+        if (assignment.volunteer_id !== volunteer.id) {
+          throw { statusCode: 403, message: 'Unauthorized: You can only update tasks assigned to your account.' };
+        }
+
+        if (assignment.status === 'picked_up') {
+          throw { statusCode: 400, message: 'Food has already been marked as picked up.' };
+        }
+
+        if (assignment.status !== 'assigned' && assignment.status !== 'in_transit_to_pickup') {
+          throw { statusCode: 400, message: `Cannot mark picked up from status "${assignment.status}".` };
+        }
+
+        const updatedAsgn = await client.query(
+          `UPDATE assignments
+           SET status = 'picked_up',
+               actual_pickup_time = NOW(),
+               picked_up_at = NOW(),
+               notes = CASE WHEN $1::text IS NOT NULL THEN notes || ' | Pickup: ' || $1 ELSE notes END,
+               updated_at = NOW()
+           WHERE id = $2
+           RETURNING *`,
+          [notes || null, assignment.id]
+        );
+
+        await client.query(
+          `UPDATE donations SET status = 'PICKED_UP', updated_at = NOW() WHERE id = $1`,
+          [assignment.donation_id]
+        );
+
+        await client.query(
+          `INSERT INTO donation_status_history (donation_id, from_status, to_status, changed_by_user_id, notes)
+           VALUES ($1, 'VOLUNTEER_ASSIGNED', 'PICKED_UP', $2, 'Food collected from donor location')`,
+          [assignment.donation_id, req.user.id]
+        );
+
+        return updatedAsgn.rows[0];
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: 'Pickup confirmed. Safe transport to shelter initialized.',
+        assignment: result,
+      });
+    } catch (err) {
+      const statusCode = err.statusCode || 500;
+      return res.status(statusCode).json({ success: false, error: err.message || 'Failed to record pickup.' });
     }
-
-    const volunteer = volRes.rows[0];
-
-    const result = await withTransaction(async (client) => {
-      const asgnLock = await client.query('SELECT * FROM assignments WHERE id = $1 FOR UPDATE', [id]);
-      if (asgnLock.rows.length === 0) {
-        throw { statusCode: 404, message: 'Assignment not found.' };
-      }
-
-      const assignment = asgnLock.rows[0];
-
-      if (assignment.volunteer_id !== volunteer.id) {
-        throw { statusCode: 403, message: 'Unauthorized: You can only update tasks assigned to your account.' };
-      }
-
-      if (assignment.status === 'picked_up') {
-        throw { statusCode: 400, message: 'Food has already been marked as picked up.' };
-      }
-
-      if (assignment.status !== 'assigned' && assignment.status !== 'in_transit_to_pickup') {
-        throw { statusCode: 400, message: `Cannot mark picked up from status "${assignment.status}".` };
-      }
-
-      const updatedAsgn = await client.query(
-        `UPDATE assignments
-         SET status = 'picked_up',
-             actual_pickup_time = NOW(),
-             picked_up_at = NOW(),
-             notes = CASE WHEN $1::text IS NOT NULL THEN notes || ' | Pickup: ' || $1 ELSE notes END,
-             updated_at = NOW()
-         WHERE id = $2
-         RETURNING *`,
-        [notes || null, assignment.id]
-      );
-
-      await client.query(
-        `UPDATE donations SET status = 'PICKED_UP', updated_at = NOW() WHERE id = $1`,
-        [assignment.donation_id]
-      );
-
-      await client.query(
-        `INSERT INTO donation_status_history (donation_id, from_status, to_status, changed_by_user_id, notes)
-         VALUES ($1, 'VOLUNTEER_ASSIGNED', 'PICKED_UP', $2, 'Food collected from donor location')`,
-        [assignment.donation_id, req.user.id]
-      );
-
-      return updatedAsgn.rows[0];
-    });
-
-    return res.status(200).json({
-      success: true,
-      message: 'Pickup confirmed. Safe transport to shelter initialized.',
-      assignment: result,
-    });
   },
 
   /**
@@ -261,27 +292,28 @@ export const volunteerController = {
    * Prerequisite: Delivery cannot occur before pickup!
    */
   async deliverAssignment(req, res) {
-    const { id } = req.params;
-    const { notes } = req.body;
+    try {
+      const id = req.params.assignmentId || req.params.id;
+      const { notes } = req.body;
 
-    const volRes = await query('SELECT id, name FROM volunteers WHERE user_id = $1', [req.user.id]);
-    if (volRes.rows.length === 0) {
-      return res.status(404).json({ success: false, error: 'Volunteer profile not found.' });
-    }
-
-    const volunteer = volRes.rows[0];
-
-    const result = await withTransaction(async (client) => {
-      const asgnLock = await client.query('SELECT * FROM assignments WHERE id = $1 FOR UPDATE', [id]);
-      if (asgnLock.rows.length === 0) {
-        throw { statusCode: 404, message: 'Assignment not found.' };
+      const volRes = await query('SELECT id, name FROM volunteers WHERE user_id = $1', [req.user.id]);
+      if (volRes.rows.length === 0) {
+        return res.status(404).json({ success: false, error: 'Volunteer profile not found.' });
       }
 
-      const assignment = asgnLock.rows[0];
+      const volunteer = volRes.rows[0];
 
-      if (assignment.volunteer_id !== volunteer.id) {
-        throw { statusCode: 403, message: 'Unauthorized: You can only update tasks assigned to your account.' };
-      }
+      const result = await withTransaction(async (client) => {
+        const asgnLock = await client.query('SELECT * FROM assignments WHERE id = $1 FOR UPDATE', [id]);
+        if (asgnLock.rows.length === 0) {
+          throw { statusCode: 404, message: 'Assignment not found.' };
+        }
+
+        const assignment = asgnLock.rows[0];
+
+        if (assignment.volunteer_id !== volunteer.id) {
+          throw { statusCode: 403, message: 'Unauthorized: You can only update tasks assigned to your account.' };
+        }
 
       if (assignment.status === 'delivered') {
         throw { statusCode: 400, message: 'Task is already marked as delivered.' };
@@ -336,6 +368,10 @@ export const volunteerController = {
       message: 'Delivery marked as complete. NGO partner has been notified to verify and confirm receipt.',
       assignment: result,
     });
+    } catch (err) {
+      const statusCode = err.statusCode || 500;
+      return res.status(statusCode).json({ success: false, error: err.message || 'Failed to record delivery.' });
+    }
   },
 
   /**

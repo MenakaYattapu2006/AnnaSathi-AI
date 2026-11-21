@@ -133,12 +133,14 @@ export function mapAssignmentFromDb(row: any): Assignment {
     ngoId: row.ngo_id || row.ngoId,
     status: row.status,
     pickup: row.pickup || {
-      address: row.pickup_address || '',
+      address: row.pickup_address || row.street || '',
       contactPerson: row.pickup_contact_person || '',
       contactPhone: row.pickup_contact_phone || '',
       estimatedPickupTime: row.estimated_pickup_time || '',
       actualPickupTime: row.actual_pickup_time,
       verificationOtp: row.verification_otp,
+      latitude: Number(row.pickup_latitude ?? row.latitude ?? 17.4156),
+      longitude: Number(row.pickup_longitude ?? row.longitude ?? 78.4357),
     },
     delivery: row.delivery || {
       ngoName: row.delivery_ngo_name || row.destination_ngo_name || '',
@@ -148,11 +150,21 @@ export function mapAssignmentFromDb(row: any): Assignment {
       estimatedDeliveryTime: row.estimated_delivery_time || '',
       actualDeliveryTime: row.actual_delivery_time,
       recipientSignatureName: row.recipient_signature_name,
+      latitude: Number(row.delivery_latitude ?? 17.3850),
+      longitude: Number(row.delivery_longitude ?? 78.4867),
     },
     assignedAt: row.assigned_at || row.assignedAt || new Date().toISOString(),
     pickedUpAt: row.picked_up_at || row.pickedUpAt,
     deliveredAt: row.actual_delivery_time || row.deliveredAt,
     notes: row.notes,
+    foodName: row.food_name || row.foodName,
+    category: row.category,
+    quantity: row.quantity != null ? Number(row.quantity) : undefined,
+    unit: row.unit,
+    urgencyScore: row.urgency_score != null ? Number(row.urgency_score) : undefined,
+    urgencyLevel: row.urgency_level || row.urgencyLevel,
+    dietaryType: row.dietary_type || row.dietaryType,
+    expiryTime: row.expiry_time || row.expiryTime,
   };
 }
 

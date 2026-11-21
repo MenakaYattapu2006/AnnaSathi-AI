@@ -5,6 +5,7 @@ import { Button } from '../../components/common/Button';
 import { Card } from '../../components/common/Card';
 import { EmptyState } from '../../components/common/EmptyState';
 import { TaskDetailsModal } from '../../components/volunteer/TaskDetailsModal';
+import { RouteMapModal } from '../../components/volunteer/RouteMapModal';
 import {
   Truck,
   CheckCircle2,
@@ -44,6 +45,7 @@ const AssignedTasks: React.FC = () => {
   const [myTasks, setMyTasks] = useState<Assignment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
+  const [mapTask, setMapTask] = useState<Assignment | null>(null);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // Status Filter Tabs
@@ -373,6 +375,16 @@ const AssignedTasks: React.FC = () => {
                     <Button
                       variant="outline"
                       size="sm"
+                      onClick={() => setMapTask(task)}
+                      className="text-xs w-full sm:w-auto text-blue-600 dark:text-blue-400 border-blue-500/30 hover:bg-blue-50 dark:hover:bg-blue-950/30"
+                    >
+                      <MapPin size={14} className="mr-1" />
+                      Route Map
+                    </Button>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => setSelectedAssignment(task)}
                       className="text-xs w-full sm:w-auto"
                     >
@@ -417,6 +429,13 @@ const AssignedTasks: React.FC = () => {
         onPickup={handlePickup}
         onDeliver={handleDeliver}
         currentVolunteerId={volunteer?.id}
+      />
+
+      {/* Leaflet Route Map Modal + Google Maps Navigation */}
+      <RouteMapModal
+        task={mapTask}
+        isOpen={!!mapTask}
+        onClose={() => setMapTask(null)}
       />
     </div>
   );
