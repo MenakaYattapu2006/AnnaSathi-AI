@@ -170,7 +170,12 @@ const Login: React.FC = () => {
                   >
                     Password
                   </label>
-                  <span className="text-[11px] text-slate-400">Encrypted</span>
+                  <Link
+                    to="/forgot-password"
+                    className="text-xs font-semibold text-brand-900 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:underline transition-colors"
+                  >
+                    Forgot password?
+                  </Link>
                 </div>
                 <div className="relative rounded-lg shadow-xs">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">

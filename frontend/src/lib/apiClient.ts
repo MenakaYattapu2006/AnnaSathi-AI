@@ -313,10 +313,10 @@ export const apiClient = {
         body: JSON.stringify({ email }),
       }),
 
-    resetPassword: (token: string, password: string) =>
+    resetPassword: (email: string, otp: string, newPassword: string) =>
       request('/auth/reset-password', {
         method: 'POST',
-        body: JSON.stringify({ token, password }),
+        body: JSON.stringify({ email, otp, newPassword }),
       }),
   },
 

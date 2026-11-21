@@ -8,6 +8,7 @@ import { Loading } from '../components/common/Loading';
 const Landing = lazy(() => import('../pages/Landing'));
 const Login = lazy(() => import('../pages/auth/Login'));
 const Register = lazy(() => import('../pages/auth/Register'));
+const ForgotPassword = lazy(() => import('../pages/auth/ForgotPassword'));
 const NotFound = lazy(() => import('../pages/NotFound'));
 
 // Donor pages (lazy loaded)
@@ -53,6 +54,7 @@ export const AppRoutes: React.FC = () => {
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
         {/* Protected Authenticated Routes wrapped in MainLayout */}
         <Route element={<ProtectedRoute />}>
