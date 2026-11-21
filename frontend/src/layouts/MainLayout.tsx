@@ -24,7 +24,25 @@ const getInitials = (name?: string): string => {
   const parts = name.trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return 'SA';
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  return (
+    <> {/* Mobile overlay */}
+      {sidebarOpen && (
+        <>
+          <div className="fixed inset-0 bg-black/30 z-40" onClick={() => setSidebarOpen(false)} />
+          <aside className="fixed inset-y-0 left-0 w-64 bg-white dark:bg-[#11171D] z-50 transform transition-transform duration-200 ease-out">
+            <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-[#1E293B]">
+              <span className="text-lg font-bold text-[#0f392b] dark:text-emerald-400">Menu</span>
+              <button onClick={() => setSidebarOpen(false)} className="p-2 text-slate-600 dark:text-slate-400 hover:text-[#0f392b] dark:hover:text-emerald-400">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <Sidebar items={sidebarItems} role={user.role as any} onItemClick={closeSidebar} className="h-full" />
+          </aside>
+        </>
+      )}
+    </>
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#090D10] text-slate-800 dark:text-slate-100 font-sans antialiased flex flex-col selection:bg-emerald-100 selection:text-emerald-900 transition-colors duration-200">
+parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 };
 
 const getRoleSubtitle = (role: string): string => {
@@ -120,7 +138,25 @@ export const MainLayout: React.FC = () => {
       }
     };
     document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
+    return (
+    <> {/* Mobile overlay */}
+      {sidebarOpen && (
+        <>
+          <div className="fixed inset-0 bg-black/30 z-40" onClick={() => setSidebarOpen(false)} />
+          <aside className="fixed inset-y-0 left-0 w-64 bg-white dark:bg-[#11171D] z-50 transform transition-transform duration-200 ease-out">
+            <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-[#1E293B]">
+              <span className="text-lg font-bold text-[#0f392b] dark:text-emerald-400">Menu</span>
+              <button onClick={() => setSidebarOpen(false)} className="p-2 text-slate-600 dark:text-slate-400 hover:text-[#0f392b] dark:hover:text-emerald-400">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <Sidebar items={sidebarItems} role={user.role as any} onItemClick={closeSidebar} className="h-full" />
+          </aside>
+        </>
+      )}
+    </>
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#090D10] text-slate-800 dark:text-slate-100 font-sans antialiased flex flex-col selection:bg-emerald-100 selection:text-emerald-900 transition-colors duration-200">
+) => document.removeEventListener('mousedown', handleClick);
   }, [notifMenuOpen]);
 
   // Close mobile sidebar on Escape
@@ -130,13 +166,49 @@ export const MainLayout: React.FC = () => {
       if (e.key === 'Escape') setSidebarOpen(false);
     };
     document.addEventListener('keydown', handleKey);
-    return () => document.removeEventListener('keydown', handleKey);
+    return (
+    <> {/* Mobile overlay */}
+      {sidebarOpen && (
+        <>
+          <div className="fixed inset-0 bg-black/30 z-40" onClick={() => setSidebarOpen(false)} />
+          <aside className="fixed inset-y-0 left-0 w-64 bg-white dark:bg-[#11171D] z-50 transform transition-transform duration-200 ease-out">
+            <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-[#1E293B]">
+              <span className="text-lg font-bold text-[#0f392b] dark:text-emerald-400">Menu</span>
+              <button onClick={() => setSidebarOpen(false)} className="p-2 text-slate-600 dark:text-slate-400 hover:text-[#0f392b] dark:hover:text-emerald-400">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <Sidebar items={sidebarItems} role={user.role as any} onItemClick={closeSidebar} className="h-full" />
+          </aside>
+        </>
+      )}
+    </>
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#090D10] text-slate-800 dark:text-slate-100 font-sans antialiased flex flex-col selection:bg-emerald-100 selection:text-emerald-900 transition-colors duration-200">
+) => document.removeEventListener('keydown', handleKey);
   }, [sidebarOpen]);
 
   // Lock body scroll when mobile sidebar is open
   useEffect(() => {
     document.body.style.overflow = sidebarOpen ? 'hidden' : '';
-    return () => {
+    return (
+    <> {/* Mobile overlay */}
+      {sidebarOpen && (
+        <>
+          <div className="fixed inset-0 bg-black/30 z-40" onClick={() => setSidebarOpen(false)} />
+          <aside className="fixed inset-y-0 left-0 w-64 bg-white dark:bg-[#11171D] z-50 transform transition-transform duration-200 ease-out">
+            <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-[#1E293B]">
+              <span className="text-lg font-bold text-[#0f392b] dark:text-emerald-400">Menu</span>
+              <button onClick={() => setSidebarOpen(false)} className="p-2 text-slate-600 dark:text-slate-400 hover:text-[#0f392b] dark:hover:text-emerald-400">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <Sidebar items={sidebarItems} role={user.role as any} onItemClick={closeSidebar} className="h-full" />
+          </aside>
+        </>
+      )}
+    </>
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#090D10] text-slate-800 dark:text-slate-100 font-sans antialiased flex flex-col selection:bg-emerald-100 selection:text-emerald-900 transition-colors duration-200">
+) => {
       document.body.style.overflow = '';
     };
   }, [sidebarOpen]);
@@ -161,6 +233,24 @@ export const MainLayout: React.FC = () => {
   };
 
   return (
+    <> {/* Mobile overlay */}
+      {sidebarOpen && (
+        <>
+          <div className="fixed inset-0 bg-black/30 z-40" onClick={() => setSidebarOpen(false)} />
+          <aside className="fixed inset-y-0 left-0 w-64 bg-white dark:bg-[#11171D] z-50 transform transition-transform duration-200 ease-out">
+            <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-[#1E293B]">
+              <span className="text-lg font-bold text-[#0f392b] dark:text-emerald-400">Menu</span>
+              <button onClick={() => setSidebarOpen(false)} className="p-2 text-slate-600 dark:text-slate-400 hover:text-[#0f392b] dark:hover:text-emerald-400">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <Sidebar items={sidebarItems} role={user.role as any} onItemClick={closeSidebar} className="h-full" />
+          </aside>
+        </>
+      )}
+    </>
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#090D10] text-slate-800 dark:text-slate-100 font-sans antialiased flex flex-col selection:bg-emerald-100 selection:text-emerald-900 transition-colors duration-200">
+
     <div className="min-h-screen bg-[#f8fafc] dark:bg-[#090D10] text-slate-800 dark:text-slate-100 font-sans antialiased flex flex-col selection:bg-emerald-100 selection:text-emerald-900 transition-colors duration-200">
       {/* ───── Top Header Bar ───── */}
       <header
