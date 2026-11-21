@@ -283,10 +283,15 @@ export const authController = {
           ]
         );
       } else if (user.role === 'volunteer') {
+        const vCity = (registrationData.city || user.city || '').trim();
+        const vPincode = (registrationData.pincode || user.pincode || '').trim();
+        const serviceLoc = [vCity, vPincode].filter(Boolean).join(' - ') || vCity || vPincode || 'Local Service Area';
+        const serviceAreas = [serviceLoc];
+
         await client.query(
           `INSERT INTO volunteers (user_id, name, phone, email, vehicle_type, service_areas, availability, status)
-           VALUES ($1, $2, $3, $4, 'two_wheeler', ARRAY['Hyderabad Metropolitan'], 'available', 'active')`,
-          [user.id, user.name, user.phone, user.email]
+           VALUES ($1, $2, $3, $4, 'two_wheeler', $5, 'available', 'active')`,
+          [user.id, user.name, user.phone, user.email, serviceAreas]
         );
       }
 

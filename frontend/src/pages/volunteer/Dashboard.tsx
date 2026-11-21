@@ -522,7 +522,7 @@ const VolunteerDashboard: React.FC = () => {
               <div className="flex justify-between items-center py-1.5 border-b border-border/50">
                 <span className="text-xs text-secondary-text">Service Areas</span>
                 <span className="font-medium text-primary-text text-xs text-right max-w-[160px] truncate">
-                  {volunteer?.serviceArea?.join(', ') || 'Hyderabad'}
+                  {volunteer?.serviceArea?.join(', ') || [user?.profile?.city || (user as any)?.city, user?.profile?.pincode || (user as any)?.pincode].filter(Boolean).join(' - ') || 'Local Area'}
                 </span>
               </div>
               <div className="flex justify-between items-center py-1.5">

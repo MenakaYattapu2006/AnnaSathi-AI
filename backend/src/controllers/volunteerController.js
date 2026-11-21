@@ -6,11 +6,34 @@ export const volunteerController = {
    * Get volunteer profile for authenticated user
    */
   async getMe(req, res) {
-    const volRes = await query('SELECT * FROM volunteers WHERE user_id = $1', [req.user.id]);
+    const volRes = await query(
+      `SELECT v.*, u.city as user_city, u.pincode as user_pincode
+       FROM volunteers v
+       JOIN users u ON v.user_id = u.id
+       WHERE v.user_id = $1`,
+      [req.user.id]
+    );
     if (volRes.rows.length === 0) {
       return res.status(404).json({ success: false, error: 'Volunteer record not found.' });
     }
-    return res.status(200).json({ success: true, volunteer: volRes.rows[0] });
+    const volunteer = volRes.rows[0];
+
+    // If service_areas was defaulted to 'Hyderabad Metropolitan' or is empty, auto-correct to the user's registered city and pincode
+    const registeredArea = [volunteer.user_city, volunteer.user_pincode].filter(Boolean).join(' - ');
+    const hasDefaultHyderabad =
+      !volunteer.service_areas ||
+      volunteer.service_areas.length === 0 ||
+      (volunteer.service_areas.length === 1 && volunteer.service_areas[0] === 'Hyderabad Metropolitan');
+
+    if (hasDefaultHyderabad && registeredArea && !registeredArea.toLowerCase().includes('hyderabad')) {
+      volunteer.service_areas = [registeredArea];
+      await query('UPDATE volunteers SET service_areas = $1, updated_at = NOW() WHERE id = $2', [
+        volunteer.service_areas,
+        volunteer.id,
+      ]);
+    }
+
+    return res.status(200).json({ success: true, volunteer });
   },
 
   /**

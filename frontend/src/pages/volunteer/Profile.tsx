@@ -49,13 +49,20 @@ const VolunteerProfile: React.FC = () => {
     null
   );
 
+  const defaultServiceArea =
+    volunteer?.serviceArea && volunteer.serviceArea.length > 0
+      ? volunteer.serviceArea.join(', ')
+      : [user?.profile?.city || (user as any)?.city, user?.profile?.pincode || (user as any)?.pincode]
+          .filter(Boolean)
+          .join(' - ');
+
   const [formData, setFormData] = useState({
     name: volunteer?.name || user?.name || '',
     email: volunteer?.email || user?.email || '',
     phone: volunteer?.phone || user?.phone || '',
     vehicleType: volunteer?.vehicleType || 'two_wheeler',
     availability: volunteer?.availability || 'available',
-    serviceArea: volunteer?.serviceArea ? volunteer.serviceArea.join(', ') : 'Gachibowli, Madhapur, Hitec City',
+    serviceArea: defaultServiceArea,
   });
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
@@ -492,7 +499,7 @@ const VolunteerProfile: React.FC = () => {
                     type="text"
                     value={formData.serviceArea}
                     onChange={(e) => setFormData({ ...formData, serviceArea: e.target.value })}
-                    placeholder="e.g. Gachibowli, Madhapur, Kondapur"
+                    placeholder="e.g. City Name, Pincode, Local Areas"
                     className="w-full p-2.5 rounded-md border border-border bg-surface text-primary-text focus:outline-none focus:ring-1 focus:ring-primary"
                   />
                 </div>
