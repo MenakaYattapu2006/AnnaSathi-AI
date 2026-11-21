@@ -254,7 +254,7 @@ const ForgotPassword: React.FC = () => {
                       type="button"
                       onClick={handleResendOtp}
                       disabled={resendCooldown > 0 || isLoading}
-                      className="text-xs text-brand-900 dark:text-emerald-400 hover:underline flex items-center gap-1 disabled:opacity-50 cursor-pointer"
+                      className="text-xs text-brand-900 dark:text-emerald-400 hover:text-emerald-700 flex items-center gap-1 disabled:opacity-50 cursor-pointer"
                     >
                       <RefreshCw className={`w-3 h-3 ${isLoading ? 'animate-spin' : ''}`} />
                       <span>{resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend Code'}</span>
@@ -362,7 +362,7 @@ const ForgotPassword: React.FC = () => {
                 Remember your password?{' '}
                 <Link
                   to="/login"
-                  className="font-semibold text-brand-900 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 underline decoration-emerald-500/30 underline-offset-4 transition-colors"
+                  className="font-semibold text-brand-900 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors"
                 >
                   Back to Sign In
                 </Link>

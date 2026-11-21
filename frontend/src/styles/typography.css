@@ -41,9 +41,10 @@
   /* Links */
   a {
     color: var(--color-primary);
+    text-decoration: none;
   }
   a:hover {
-    @apply underline;
+    text-decoration: none;
   }
 }
 
