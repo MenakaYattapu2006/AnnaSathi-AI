@@ -71,17 +71,16 @@ export const NGOVerification: React.FC = () => {
   }, [ngos]);
 
   const filteredNgos = useMemo(() => {
-    return ngos.filter((n) => {
-      const matchesTab = activeTab === 'all' || n.verificationStatus === activeTab;
+    return ngos.filter((ngo) => {
+      const matchesTab = activeTab === 'all' || ngo.verificationStatus === activeTab;
       const matchesSearch =
-        n.organizationName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        n.contactPerson.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        n.contactEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        D
-        < p className = "text-xs text-secondary-text" > { ngo.address.city }, { ngo.address.state }</p>
-        </div >
-      ),
-    },
+        ngo.organizationName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        ngo.contactPerson.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        ngo.contactEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        `${ngo.address.city} ${ngo.address.state}`.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesTab && matchesSearch;
+    });
+  }, [ngos, activeTab, searchQuery]);
 {
   header: 'Contact Person',
     accessor: (ngo) => (
