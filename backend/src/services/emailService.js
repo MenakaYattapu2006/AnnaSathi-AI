@@ -1,14 +1,12 @@
 // Brevo Transactional Email & OTP Delivery Service
-import brevo from '@getbrevo/brevo';
+import * as brevo from '@getbrevo/brevo';
 import { config } from '../config/index.js';
 
 let apiInstance = null;
 
 if (config.brevo.apiKey) {
-  const defaultClient = brevo.ApiClient.instance;
-  const apiKey = defaultClient.authentications['api-key'];
-  apiKey.apiKey = config.brevo.apiKey;
   apiInstance = new brevo.TransactionalEmailsApi();
+  apiInstance.setApiKey(brevo.TransactionalEmailsApiApiKeys.apiKey, config.brevo.apiKey);
 } else {
   console.warn('⚠️  BREVO_API_KEY is not configured. Transactional emails will be simulated in the console.');
 }
@@ -54,7 +52,8 @@ export async function sendOtpEmail(toEmail, otp, purpose = 'login') {
       sendSmtpEmail.to = [{ email: toEmail }];
 
       const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
-      return { success: true, messageId: data.messageId };
+      const messageId = data?.body?.messageId || data?.messageId;
+      return { success: true, messageId };
     } catch (err) {
       console.error('Brevo API delivery error:', err?.response?.body || err.message);
       // In development fallback to console logging so local workflows don't stall
