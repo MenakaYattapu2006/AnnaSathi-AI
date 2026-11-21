@@ -218,7 +218,7 @@ async function request<T = any>(endpoint: string, options: RequestInit = {}): Pr
 
     if (!response.ok) {
       throw new ApiClientError(
-        data.error || data.message || `API request failed with status ${response.status}`,
+        data.error || data.message || (Array.isArray(data.errors) ? data.errors[0] : null) || `API request failed with status ${response.status}`,
         response.status,
         data.details || data.errors
       );

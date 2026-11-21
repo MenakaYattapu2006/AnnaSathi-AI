@@ -47,6 +47,10 @@ const Register: React.FC = () => {
       setError('Please provide a valid email address.');
       return;
     }
+    if (!phone.trim() || phone.trim().length < 8) {
+      setError('Please provide a valid phone number (at least 8 digits).');
+      return;
+    }
     if (password.length < 8) {
       setError('Password must be at least 8 characters.');
       return;
@@ -249,6 +253,7 @@ const Register: React.FC = () => {
                     <input
                       id="register-phone"
                       type="tel"
+                      required
                       value={phone}
                       onChange={(e) => {
                         setPhone(e.target.value);

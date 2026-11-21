@@ -44,7 +44,7 @@ export const authController = {
   async register(req, res) {
     const validation = validateRegistrationInput(req.body);
     if (!validation.isValid) {
-      return res.status(400).json({ success: false, errors: validation.errors });
+      return res.status(400).json({ success: false, error: validation.errors[0], errors: validation.errors });
     }
 
     const { name, email, phone, password, role, organizationName, address, city, state, pincode } = req.body;

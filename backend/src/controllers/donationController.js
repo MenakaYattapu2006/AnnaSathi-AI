@@ -10,7 +10,7 @@ export const donationController = {
   async createDonation(req, res) {
     const validation = validateDonationInput(req.body);
     if (!validation.isValid) {
-      return res.status(400).json({ success: false, errors: validation.errors });
+      return res.status(400).json({ success: false, error: validation.errors[0], errors: validation.errors });
     }
 
     const {
