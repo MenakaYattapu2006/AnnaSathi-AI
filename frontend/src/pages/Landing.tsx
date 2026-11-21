@@ -98,17 +98,7 @@ export const Landing: React.FC = () => {
             >
               About Us
             </a>
-            <a
-              href="#how-it-works"
-              onClick={() => setActiveTab('how-it-works')}
-              className={`px-3 py-1.5 transition-all rounded-lg ${
-                activeTab === 'how-it-works'
-                  ? 'bg-white dark:bg-[#11171D] text-[#0f392b] dark:text-emerald-400 font-bold shadow-sm'
-                  : 'hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-[#1A232E]'
-              }`}
-            >
-              How It Works
-            </a>
+
             <a
               href="#ai-features"
               onClick={() => setActiveTab('features')}
@@ -1395,9 +1385,7 @@ export const Landing: React.FC = () => {
                 <a href="#about" className="text-slate-400 hover:text-white dark:hover:text-emerald-300 transition-colors w-fit">
                   About Us
                 </a>
-                <a href="#how-it-works" className="text-slate-400 hover:text-white dark:hover:text-emerald-300 transition-colors w-fit">
-                  How It Works
-                </a>
+
                 <a href="#ai-features" className="text-slate-400 hover:text-white dark:hover:text-emerald-300 transition-colors w-fit">
                   Our Features
                 </a>
@@ -1452,14 +1440,16 @@ export const Landing: React.FC = () => {
               &copy; {new Date().getFullYear()} AnnaSathi AI. All Rights Reserved. Together, let's make every meal count.
             </p>
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-1.5 font-mono text-[11px] text-slate-400 bg-slate-800/80 dark:bg-[#11171D] px-2.5 py-1 rounded-md border border-slate-700/60 dark:border-[#1E293B]">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                <span>ISO 27001 AI SECURE</span>
-              </div>
-              <div className="flex items-center gap-1.5 font-mono text-[11px] text-slate-400 bg-slate-800/80 dark:bg-[#11171D] px-2.5 py-1 rounded-md border border-slate-700/60 dark:border-[#1E293B]">
-                <Lock className="w-3.5 h-3.5 text-emerald-400" />
-                <span>256-BIT ENCRYPTED</span>
-              </div>
+              <p className="text-center md:text-left">
+  Developed by{' '}
+  <a href="https://github.com/MenakaYattapu2006" target="_blank" rel="noopener noreferrer" className="underline hover:text-emerald-400">
+    Menaka
+  </a>{' '}
+  |{' '}
+  <a href="https://github.com/PavanputraYarramsetty" target="_blank" rel="noopener noreferrer" className="underline hover:text-emerald-400">
+    Pavanputra
+  </a>
+</p>
             </div>
           </div>
         </div>
