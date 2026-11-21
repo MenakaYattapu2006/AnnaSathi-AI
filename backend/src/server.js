@@ -10,7 +10,7 @@ const server = http.createServer(app);
 // Initialize Socket.IO
 const io = new Server(server, {
   cors: {
-    origin: [config.frontendUrl, 'http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:3000'],
+    origin: [config.frontendUrl, 'https://annasathi.onrender.com', 'http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:3000'],
     credentials: true,
     methods: ['GET', 'POST']
   }

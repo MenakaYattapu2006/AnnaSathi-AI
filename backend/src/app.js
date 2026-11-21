@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 import { config } from './config/index.js';
@@ -19,13 +20,15 @@ const app = express();
 // Security middleware
 app.use(
   helmet({
-    crossOriginResourcePolicy: { policy: 'cross-origin' }
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    contentSecurityPolicy: false, // Allows Leaflet map tiles and inline styles
   })
 );
 
 // CORS configuration for cross-origin SPA requests with credentials
 const allowedOrigins = [
   config.frontendUrl,
+  'https://annasathi.onrender.com',
   'http://localhost:5173',
   'http://127.0.0.1:5173',
   'http://localhost:3000'
@@ -76,18 +79,33 @@ app.use('/api/v1/', globalLimiter);
 // Local uploaded file serving
 app.use('/api/v1/files', express.static(path.join(__dirname, '../uploads')));
 
-// Root route
-app.get('/', (req, res) => {
-  res.status(200).json({
-    name: 'AnnaSathi AI Backend API',
-    status: 'online',
-    version: '1.0.0',
-    documentation: '/api/v1/health'
-  });
-});
-
 // API Routes
 app.use('/api/v1', apiRouter);
+
+// Frontend static asset serving (Unified Single-Service Deployment on Render)
+const frontendDistPath = path.resolve(__dirname, '../../frontend/dist');
+if (fs.existsSync(frontendDistPath)) {
+  app.use(express.static(frontendDistPath));
+
+  // Client-side SPA routing fallback for all non-API GET requests
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) {
+      return next();
+    }
+    res.sendFile(path.join(frontendDistPath, 'index.html'));
+  });
+} else {
+  // If frontend is not built yet (e.g. standalone API mode)
+  app.get('/', (req, res) => {
+    res.status(200).json({
+      name: 'AnnaSathi AI Backend API',
+      status: 'online',
+      version: '1.0.0',
+      documentation: '/api/v1/health',
+      note: 'Frontend build not found at frontend/dist. Run `npm run build` in root.'
+    });
+  });
+}
 
 // Catch-all 404 & Error Handler
 app.use(notFoundHandler);

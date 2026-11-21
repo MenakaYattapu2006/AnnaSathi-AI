@@ -55,7 +55,7 @@ export const config = {
   cookie: {
     domain: process.env.COOKIE_DOMAIN || undefined,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    sameSite: process.env.COOKIE_SAMESITE || 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
   },
 };
