@@ -321,9 +321,14 @@ export const listAllDonations = async (req, res, next) => {
 export const getActiveDeliveriesTelemetry = async (req, res, next) => {
   try {
     const activeAssignments = await query(
-      `SELECT a.id as assignment_id, a.status as assignment_status, a.assigned_at as created_at,
-              d.id as donation_id, d.food_name as donation_title, d.category as food_category, d.quantity, d.unit,
+      `SELECT a.id, a.id as assignment_id, a.status, a.status as assignment_status, a.assigned_at, a.assigned_at as created_at,
+              a.notes,
+              d.id as donation_id, d.food_name, d.food_name as donation_title, d.category as food_category, d.quantity, d.unit,
               a.pickup_address, d.latitude as pickup_latitude, d.longitude as pickup_longitude,
+              d.contact_person as pickup_contact_person, d.contact_phone as pickup_contact_phone,
+              n.id as ngo_id, n.organization_name as delivery_ngo_name,
+              n.street || ', ' || n.city as delivery_address,
+              n.contact_person as delivery_contact_person, n.contact_phone as delivery_contact_phone,
               n.latitude as delivery_latitude, n.longitude as delivery_longitude,
               v.id as volunteer_id, v.name as volunteer_name, v.phone as volunteer_phone,
               v.current_latitude, v.current_longitude, v.location_updated_at
@@ -331,7 +336,6 @@ export const getActiveDeliveriesTelemetry = async (req, res, next) => {
        JOIN donations d ON a.donation_id = d.id
        JOIN ngos n ON a.ngo_id = n.id
        LEFT JOIN volunteers v ON a.volunteer_id = v.id
-       WHERE a.status IN ('assigned', 'in_transit_to_pickup', 'picked_up', 'in_transit_to_drop')
        ORDER BY a.assigned_at DESC`
     );
 

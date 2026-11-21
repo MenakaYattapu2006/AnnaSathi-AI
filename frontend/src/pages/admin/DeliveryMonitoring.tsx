@@ -90,12 +90,16 @@ export const DeliveryMonitoring: React.FC = () => {
       else if (statusFilter === 'cancelled') matchesTab = isCancelled;
 
       const donation = donations.find((d) => d.id === a.donationId);
-      const matchesSearch =
-        a.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        a.pickup.contactPerson.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        a.delivery.ngoName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (donation && donation.foodName.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (a.volunteerId && a.volunteerId.toLowerCase().includes(searchQuery.toLowerCase()));
+      const q = searchQuery.toLowerCase().trim();
+      const matchesSearch = !q || (
+        (a.id || '').toLowerCase().includes(q) ||
+        (a.pickup?.contactPerson || '').toLowerCase().includes(q) ||
+        (a.pickup?.address || '').toLowerCase().includes(q) ||
+        (a.delivery?.ngoName || '').toLowerCase().includes(q) ||
+        (a.delivery?.address || '').toLowerCase().includes(q) ||
+        (donation?.foodName || '').toLowerCase().includes(q) ||
+        (a.volunteerId || '').toLowerCase().includes(q)
+      );
 
       return matchesTab && matchesSearch;
     });
@@ -141,10 +145,10 @@ export const DeliveryMonitoring: React.FC = () => {
       accessor: (a) => (
         <div className="text-xs space-y-0.5">
           <p className="text-secondary-text truncate max-w-[200px]">
-            <strong className="text-primary-text">From:</strong> {a.pickup.address}
+            <strong className="text-primary-text">From:</strong> {a.pickup?.address || 'Pickup Point'}
           </p>
           <p className="text-secondary-text truncate max-w-[200px]">
-            <strong className="text-primary-text">To:</strong> {a.delivery.ngoName} ({a.delivery.address})
+            <strong className="text-primary-text">To:</strong> {a.delivery?.ngoName || 'NGO'}{a.delivery?.address ? ` (${a.delivery.address})` : ''}
           </p>
         </div>
       ),
@@ -154,6 +158,7 @@ export const DeliveryMonitoring: React.FC = () => {
       accessor: (a) => {
         const donation = donations.find((d) => d.id === a.donationId);
         const receiptConfirmed = donation?.status === 'RECEIPT_CONFIRMED';
+        const displayStatus = (a.status || 'available').replace(/_/g, ' ').toUpperCase();
         return (
           <div className="space-y-1">
             <Badge
@@ -168,7 +173,7 @@ export const DeliveryMonitoring: React.FC = () => {
                   : 'info'
               }
             >
-              {a.status.replace(/_/g, ' ').toUpperCase()}
+              {displayStatus}
             </Badge>
             {receiptConfirmed && (
               <Badge size="sm" variant="success" className="block text-[10px] text-center">
@@ -308,11 +313,11 @@ export const DeliveryMonitoring: React.FC = () => {
                 <p className="font-bold text-primary-text flex items-center gap-1">
                   <MapPin size={14} className="text-primary" /> Pickup Location
                 </p>
-                <p className="text-secondary-text">{selectedAssignment.pickup.address}</p>
+                <p className="text-secondary-text">{selectedAssignment.pickup?.address || 'Pickup Point'}</p>
                 <p className="text-secondary-text">
-                  Contact: <strong className="text-primary-text">{selectedAssignment.pickup.contactPerson}</strong> ({selectedAssignment.pickup.contactPhone})
+                  Contact: <strong className="text-primary-text">{selectedAssignment.pickup?.contactPerson || 'Donor Contact'}</strong> ({selectedAssignment.pickup?.contactPhone || 'N/A'})
                 </p>
-                {selectedAssignment.pickup.actualPickupTime && (
+                {selectedAssignment.pickup?.actualPickupTime && (
                   <p className="text-success font-medium">
                     Picked up at: {new Date(selectedAssignment.pickup.actualPickupTime).toLocaleTimeString()}
                   </p>
@@ -323,12 +328,12 @@ export const DeliveryMonitoring: React.FC = () => {
                 <p className="font-bold text-primary-text flex items-center gap-1">
                   <Building2 size={14} className="text-secondary" /> Destination NGO
                 </p>
-                <p className="font-semibold text-primary-text">{selectedAssignment.delivery.ngoName}</p>
-                <p className="text-secondary-text">{selectedAssignment.delivery.address}</p>
+                <p className="font-semibold text-primary-text">{selectedAssignment.delivery?.ngoName || 'NGO Partner'}</p>
+                <p className="text-secondary-text">{selectedAssignment.delivery?.address || 'Shelter Destination'}</p>
                 <p className="text-secondary-text">
-                  Contact: <strong className="text-primary-text">{selectedAssignment.delivery.contactPerson}</strong> ({selectedAssignment.delivery.contactPhone})
+                  Contact: <strong className="text-primary-text">{selectedAssignment.delivery?.contactPerson || 'Shelter Coordinator'}</strong> ({selectedAssignment.delivery?.contactPhone || 'N/A'})
                 </p>
-                {selectedAssignment.delivery.actualDeliveryTime && (
+                {selectedAssignment.delivery?.actualDeliveryTime && (
                   <p className="text-success font-medium">
                     Delivered at: {new Date(selectedAssignment.delivery.actualDeliveryTime).toLocaleTimeString()}
                   </p>
@@ -347,12 +352,12 @@ export const DeliveryMonitoring: React.FC = () => {
                       longitude: linkedDonation.pickupAddress.longitude,
                       label: linkedDonation.pickupAddress.street,
                     }
-                  : { latitude: 17.385044, longitude: 78.486671, label: selectedAssignment.pickup.address };
+                  : { latitude: selectedAssignment.pickup?.latitude || 16.5378, longitude: selectedAssignment.pickup?.longitude || 81.6233, label: selectedAssignment.pickup?.address || 'Pickup Point' };
 
                 const deliveryCoord = {
-                  latitude: pickupCoord.latitude + 0.022,
-                  longitude: pickupCoord.longitude + 0.028,
-                  label: selectedAssignment.delivery.ngoName,
+                  latitude: selectedAssignment.delivery?.latitude || pickupCoord.latitude + 0.022,
+                  longitude: selectedAssignment.delivery?.longitude || pickupCoord.longitude + 0.028,
+                  label: selectedAssignment.delivery?.ngoName || 'Destination Shelter',
                 };
 
                 const volunteerCoord = selectedAssignment.volunteerId
