@@ -433,7 +433,7 @@ export const MainLayout: React.FC = () => {
 
         {/* Main Content Workspace (Preserves inside content untouched) */}
         <main
-          className="flex-1 overflow-y-auto custom-scrollbar p-6 lg:p-9 space-y-8 bg-[#f8fafc] dark:bg-[#090D10] transition-colors duration-200"
+          className="flex-1 overflow-y-auto custom-scrollbar p-3.5 sm:p-6 lg:p-9 space-y-6 sm:space-y-8 bg-[#f8fafc] dark:bg-[#090D10] transition-colors duration-200"
           data-purpose="dashboard-workspace"
         >
           <Outlet />
