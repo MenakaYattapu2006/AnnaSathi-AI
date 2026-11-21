@@ -6,6 +6,7 @@ const router = Router();
 
 router.post('/register', authController.register);
 router.post('/verify-otp', authController.verifyRegisterOtp);
+router.post('/resend-otp', authController.resendRegisterOtp);
 
 router.post('/login', authController.login);
 router.post('/verify-login-otp', authController.verifyLoginOtp);

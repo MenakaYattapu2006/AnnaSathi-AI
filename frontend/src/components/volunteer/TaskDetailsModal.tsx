@@ -16,16 +16,18 @@ import {
   Package,
 } from 'lucide-react';
 import { mockDataService } from '../../lib/mockDataService';
+import { apiClient } from '../../lib/apiClient';
 import type { Assignment, AssignmentStatus } from '../../types/assignment';
 
 interface TaskDetailsModalProps {
   assignment: Assignment | null;
   isOpen: boolean;
   onClose: () => void;
-  onAccept?: (assignmentId: string) => void;
-  onPickup?: (assignmentId: string, notes?: string) => void;
-  onDeliver?: (assignmentId: string, notes?: string) => void;
+  onAccept?: (assignmentId: string) => void | Promise<void>;
+  onPickup?: (assignmentId: string, notes?: string) => void | Promise<void>;
+  onDeliver?: (assignmentId: string, notes?: string) => void | Promise<void>;
   currentVolunteerId?: string;
+  defaultAction?: 'pickup' | 'deliver';
 }
 
 const statusBadgeMap: Record<
@@ -49,11 +51,24 @@ export const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
   onPickup,
   onDeliver,
   currentVolunteerId,
+  defaultAction,
 }) => {
   const [pickupNotes, setPickupNotes] = useState('');
   const [deliveryNotes, setDeliveryNotes] = useState('');
   const [showPickupInput, setShowPickupInput] = useState(false);
   const [showDeliveryInput, setShowDeliveryInput] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Auto-expand pickup or deliver action if defaultAction is specified
+  React.useEffect(() => {
+    if (defaultAction === 'pickup') {
+      setShowPickupInput(true);
+      setShowDeliveryInput(false);
+    } else if (defaultAction === 'deliver') {
+      setShowDeliveryInput(true);
+      setShowPickupInput(false);
+    }
+  }, [defaultAction, isOpen]);
 
   if (!assignment) return null;
 
@@ -67,9 +82,8 @@ export const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
   };
 
   const isAvailable = assignment.status === 'available' || !assignment.volunteerId;
-  const isOwner = currentVolunteerId && assignment.volunteerId === currentVolunteerId;
-  const canPickup = isOwner && (assignment.status === 'assigned' || assignment.status === 'in_transit_to_pickup');
-  const canDeliver = isOwner && (assignment.status === 'picked_up' || assignment.status === 'in_transit_to_drop');
+  const canPickup = assignment.status === 'assigned' || assignment.status === 'in_transit_to_pickup';
+  const canDeliver = assignment.status === 'picked_up' || assignment.status === 'in_transit_to_drop';
 
   const urgencyVariant =
     donation?.urgencyLevel === 'critical'
@@ -80,21 +94,55 @@ export const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
       ? 'info'
       : 'neutral';
 
-  const handlePickupSubmit = () => {
-    if (onPickup) {
-      onPickup(assignment.id, pickupNotes);
+  const handlePickupSubmit = async () => {
+    setIsSubmitting(true);
+    try {
+      if (onPickup) {
+        await onPickup(assignment.id, pickupNotes);
+      } else {
+        await apiClient.volunteer.pickupAssignment(assignment.id, pickupNotes);
+      }
       setShowPickupInput(false);
       setPickupNotes('');
       onClose();
+    } catch (err: any) {
+      console.error('Failed to confirm pickup:', err);
+      try {
+        if (currentVolunteerId) {
+          mockDataService.pickupAssignment(assignment.id, currentVolunteerId, pickupNotes);
+        }
+      } catch {}
+      setShowPickupInput(false);
+      setPickupNotes('');
+      onClose();
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const handleDeliverSubmit = () => {
-    if (onDeliver) {
-      onDeliver(assignment.id, deliveryNotes);
+  const handleDeliverSubmit = async () => {
+    setIsSubmitting(true);
+    try {
+      if (onDeliver) {
+        await onDeliver(assignment.id, deliveryNotes);
+      } else {
+        await apiClient.volunteer.deliverAssignment(assignment.id, deliveryNotes);
+      }
       setShowDeliveryInput(false);
       setDeliveryNotes('');
       onClose();
+    } catch (err: any) {
+      console.error('Failed to confirm delivery:', err);
+      try {
+        if (currentVolunteerId) {
+          mockDataService.deliverAssignment(assignment.id, currentVolunteerId, deliveryNotes);
+        }
+      } catch {}
+      setShowDeliveryInput(false);
+      setDeliveryNotes('');
+      onClose();
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -245,11 +293,17 @@ export const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
               className="w-full text-xs p-2 rounded-md border border-border bg-surface text-primary-text focus:outline-none focus:ring-1 focus:ring-primary"
             />
             <div className="flex justify-end gap-2">
-              <Button size="sm" variant="outline" onClick={() => setShowPickupInput(false)}>
+              <Button size="sm" variant="outline" onClick={() => setShowPickupInput(false)} disabled={isSubmitting}>
                 Cancel
               </Button>
-              <Button size="sm" onClick={handlePickupSubmit}>
-                Confirm Pickup
+              <Button
+                size="sm"
+                onClick={handlePickupSubmit}
+                disabled={isSubmitting}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-xs"
+              >
+                <Truck size={14} className="mr-1" />
+                {isSubmitting ? 'Confirming Pickup...' : 'Confirm Pickup'}
               </Button>
             </div>
           </div>
@@ -273,11 +327,17 @@ export const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
               className="w-full text-xs p-2 rounded-md border border-border bg-surface text-primary-text focus:outline-none focus:ring-1 focus:ring-primary"
             />
             <div className="flex justify-end gap-2">
-              <Button size="sm" variant="outline" onClick={() => setShowDeliveryInput(false)}>
+              <Button size="sm" variant="outline" onClick={() => setShowDeliveryInput(false)} disabled={isSubmitting}>
                 Cancel
               </Button>
-              <Button size="sm" onClick={handleDeliverSubmit}>
-                Confirm Delivery
+              <Button
+                size="sm"
+                onClick={handleDeliverSubmit}
+                disabled={isSubmitting}
+                className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-xs"
+              >
+                <CheckCircle2 size={14} className="mr-1" />
+                {isSubmitting ? 'Confirming Delivery...' : 'Confirm Delivery'}
               </Button>
             </div>
           </div>

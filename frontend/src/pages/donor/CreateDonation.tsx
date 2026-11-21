@@ -9,6 +9,7 @@ import { Sparkles, CheckCircle2, Flame } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { apiClient, mapDonationFromDb } from '../../lib/apiClient';
 import { mockDataService } from '../../lib/mockDataService';
+import { resolveAddressCoordinates } from '../../utils/geocoding';
 import type { FoodCategory, QuantityUnit, Donation } from '../../types/donation';
 
 const isProduction = Boolean((import.meta as any).env?.PROD);
@@ -183,6 +184,9 @@ const CreateDonation: React.FC = () => {
       return copy;
     });
 
+    const fullAddress = `${street.trim()}, ${city.trim()}`;
+    const coords = await resolveAddressCoordinates(fullAddress);
+
     const donationPayload = {
       foodName: foodName.trim(),
       category,
@@ -195,10 +199,10 @@ const CreateDonation: React.FC = () => {
       pickupAddress: {
         street: street.trim(),
         city: city.trim(),
-        state: 'Telangana',
+        state: fullAddress.toLowerCase().includes('andhra') || fullAddress.toLowerCase().includes('surampalem') || fullAddress.toLowerCase().includes('veeravasaram') ? 'Andhra Pradesh' : 'Telangana',
         pincode: pincode.trim() || '500001',
-        latitude: 17.4156,
-        longitude: 78.4357,
+        latitude: coords.latitude,
+        longitude: coords.longitude,
         landmark: landmark.trim() || undefined,
       },
       specialInstructions: specialInstructions.trim() || undefined,

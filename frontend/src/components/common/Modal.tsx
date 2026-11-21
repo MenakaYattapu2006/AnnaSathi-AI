@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useCallback } from 'react';
 import { X } from 'lucide-react';
 import { Button } from './Button';
 
+export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -13,9 +15,19 @@ interface ModalProps {
     onClick: () => void;
     variant?: 'primary' | 'secondary' | 'outline';
   };
+  /** Modal width size preset */
+  size?: ModalSize;
   /** Additional class names for the modal container */
   className?: string;
 }
+
+const sizeClasses: Record<ModalSize, string> = {
+  sm: 'max-w-md',
+  md: 'max-w-lg',
+  lg: 'max-w-2xl',
+  xl: 'max-w-3xl',
+  '2xl': 'max-w-5xl',
+};
 
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -33,6 +45,7 @@ export const Modal: React.FC<ModalProps> = ({
   title,
   children,
   footerAction,
+  size = 'md',
   className = '',
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
@@ -136,7 +149,7 @@ export const Modal: React.FC<ModalProps> = ({
     >
       <div
         ref={modalRef}
-        className={`bg-white dark:bg-[#11171D] border border-slate-200 dark:border-[#1E293B] rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden text-slate-800 dark:text-slate-100 transition-colors duration-200 ${className}`}
+        className={`bg-white dark:bg-[#11171D] border border-slate-200 dark:border-[#1E293B] rounded-2xl shadow-2xl ${sizeClasses[size]} w-full overflow-hidden text-slate-800 dark:text-slate-100 transition-colors duration-200 ${className}`}
         role="document"
         onKeyDown={handleKeyDown}
       >

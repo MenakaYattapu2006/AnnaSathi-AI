@@ -47,9 +47,39 @@ const AssignedTasks: React.FC = () => {
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
   const [mapTask, setMapTask] = useState<Assignment | null>(null);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  // Volunteer Live GPS Location
+  const [volunteerLocation, setVolunteerLocation] = useState<
+    { latitude: number; longitude: number; label?: string } | undefined
+  >(undefined);
 
   // Status Filter Tabs
   const [activeTab, setActiveTab] = useState<'all' | 'pending_pickup' | 'in_transit' | 'delivered'>('all');
+
+  // Detect live GPS location on mount
+  React.useEffect(() => {
+    if (typeof window !== 'undefined' && 'geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setVolunteerLocation({
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude,
+            label: 'Your Live Location (GPS)',
+          });
+        },
+        () => {
+          // Standard city fallback
+          setVolunteerLocation({
+            latitude: 17.0878,
+            longitude: 82.0668,
+            label: 'Rider Standby (Surampalem)',
+          });
+        },
+        { timeout: 8000 }
+      );
+    }
+  }, []);
 
   const refreshTasks = async () => {
     setIsLoading(true);
@@ -81,16 +111,18 @@ const AssignedTasks: React.FC = () => {
   const handlePickup = async (assignmentId: string, notes?: string) => {
     if (!user) return;
     setFeedback(null);
+    setUpdatingId(assignmentId);
 
     try {
       try {
-        const response = await apiClient.volunteer.pickupAssignment(assignmentId);
+        const response = await apiClient.volunteer.pickupAssignment(assignmentId, notes);
         if (response?.success) {
           setFeedback({
             type: 'success',
             message: 'Food marked as picked up! Status updated to Picked Up (In Transit).',
           });
-          refreshTasks();
+          setSelectedAssignment(null);
+          await refreshTasks();
           return;
         }
       } catch (apiErr: any) {
@@ -108,16 +140,20 @@ const AssignedTasks: React.FC = () => {
           type: 'success',
           message: 'Food marked as picked up! Status updated to Picked Up (In Transit).',
         });
-        refreshTasks();
+        setSelectedAssignment(null);
+        await refreshTasks();
       }
     } catch (err: any) {
       setFeedback({ type: 'error', message: err.message || 'Failed to update pickup status.' });
+    } finally {
+      setUpdatingId(null);
     }
   };
 
   const handleDeliver = async (assignmentId: string, deliveryNotes?: string) => {
     if (!user) return;
     setFeedback(null);
+    setUpdatingId(assignmentId);
 
     try {
       try {
@@ -127,7 +163,8 @@ const AssignedTasks: React.FC = () => {
             type: 'success',
             message: 'Delivery marked as complete! Awaiting NGO final receipt confirmation.',
           });
-          refreshTasks();
+          setSelectedAssignment(null);
+          await refreshTasks();
           return;
         }
       } catch (apiErr: any) {
@@ -145,10 +182,13 @@ const AssignedTasks: React.FC = () => {
           type: 'success',
           message: 'Delivery marked as complete! Awaiting NGO final receipt confirmation.',
         });
-        refreshTasks();
+        setSelectedAssignment(null);
+        await refreshTasks();
       }
     } catch (err: any) {
       setFeedback({ type: 'error', message: err.message || 'Failed to update delivery status.' });
+    } finally {
+      setUpdatingId(null);
     }
   };
 
@@ -395,22 +435,24 @@ const AssignedTasks: React.FC = () => {
                     {canPickup && (
                       <Button
                         size="sm"
-                        onClick={() => setSelectedAssignment(task)}
-                        className="text-xs w-full sm:w-auto"
+                        onClick={() => handlePickup(task.id)}
+                        disabled={updatingId === task.id}
+                        className="text-xs w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-medium"
                       >
                         <Truck size={14} className="mr-1" />
-                        Mark Picked Up
+                        {updatingId === task.id ? 'Marking Picked Up...' : 'Mark Picked Up'}
                       </Button>
                     )}
 
                     {canDeliver && (
                       <Button
                         size="sm"
-                        onClick={() => setSelectedAssignment(task)}
-                        className="text-xs w-full sm:w-auto"
+                        onClick={() => handleDeliver(task.id)}
+                        disabled={updatingId === task.id}
+                        className="text-xs w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-medium"
                       >
                         <CheckCircle2 size={14} className="mr-1" />
-                        Mark Delivered
+                        {updatingId === task.id ? 'Marking Delivered...' : 'Mark Delivered'}
                       </Button>
                     )}
                   </div>
@@ -436,6 +478,7 @@ const AssignedTasks: React.FC = () => {
         task={mapTask}
         isOpen={!!mapTask}
         onClose={() => setMapTask(null)}
+        volunteerLocation={volunteerLocation}
       />
     </div>
   );

@@ -37,9 +37,7 @@ function setAuthCookies(res, sessionToken, csrfToken) {
 
 export const authController = {
   /**
-   * User Registration
-   * Creates user and corresponding role profile (Donor, NGO, Volunteer) in Supabase DB,
-   * generates session cookies, and logs the user in immediately.
+   * User Registration - Step 1: Validate input, create challenge & send Brevo OTP email
    */
   async register(req, res) {
     const validation = validateRegistrationInput(req.body);
@@ -47,7 +45,7 @@ export const authController = {
       return res.status(400).json({ success: false, error: validation.errors[0], errors: validation.errors });
     }
 
-    const { name, email, phone, password, role, organizationName, address, city, state, pincode } = req.body;
+    const { email } = req.body;
     const normalizedEmail = email.trim().toLowerCase();
 
     // Check if user already exists
@@ -56,119 +54,79 @@ export const authController = {
       return res.status(409).json({ success: false, error: 'An account with this email address already exists.' });
     }
 
-    // Hash password with Argon2id
-    const passwordHash = await hashPassword(password);
+    // Generate cryptographically secure 6-digit OTP
+    const otp = generateOtp();
+    const otpHmac = hashOtp(normalizedEmail, otp);
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
-    // Create user and role entity within a transactional boundary
-    const newUser = await withTransaction(async (client) => {
-      const userRes = await client.query(
-        `INSERT INTO users (name, email, phone, password_hash, role, status, organization_name, address, city, state, pincode, email_verified_at)
-         VALUES ($1, $2, $3, $4, $5, 'active', $6, $7, $8, $9, $10, NOW())
-         RETURNING id, name, email, phone, role, status, organization_name, city, state, pincode, created_at`,
-        [
-          name,
-          normalizedEmail,
-          phone || '+91 98765 43210',
-          passwordHash,
-          role,
-          organizationName || null,
-          address || null,
-          city || 'Hyderabad',
-          state || 'Telangana',
-          pincode || '500001',
-        ]
-      );
+    // Store OTP challenge
+    await query(
+      `INSERT INTO email_otp_challenges (email, otp_hmac, purpose, expires_at)
+       VALUES ($1, $2, 'register', $3)`,
+      [normalizedEmail, otpHmac, expiresAt]
+    );
 
-      const user = userRes.rows[0];
-
-      // Role-specific profile initialization
-      if (user.role === 'ngo') {
-        const ngoRes = await client.query(
-          `INSERT INTO ngos (user_id, organization_name, registration_number, contact_person, contact_phone, contact_email, street, city, state, pincode, latitude, longitude, verification_status)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'pending')
-           RETURNING id`,
-          [
-            user.id,
-            organizationName || `${user.name} Organization`,
-            `REG-${Date.now().toString().slice(-6)}`,
-            user.name,
-            user.phone,
-            user.email,
-            address || 'Facility Address',
-            city || 'Hyderabad',
-            state || 'Telangana',
-            pincode || '500001',
-            17.3850,
-            78.4867,
-          ]
-        );
-
-        // Seed initial capacity record
-        await client.query(
-          `INSERT INTO ngo_capacity (ngo_id, max_daily_meals, current_available_capacity, has_cold_storage)
-           VALUES ($1, 100, 100, FALSE)`,
-          [ngoRes.rows[0].id]
-        );
-
-        // Notify all platform administrators about the new pending verification request
-        const adminUsers = await client.query(`SELECT id FROM users WHERE role = 'admin'`);
-        for (const admin of adminUsers.rows) {
-          await client.query(
-            `INSERT INTO notifications (recipient_id, title, message, type, related_entity_id)
-             VALUES ($1, $2, $3, 'verification_status', $4)`,
-            [
-              admin.id,
-              'New NGO Verification Request',
-              `Organization "${organizationName || user.name}" has registered and requires admin verification approval before collecting surplus food donations.`,
-              ngoRes.rows[0].id,
-            ]
-          );
-
-          await client.query(
-            `INSERT INTO admin_activity_logs (admin_id, action_type, target_id, target_type, description, metadata)
-             VALUES ($1, 'NGO_REGISTRATION_SUBMITTED', $2, 'ngos', $3, $4)`,
-            [
-              admin.id,
-              ngoRes.rows[0].id,
-              `New NGO registration submitted for review: ${organizationName || user.name}`,
-              JSON.stringify({ organizationName: organizationName || user.name, city, state, pincode }),
-            ]
-          );
-        }
-
-        // Notify the newly registered NGO user about their pending verification status
-        await client.query(
-          `INSERT INTO notifications (recipient_id, title, message, type, related_entity_id)
-           VALUES ($1, $2, $3, 'verification_status', $4)`,
-          [
-            user.id,
-            'Verification In Progress',
-            'Your organization registration has been submitted for administrator review. You will be notified once verified to begin accepting and collecting surplus food donations.',
-            ngoRes.rows[0].id,
-          ]
-        );
-      } else if (user.role === 'volunteer') {
-        await client.query(
-          `INSERT INTO volunteers (user_id, name, phone, email, vehicle_type, service_areas, availability, status)
-           VALUES ($1, $2, $3, $4, 'two_wheeler', ARRAY['Hyderabad Metropolitan'], 'available', 'active')`,
-          [user.id, user.name, user.phone, user.email]
-        );
+    // Send OTP email via Brevo
+    try {
+      await sendOtpEmail(normalizedEmail, otp, 'register');
+    } catch (emailErr) {
+      console.error('Failed to send OTP email via Brevo:', emailErr.message);
+      if (config.isProduction) {
+        return res.status(500).json({
+          success: false,
+          error: 'Failed to deliver verification code to your email. Please verify your email address or try again later.',
+        });
       }
+    }
 
-      // Initialize notification preferences
-      await client.query(
-        `INSERT INTO notification_preferences (user_id, email_notifications, in_app_notifications)
-         VALUES ($1, TRUE, TRUE)`,
-        [user.id]
-      );
-
-      return user;
-    });
-
-    return res.status(201).json({
+    return res.status(200).json({
       success: true,
-      message: 'Account successfully registered. Please log in with your credentials to access your dashboard.',
-      user: newUser,
+      message: `A 6-digit verification code has been sent to ${normalizedEmail}. Please enter it below to complete registration.`,
+      email: normalizedEmail,
+      simulatedOtp: config.isProduction ? undefined : otp,
+    });
+  },
+
+  /**
+   * Resend Registration OTP via Brevo
+   */
+  async resendRegisterOtp(req, res) {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ success: false, error: 'Email address is required.' });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // Check if already registered
+    const existing = await query('SELECT id FROM users WHERE email = $1', [normalizedEmail]);
+    if (existing.rows.length > 0) {
+      return res.status(409).json({ success: false, error: 'This email is already registered.' });
+    }
+
+    const otp = generateOtp();
+    const otpHmac = hashOtp(normalizedEmail, otp);
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+    await query(
+      `INSERT INTO email_otp_challenges (email, otp_hmac, purpose, expires_at)
+       VALUES ($1, $2, 'register', $3)`,
+      [normalizedEmail, otpHmac, expiresAt]
+    );
+
+    try {
+      await sendOtpEmail(normalizedEmail, otp, 'register');
+    } catch (emailErr) {
+      console.error('Failed to resend OTP via Brevo:', emailErr.message);
+      if (config.isProduction) {
+        return res.status(500).json({ success: false, error: 'Failed to deliver verification code via Brevo.' });
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `New verification code sent to ${normalizedEmail}.`,
+      simulatedOtp: config.isProduction ? undefined : otp,
     });
   },
 
@@ -208,6 +166,19 @@ export const authController = {
       return res.status(400).json({ success: false, error: 'Invalid verification code. Please check your email and try again.' });
     }
 
+    // Check if user already exists
+    const existing = await query('SELECT id FROM users WHERE email = $1', [normalizedEmail]);
+    if (existing.rows.length > 0) {
+      return res.status(409).json({ success: false, error: 'An account with this email address already exists.' });
+    }
+
+    // Hash password with Argon2id
+    const password = registrationData.password;
+    if (!password || password.length < 8) {
+      return res.status(400).json({ success: false, error: 'Password must be at least 8 characters long.' });
+    }
+    const passwordHash = await hashPassword(password);
+
     // Mark OTP as verified
     await query('UPDATE email_otp_challenges SET verified = TRUE WHERE id = $1', [challenge.id]);
 
@@ -220,8 +191,8 @@ export const authController = {
         [
           registrationData.name,
           normalizedEmail,
-          registrationData.phone,
-          registrationData.passwordHash,
+          registrationData.phone || '+91 98765 43210',
+          passwordHash,
           registrationData.role,
           registrationData.organizationName || null,
           registrationData.address || null,
@@ -235,23 +206,35 @@ export const authController = {
 
       // Role-specific profile initialization
       if (user.role === 'ngo') {
+        const orgName = registrationData.organizationName || `${user.name} Organization`;
+        const streetAddr = registrationData.address || 'Facility Address';
+        const cityName = registrationData.city || 'Hyderabad';
+        const stateName = registrationData.state || 'Telangana';
+        const pin = registrationData.pincode || '500001';
+
+        const isSurampalem =
+          String(streetAddr + ' ' + cityName).toLowerCase().includes('surampalem') ||
+          String(streetAddr + ' ' + cityName).toLowerCase().includes('aditya');
+        const ngoLat = registrationData.latitude || (isSurampalem ? 17.0878 : 17.3850);
+        const ngoLng = registrationData.longitude || (isSurampalem ? 82.0668 : 78.4867);
+
         const ngoRes = await client.query(
           `INSERT INTO ngos (user_id, organization_name, registration_number, contact_person, contact_phone, contact_email, street, city, state, pincode, latitude, longitude, verification_status)
            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'pending')
            RETURNING id`,
           [
             user.id,
-            registrationData.organizationName || `${user.name} Organization`,
+            orgName,
             `REG-${Date.now().toString().slice(-6)}`,
             user.name,
             user.phone,
             user.email,
-            registrationData.address || 'Facility Address',
-            registrationData.city || 'Hyderabad',
-            registrationData.state || 'Telangana',
-            registrationData.pincode || '500001',
-            17.3850,
-            78.4867,
+            streetAddr,
+            cityName,
+            stateName,
+            pin,
+            ngoLat,
+            ngoLng,
           ]
         );
 
@@ -271,7 +254,7 @@ export const authController = {
             [
               admin.id,
               'New NGO Verification Request',
-              `Organization "${organizationName || user.name}" has registered and requires admin verification approval before collecting surplus food donations.`,
+              `Organization "${orgName}" has registered and requires admin verification approval before collecting surplus food donations.`,
               ngoRes.rows[0].id,
             ]
           );
@@ -282,8 +265,8 @@ export const authController = {
             [
               admin.id,
               ngoRes.rows[0].id,
-              `New NGO registration submitted for review: ${organizationName || user.name}`,
-              JSON.stringify({ organizationName: organizationName || user.name, city, state, pincode }),
+              `New NGO registration submitted for review: ${orgName}`,
+              JSON.stringify({ organizationName: orgName, city: cityName, state: stateName, pincode: pin }),
             ]
           );
         }
@@ -317,25 +300,10 @@ export const authController = {
       return user;
     });
 
-    // Create session
-    const sessionToken = generateSessionToken();
-    const tokenHash = hashSessionToken(sessionToken);
-    const csrfToken = generateCsrfToken();
-    const expiresAt = new Date(Date.now() + config.cookie.maxAge);
-
-    await query(
-      `INSERT INTO user_sessions (user_id, session_token_hash, ip_address, user_agent, expires_at)
-       VALUES ($1, $2, $3, $4, $5)`,
-      [newUser.id, tokenHash, req.ip, req.headers['user-agent'] || 'client', expiresAt]
-    );
-
-    setAuthCookies(res, sessionToken, csrfToken);
-
     return res.status(201).json({
       success: true,
-      message: 'Account successfully registered and verified.',
+      message: 'Account successfully registered and verified. Please sign in with your credentials to access your dashboard.',
       user: newUser,
-      csrfToken,
     });
   },
 

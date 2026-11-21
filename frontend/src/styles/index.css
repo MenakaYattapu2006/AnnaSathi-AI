@@ -9,3 +9,10 @@
 /* Tailwind utilities are emitted by the compiler */
 @tailwind components;
 @tailwind utilities;
+
+/* Leaflet Custom Marker Icons Reset */
+.leaflet-div-icon.custom-map-pin-icon,
+.custom-map-pin-icon {
+  background: transparent !important;
+  border: none !important;
+}

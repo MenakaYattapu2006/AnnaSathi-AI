@@ -221,7 +221,7 @@ export const volunteerController = {
   async pickupAssignment(req, res) {
     try {
       const id = req.params.assignmentId || req.params.id;
-      const { notes } = req.body;
+      const { notes } = req.body || {};
 
       const volRes = await query('SELECT id, name FROM volunteers WHERE user_id = $1', [req.user.id]);
       if (volRes.rows.length === 0) {
@@ -294,7 +294,7 @@ export const volunteerController = {
   async deliverAssignment(req, res) {
     try {
       const id = req.params.assignmentId || req.params.id;
-      const { notes } = req.body;
+      const { notes } = req.body || {};
 
       const volRes = await query('SELECT id, name FROM volunteers WHERE user_id = $1', [req.user.id]);
       if (volRes.rows.length === 0) {

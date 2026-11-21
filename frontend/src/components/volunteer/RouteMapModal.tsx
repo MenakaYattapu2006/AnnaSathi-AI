@@ -1,18 +1,16 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
 import { Badge } from '../common/Badge';
 import { DeliveryMap } from '../common/DeliveryMap';
 import type { Assignment } from '../../types/assignment';
+import { resolveAddressCoordinates } from '../../utils/geocoding';
 import {
-  MapPin,
   ExternalLink,
   Navigation,
   CheckCircle2,
-  Clock,
   Phone,
   User,
-  Building2,
   Package,
 } from 'lucide-react';
 
@@ -37,24 +35,68 @@ export const RouteMapModal: React.FC<RouteMapModalProps> = ({
   volunteerLocation,
   isAccepting = false,
 }) => {
+  // State for resolved coordinates
+  const [pickupCoords, setPickupCoords] = useState<{ latitude: number; longitude: number }>({
+    latitude: 17.0878,
+    longitude: 82.0668,
+  });
+  const [deliveryCoords, setDeliveryCoords] = useState<{ latitude: number; longitude: number }>({
+    latitude: 17.0878,
+    longitude: 82.0668,
+  });
+  const [isResolving, setIsResolving] = useState(false);
+
+  useEffect(() => {
+    if (!task) return;
+
+    let isMounted = true;
+    setIsResolving(true);
+
+    const resolveLocations = async () => {
+      try {
+        const [pLoc, dLoc] = await Promise.all([
+          resolveAddressCoordinates(
+            task.pickup.address,
+            task.pickup.latitude,
+            task.pickup.longitude
+          ),
+          resolveAddressCoordinates(
+            task.delivery.address || task.delivery.ngoName,
+            task.delivery.latitude,
+            task.delivery.longitude
+          ),
+        ]);
+
+        if (isMounted) {
+          setPickupCoords({ latitude: pLoc.latitude, longitude: pLoc.longitude });
+          setDeliveryCoords({ latitude: dLoc.latitude, longitude: dLoc.longitude });
+          setIsResolving(false);
+        }
+      } catch {
+        if (isMounted) {
+          setIsResolving(false);
+        }
+      }
+    };
+
+    resolveLocations();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [task?.id, task?.pickup.address, task?.delivery.address]);
+
   if (!task) return null;
 
-  // Safe coordinates fallback (Hyderabad central if none specified)
-  const pickupLat = task.pickup.latitude || 17.4156;
-  const pickupLng = task.pickup.longitude || 78.4357;
-  const deliveryLat = task.delivery.latitude || 17.3850;
-  const deliveryLng = task.delivery.longitude || 78.4867;
-
   // Volunteer rider location (GPS or nearby pickup)
-  const volLat = volunteerLocation?.latitude || 17.4000;
-  const volLng = volunteerLocation?.longitude || 78.4500;
+  const volLat = volunteerLocation?.latitude;
+  const volLng = volunteerLocation?.longitude;
+  const hasGps = Boolean(volLat && volLng && !isNaN(volLat) && !isNaN(volLng));
 
   // Google Maps Full Delivery Route URL:
   // Origin: Volunteer Current Location (or Pickup Address if GPS not available)
   // Waypoint: Pickup Address (Donor Location)
   // Destination: Delivery Shelter (NGO Location)
-  const hasGps = Boolean(volunteerLocation?.latitude && volunteerLocation?.longitude);
-  
   const fullRouteGoogleMapsUrl = hasGps
     ? `https://www.google.com/maps/dir/?api=1&origin=${volLat},${volLng}&destination=${encodeURIComponent(
         task.delivery.address
@@ -92,6 +134,7 @@ export const RouteMapModal: React.FC<RouteMapModalProps> = ({
               <p className="text-xs text-slate-500 dark:text-slate-400">
                 {task.quantity ? `${task.quantity} ${task.unit || 'units'}` : 'Rescue Package'} •{' '}
                 <span className="capitalize">{task.dietaryType || 'Veg'}</span>
+                {isResolving && <span className="ml-2 text-primary text-[11px] font-medium">Updating pin coordinates...</span>}
               </p>
             </div>
           </div>
@@ -123,23 +166,27 @@ export const RouteMapModal: React.FC<RouteMapModalProps> = ({
           <DeliveryMap
             height="340px"
             pickupLocation={{
-              latitude: pickupLat,
-              longitude: pickupLng,
+              latitude: pickupCoords.latitude,
+              longitude: pickupCoords.longitude,
               label: `Pickup: ${task.pickup.address}`,
               type: 'pickup',
             }}
             deliveryLocation={{
-              latitude: deliveryLat,
-              longitude: deliveryLng,
+              latitude: deliveryCoords.latitude,
+              longitude: deliveryCoords.longitude,
               label: `Shelter: ${task.delivery.ngoName || task.delivery.address}`,
               type: 'delivery',
             }}
-            volunteerLocation={{
-              latitude: volLat,
-              longitude: volLng,
-              label: hasGps ? 'Your Live Location (GPS)' : 'Delivery Rider (Standby)',
-              type: 'volunteer',
-            }}
+            volunteerLocation={
+              hasGps && volLat != null && volLng != null
+                ? {
+                    latitude: volLat,
+                    longitude: volLng,
+                    label: volunteerLocation?.label || 'Your Live Location (GPS)',
+                    type: 'volunteer',
+                  }
+                : undefined
+            }
             showRoute={true}
           />
         </div>

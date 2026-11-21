@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../../components/common/PageHeader';
 import { DashboardStatCard } from '../../components/common/DashboardStatCard';
@@ -21,6 +21,7 @@ import {
   ShieldCheck,
   Star,
   Package,
+  X,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { apiClient, mapVolunteerFromDb, mapAssignmentFromDb, mapDonationFromDb } from '../../lib/apiClient';
@@ -58,58 +59,140 @@ const VolunteerDashboard: React.FC = () => {
     statusDistribution: [] as { status: AssignmentStatus; count: number }[],
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-  useEffect(() => {
-    let isMounted = true;
-    async function loadData() {
-      try {
-        const volRes = await apiClient.volunteer.getMe().catch(() => null);
-        if (volRes?.volunteer && isMounted) {
-          setVolunteer(mapVolunteerFromDb(volRes.volunteer));
-        }
-
-        const [availRes, myTasksRes] = await Promise.all([
-          apiClient.volunteer.getAvailableTasks().catch(() => ({ tasks: [] })),
-          apiClient.volunteer.getAssignedTasks().catch(() => ({ tasks: [] })),
-        ]);
-
-        if (isMounted && myTasksRes?.tasks) {
-          const myTasks: Assignment[] = myTasksRes.tasks.map(mapAssignmentFromDb);
-          const activeCount = myTasks.filter((t) =>
-            ['assigned', 'in_transit_to_pickup', 'picked_up', 'in_transit_to_drop'].includes(t.status)
-          ).length;
-          const completedCount = myTasks.filter((t) => t.status === 'delivered').length;
-
-          setStats({
-            availableTasksCount: (availRes?.tasks || []).length,
-            activeTasksCount: activeCount,
-            completedTasksCount: completedCount,
-            totalMealsDelivered: (volRes?.volunteer?.total_deliveries_completed || 0) * 50,
-            recentAssignments: myTasks.slice(0, 5),
-            statusDistribution: [],
-          });
-          setIsLoading(false);
-          return;
-        }
-      } catch {
-        if (isProduction) {
-          if (isMounted) setIsLoading(false);
-          return;
-        }
+  const loadData = useCallback(async () => {
+    try {
+      const volRes = await apiClient.volunteer.getMe().catch(() => null);
+      if (volRes?.volunteer) {
+        setVolunteer(mapVolunteerFromDb(volRes.volunteer));
       }
 
-      if (user && isMounted) {
-        setVolunteer(mockDataService.getVolunteerByUserId(user.id));
-        setStats(mockDataService.getVolunteerDashboardStats(user.id));
+      const [availRes, myTasksRes] = await Promise.all([
+        apiClient.volunteer.getAvailableTasks().catch(() => ({ tasks: [] })),
+        apiClient.volunteer.getAssignedTasks().catch(() => ({ tasks: [] })),
+      ]);
+
+      if (myTasksRes?.tasks) {
+        const myTasks: Assignment[] = myTasksRes.tasks.map(mapAssignmentFromDb);
+        const activeCount = myTasks.filter((t) =>
+          ['assigned', 'in_transit_to_pickup', 'picked_up', 'in_transit_to_drop'].includes(t.status)
+        ).length;
+        const completedCount = myTasks.filter((t) => t.status === 'delivered').length;
+
+        setStats({
+          availableTasksCount: (availRes?.tasks || []).length,
+          activeTasksCount: activeCount,
+          completedTasksCount: completedCount,
+          totalMealsDelivered: (volRes?.volunteer?.total_deliveries_completed || 0) * 50,
+          recentAssignments: myTasks.slice(0, 5),
+          statusDistribution: [],
+        });
+        setIsLoading(false);
+        return;
       }
-      if (isMounted) setIsLoading(false);
+    } catch {
+      if (isProduction) {
+        setIsLoading(false);
+        return;
+      }
     }
 
-    loadData();
-    return () => {
-      isMounted = false;
-    };
+    if (user) {
+      setVolunteer(mockDataService.getVolunteerByUserId(user.id));
+      setStats(mockDataService.getVolunteerDashboardStats(user.id));
+    }
+    setIsLoading(false);
   }, [user]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  const handlePickup = async (assignmentId: string, notes?: string) => {
+    setIsUpdating(true);
+    setFeedback(null);
+    try {
+      try {
+        const res = await apiClient.volunteer.pickupAssignment(assignmentId, notes);
+        if (res?.success) {
+          setFeedback({
+            type: 'success',
+            message: 'Food marked as picked up! Status updated to In Transit to Shelter.',
+          });
+          setSelectedAssignment(null);
+          await loadData();
+          return;
+        }
+      } catch (apiErr: any) {
+        if (isProduction) {
+          setFeedback({ type: 'error', message: apiErr.message || 'Server error: Failed to record pickup.' });
+          return;
+        }
+      }
+
+      if (user) {
+        const result = mockDataService.pickupAssignment(assignmentId, user.id, notes);
+        if (result.success) {
+          setFeedback({
+            type: 'success',
+            message: 'Food marked as picked up! Status updated to In Transit to Shelter.',
+          });
+        } else {
+          setFeedback({ type: 'error', message: result.error || 'Failed to record pickup.' });
+        }
+      }
+      setSelectedAssignment(null);
+      await loadData();
+    } catch (err: any) {
+      setFeedback({ type: 'error', message: err.message || 'Failed to record pickup.' });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleDeliver = async (assignmentId: string, notes?: string) => {
+    setIsUpdating(true);
+    setFeedback(null);
+    try {
+      try {
+        const res = await apiClient.volunteer.deliverAssignment(assignmentId, notes);
+        if (res?.success) {
+          setFeedback({
+            type: 'success',
+            message: 'Delivery marked as complete! Awaiting NGO final confirmation.',
+          });
+          setSelectedAssignment(null);
+          await loadData();
+          return;
+        }
+      } catch (apiErr: any) {
+        if (isProduction) {
+          setFeedback({ type: 'error', message: apiErr.message || 'Server error: Failed to record delivery.' });
+          return;
+        }
+      }
+
+      if (user) {
+        const result = mockDataService.deliverAssignment(assignmentId, user.id, notes);
+        if (result.success) {
+          setFeedback({
+            type: 'success',
+            message: 'Delivery marked as complete! Awaiting NGO final confirmation.',
+          });
+        } else {
+          setFeedback({ type: 'error', message: result.error || 'Failed to record delivery.' });
+        }
+      }
+      setSelectedAssignment(null);
+      await loadData();
+    } catch (err: any) {
+      setFeedback({ type: 'error', message: err.message || 'Failed to record delivery.' });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
   // Find active task currently in progress
   const activeTask = stats.recentAssignments.find((a) =>
@@ -159,6 +242,32 @@ const VolunteerDashboard: React.FC = () => {
         </div>
       </div>
 
+      {/* Action Feedback Banner */}
+      {feedback && (
+        <div
+          className={`p-4 rounded-lg flex items-start justify-between gap-3 border ${
+            feedback.type === 'success'
+              ? 'bg-success/10 border-success/30 text-success'
+              : 'bg-danger/10 border-danger/30 text-danger'
+          }`}
+        >
+          <div className="flex items-start gap-2.5">
+            {feedback.type === 'success' ? (
+              <CheckCircle2 size={20} className="flex-shrink-0 mt-0.5" />
+            ) : (
+              <AlertCircle size={20} className="flex-shrink-0 mt-0.5" />
+            )}
+            <p className="text-sm font-medium">{feedback.message}</p>
+          </div>
+          <button
+            onClick={() => setFeedback(null)}
+            className="text-current hover:opacity-75 transition-opacity"
+          >
+            <X size={16} />
+          </button>
+        </div>
+      )}
+
       {/* Active Task Banner Alert */}
       {activeTask && (
         <div className="p-4 bg-primary/10 border border-primary/30 rounded-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -176,7 +285,7 @@ const VolunteerDashboard: React.FC = () => {
                 </Badge>
               </div>
               <h4 className="font-bold text-base text-primary-text mt-0.5">
-                {activeDonation?.foodName || 'Assigned Food Package'}
+                {activeTask.foodName || activeDonation?.foodName || 'Assigned Food Package'}
               </h4>
               <p className="text-xs text-secondary-text mt-0.5">
                 Pickup: {activeTask.pickup.address} &rarr; Destination: {activeTask.delivery.address}
@@ -184,10 +293,37 @@ const VolunteerDashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 self-end md:self-center">
-            <Button size="sm" onClick={() => setSelectedAssignment(activeTask)}>
+          <div className="flex flex-wrap items-center gap-2 self-end md:self-center">
+            {activeTask.status === 'assigned' || activeTask.status === 'in_transit_to_pickup' ? (
+              <Button
+                size="sm"
+                onClick={() => handlePickup(activeTask.id)}
+                disabled={isUpdating}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-xs"
+              >
+                <Truck size={14} className="mr-1.5" />
+                {isUpdating ? 'Marking Picked Up...' : 'Mark Picked Up'}
+              </Button>
+            ) : (
+              <Button
+                size="sm"
+                onClick={() => handleDeliver(activeTask.id)}
+                disabled={isUpdating}
+                className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-xs"
+              >
+                <CheckCircle2 size={14} className="mr-1.5" />
+                {isUpdating ? 'Marking Delivered...' : 'Mark Delivered'}
+              </Button>
+            )}
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSelectedAssignment(activeTask)}
+            >
               Update Progress
             </Button>
+
             <Button
               variant="outline"
               size="sm"
@@ -460,6 +596,8 @@ const VolunteerDashboard: React.FC = () => {
         assignment={selectedAssignment}
         isOpen={!!selectedAssignment}
         onClose={() => setSelectedAssignment(null)}
+        onPickup={handlePickup}
+        onDeliver={handleDeliver}
         currentVolunteerId={volunteer?.id}
       />
     </div>

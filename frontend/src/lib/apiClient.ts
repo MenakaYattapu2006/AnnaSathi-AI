@@ -284,10 +284,16 @@ export const apiClient = {
         body: JSON.stringify(userData),
       }),
 
-    verifyRegisterOtp: (email: string, otp: string) =>
+    verifyRegisterOtp: (email: string, otp: string, registrationData?: any) =>
       request('/auth/verify-otp', {
         method: 'POST',
-        body: JSON.stringify({ email, otp }),
+        body: JSON.stringify({ email, otp, registrationData }),
+      }),
+
+    resendRegisterOtp: (email: string) =>
+      request('/auth/resend-otp', {
+        method: 'POST',
+        body: JSON.stringify({ email }),
       }),
 
     logout: () =>
@@ -407,9 +413,10 @@ export const apiClient = {
         method: 'POST',
       }),
 
-    pickupAssignment: (assignmentId: string) =>
+    pickupAssignment: (assignmentId: string, notes?: string) =>
       request(`/volunteer/pickup/${assignmentId}`, {
         method: 'POST',
+        body: JSON.stringify({ notes }),
       }),
 
     deliverAssignment: (assignmentId: string, notes?: string) =>

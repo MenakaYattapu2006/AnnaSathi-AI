@@ -60,9 +60,9 @@ const AvailableTasks: React.FC = () => {
         () => {
           // Standard city fallback
           setVolunteerLocation({
-            latitude: 17.3850,
-            longitude: 78.4867,
-            label: 'Rider Standby (Hyderabad Central)',
+            latitude: 17.0878,
+            longitude: 82.0668,
+            label: 'Rider Standby (Surampalem)',
           });
         },
         { timeout: 8000 }
@@ -295,7 +295,7 @@ const AvailableTasks: React.FC = () => {
             </select>
 
             {hasActiveFilters && (
-              <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs">
+              <Button variant="outline" size="sm" onClick={clearFilters} className="text-xs">
                 Reset
               </Button>
             )}
