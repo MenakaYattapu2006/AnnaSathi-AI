@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import type { UserRole } from '../../types/user';
 
@@ -21,6 +21,17 @@ interface SidebarProps {
   onItemClick?: () => void;
 }
 
+/** Returns true when viewport width >= 768px (Tailwind md breakpoint) */
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(() => window.innerWidth >= 768);
+  useEffect(() => {
+    const handler = () => setIsDesktop(window.innerWidth >= 768);
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, []);
+  return isDesktop;
+}
+
 /**
  * Clean and minimal enterprise sidebar component.
  * Displays strictly the navigation pages for the user's role.
@@ -31,11 +42,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
   className = '',
   onItemClick,
 }) => {
+  const isDesktop = useIsDesktop();
   const filtered = items.filter((it) => !it.roles || it.roles.includes(role));
+
+  if (!isDesktop) return null;
 
   return (
     <aside
-      className={`hidden md:flex flex-col w-64 border-r border-slate-200 dark:border-[#1E293B] bg-white dark:bg-[#11171D] flex-shrink-0 min-h-[calc(100vh-4rem)] transition-colors duration-200 ${className}`}
+      className={`flex flex-col w-64 border-r border-slate-200 dark:border-[#1E293B] bg-white dark:bg-[#11171D] flex-shrink-0 min-h-[calc(100vh-4rem)] transition-colors duration-200 ${className}`}
       data-purpose="primary-sidebar"
     >
       {/* Navigation Links */}
