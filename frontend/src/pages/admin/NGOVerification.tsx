@@ -89,6 +89,7 @@ export const NGOVerification: React.FC = () => {
       try {
         const response = await apiClient.admin.reviewNGOVerification(ngo.id, 'VERIFIED');
         if (response?.success) {
+          mockDataService.verifyNGO(ngo.id, currentAdmin.id);
           setFeedback({
             type: 'success',
             message: `Successfully verified NGO: ${ngo.organizationName}. Organization can now receive donations.`,
@@ -103,20 +104,18 @@ export const NGOVerification: React.FC = () => {
           setVerifyConfirmNgo(null);
           return;
         }
-      }
-
-      const result = mockDataService.verifyNGO(ngo.id, currentAdmin.id);
-      if (result.success) {
-        setFeedback({
-          type: 'success',
-          message: `Successfully verified NGO: ${ngo.organizationName}. Organization can now receive donations.`,
-        });
-        loadNgos();
-      } else {
-        setFeedback({
-          type: 'error',
-          message: result.error || 'Failed to verify organization.',
-        });
+        // Dev fallback if backend is offline
+        const result = mockDataService.verifyNGO(ngo.id, currentAdmin.id);
+        if (result.success) {
+          setFeedback({
+            type: 'success',
+            message: `Verified NGO: ${ngo.organizationName} (offline mock mode). Note: ${apiErr.message}`,
+          });
+          loadNgos();
+          setVerifyConfirmNgo(null);
+          return;
+        }
+        throw apiErr;
       }
     } catch (err: any) {
       setFeedback({ type: 'error', message: err.message || 'Failed to verify organization.' });
@@ -136,6 +135,7 @@ export const NGOVerification: React.FC = () => {
       try {
         const response = await apiClient.admin.reviewNGOVerification(rejectingNgo.id, 'REJECTED', rejectionReason.trim());
         if (response?.success) {
+          mockDataService.rejectNGO(rejectingNgo.id, currentAdmin.id, rejectionReason.trim());
           setFeedback({
             type: 'success',
             message: `Rejected application for ${rejectingNgo.organizationName}. Reason recorded.`,
@@ -150,20 +150,18 @@ export const NGOVerification: React.FC = () => {
           setFeedback({ type: 'error', message: apiErr.message || 'Server error: Failed to reject NGO.' });
           return;
         }
-      }
-
-      const result = mockDataService.rejectNGO(rejectingNgo.id, currentAdmin.id, rejectionReason.trim());
-      if (result.success) {
-        setFeedback({
-          type: 'success',
-          message: `Rejected application for ${rejectingNgo.organizationName}. Reason recorded.`,
-        });
-        loadNgos();
-      } else {
-        setFeedback({
-          type: 'error',
-          message: result.error || 'Failed to reject organization.',
-        });
+        const result = mockDataService.rejectNGO(rejectingNgo.id, currentAdmin.id, rejectionReason.trim());
+        if (result.success) {
+          setFeedback({
+            type: 'success',
+            message: `Rejected application for ${rejectingNgo.organizationName} (offline mock mode). Note: ${apiErr.message}`,
+          });
+          loadNgos();
+          setRejectingNgo(null);
+          setRejectionReason('');
+          return;
+        }
+        throw apiErr;
       }
     } catch (err: any) {
       setFeedback({ type: 'error', message: err.message || 'Failed to reject organization.' });

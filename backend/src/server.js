@@ -16,6 +16,8 @@ const io = new Server(server, {
   }
 });
 
+app.set('io', io);
+
 initSockets(io);
 
 const PORT = config.port || 5000;

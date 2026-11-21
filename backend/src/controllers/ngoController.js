@@ -22,8 +22,8 @@ export const ngoController = {
 
     const ngo = ngoRes.rows[0];
 
-    const reqsRes = await query('SELECT * FROM ngo_requirements WHERE ngo_id = $1', [ngo.id]);
-    const docsRes = await query('SELECT id, document_type, document_name, storage_path, verification_status, uploaded_at FROM ngo_documents WHERE ngo_id = $1', [ngo.id]);
+    const reqsRes = await query('SELECT * FROM ngo_requirements WHERE ngo_id = $1', [ngo.id]).catch(() => ({ rows: [] }));
+    const docsRes = await query('SELECT id, document_type, document_name, storage_path, verification_status, uploaded_at FROM ngo_documents WHERE ngo_id = $1', [ngo.id]).catch(() => ({ rows: [] }));
 
     return res.status(200).json({
       success: true,

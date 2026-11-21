@@ -63,15 +63,24 @@ const NGODashboard: React.FC = () => {
   });
   const [isLoading, setIsLoading] = useState(true);
 
-  const verificationStatus = ngo?.verificationStatus || 'pending';
+  const verificationStatus =
+    ngo?.verificationStatus ||
+    (user as any)?.ngo?.verification_status?.toLowerCase() ||
+    (user as any)?.verificationStatus ||
+    'pending';
 
   useEffect(() => {
     let isMounted = true;
     async function loadData() {
+      let currentNgo: NGO | undefined = undefined;
       try {
         const ngoRes = await apiClient.ngo.getMe().catch(() => null);
         if (ngoRes?.ngo && isMounted) {
-          setNgo(mapNgoFromDb(ngoRes.ngo));
+          currentNgo = mapNgoFromDb(ngoRes.ngo);
+          setNgo(currentNgo);
+        } else if ((user as any)?.ngo && isMounted) {
+          currentNgo = mapNgoFromDb((user as any).ngo);
+          setNgo(currentNgo);
         }
 
         const [availRes, acceptedRes] = await Promise.all([
@@ -120,8 +129,9 @@ const NGODashboard: React.FC = () => {
         }
       }
 
-      if (user && isMounted) {
-        setNgo(mockDataService.getNGOByUserId(user.id));
+      if (!currentNgo && user && isMounted) {
+        const mockNgo = mockDataService.getNGOByUserId(user.id);
+        if (mockNgo) setNgo(mockNgo);
         setStats(mockDataService.getNGODashboardStats(user.id));
       }
       if (isMounted) setIsLoading(false);

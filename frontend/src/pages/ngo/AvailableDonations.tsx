@@ -38,7 +38,11 @@ const AvailableDonations: React.FC = () => {
   const [selectedDonation, setSelectedDonation] = useState<Donation | null>(null);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-  const verificationStatus = ngo?.verificationStatus || 'pending';
+  const verificationStatus =
+    ngo?.verificationStatus ||
+    (user as any)?.ngo?.verification_status?.toLowerCase() ||
+    (user as any)?.verificationStatus ||
+    'pending';
   const isVerified = verificationStatus === 'verified';
   const isPending = verificationStatus === 'pending';
   const isRejected = verificationStatus === 'rejected';
@@ -51,10 +55,15 @@ const AvailableDonations: React.FC = () => {
 
   const refreshDonations = async () => {
     setIsLoading(true);
+    let currentNgo: NGO | undefined = undefined;
     try {
       const ngoRes = await apiClient.ngo.getMe().catch(() => null);
       if (ngoRes?.ngo) {
-        setNgo(mapNgoFromDb(ngoRes.ngo));
+        currentNgo = mapNgoFromDb(ngoRes.ngo);
+        setNgo(currentNgo);
+      } else if ((user as any)?.ngo) {
+        currentNgo = mapNgoFromDb((user as any).ngo);
+        setNgo(currentNgo);
       }
 
       const donRes = await apiClient.ngo.getAvailableDonations();
@@ -71,8 +80,9 @@ const AvailableDonations: React.FC = () => {
       }
     }
 
-    if (user) {
-      setNgo(mockDataService.getNGOByUserId(user.id));
+    if (!currentNgo && user) {
+      const mockNgo = mockDataService.getNGOByUserId(user.id);
+      if (mockNgo) setNgo(mockNgo);
       setDonations(mockDataService.getAvailableDonationsForNGO(user.id));
     }
     setIsLoading(false);

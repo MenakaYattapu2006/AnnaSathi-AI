@@ -92,7 +92,10 @@ const OrganizationProfile: React.FC = () => {
           });
         }
       } catch {
-        if (!isProduction && user && isMounted) {
+        if (user && (user as any).ngo && isMounted) {
+          const mapped = mapNgoFromDb((user as any).ngo);
+          setNgo(mapped);
+        } else if (!isProduction && user && isMounted) {
           const mock = mockDataService.getNGOByUserId(user.id);
           if (mock) setNgo(mock);
         }

@@ -208,28 +208,51 @@ export const reviewNGOVerification = async (req, res, next) => {
       );
 
       // Audit log
-      await client.query(
-        `INSERT INTO admin_activity_logs (admin_id, action_type, target_id, target_type, description, metadata)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
-        [req.user.id, `NGO_${status.toUpperCase()}`, id, 'ngos', `Admin reviewed NGO verification: ${status.toUpperCase()}`, JSON.stringify({ notes })]
-      );
+      const adminId = req.user?.id || 'a0000000-0000-0000-0000-000000000401';
+      try {
+        await client.query(
+          `INSERT INTO admin_activity_logs (admin_id, action_type, target_id, target_type, description, metadata)
+           VALUES ($1, $2, $3, $4, $5, $6)`,
+          [adminId, `NGO_${status.toUpperCase()}`, id, 'ngos', `Admin reviewed NGO verification: ${status.toUpperCase()}`, JSON.stringify({ notes })]
+        );
+      } catch (logErr) {
+        console.warn('Admin activity log warning:', logErr.message);
+      }
 
       // Notify the NGO user about the approval or rejection
-      await client.query(
-        `INSERT INTO notifications (recipient_id, title, message, type, related_entity_id)
-         VALUES ($1, $2, $3, 'verification_status', $4)`,
-        [
-          updatedNGO.rows[0].user_id,
-          normalizedStatus === 'verified' ? 'NGO Verification Approved' : 'NGO Verification Rejected',
-          normalizedStatus === 'verified'
-            ? `Congratulations! Your organization "${updatedNGO.rows[0].organization_name}" has been verified by the administrator. You are now authorized to accept and collect surplus food donations.`
-            : `Your organization verification request was rejected. Reason: ${notes || 'Documentation requirements not met.'}`,
-          id
-        ]
-      );
+      try {
+        await client.query(
+          `INSERT INTO notifications (recipient_id, title, message, type, related_entity_id)
+           VALUES ($1, $2, $3, 'verification_status', $4)`,
+          [
+            updatedNGO.rows[0].user_id,
+            normalizedStatus === 'verified' ? 'NGO Verification Approved' : 'NGO Verification Rejected',
+            normalizedStatus === 'verified'
+              ? `Congratulations! Your organization "${updatedNGO.rows[0].organization_name}" has been verified by the administrator. You are now authorized to accept and collect surplus food donations.`
+              : `Your organization verification request was rejected. Reason: ${notes || 'Documentation requirements not met.'}`,
+            id
+          ]
+        );
+      } catch (notifErr) {
+        console.warn('Verification notification warning:', notifErr.message);
+      }
 
       return updatedNGO.rows[0];
     });
+
+    // Real-time telemetry via Socket.IO
+    const io = req.app.get('io');
+    if (io) {
+      io.to(`user:${result.user_id}`).emit('verification_updated', {
+        verificationStatus: normalizedStatus,
+        verifiedAt: normalizedStatus === 'verified' ? new Date().toISOString() : null,
+      });
+      io.emit('ngo:verification_updated', {
+        ngoId: id,
+        userId: result.user_id,
+        verificationStatus: normalizedStatus,
+      });
+    }
 
     res.status(200).json({
       success: true,
