@@ -196,18 +196,6 @@ export const MainLayout: React.FC = () => {
               </span>
             </div>
           </NavLink>
-
-          {/* Quick Divider */}
-          <div className="hidden md:block h-5 w-px bg-slate-200 dark:bg-slate-700/60" />
-
-          {/* Environment / Status Indicator */}
-          <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/60 dark:border-emerald-800/40">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-xs font-semibold text-emerald-900 dark:text-emerald-300">Production Node</span>
-            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white dark:bg-[#131B22] text-emerald-800 dark:text-emerald-400 shadow-xs border border-emerald-100 dark:border-emerald-900/50">
-              v4.0.2
-            </span>
-          </div>
         </div>
 
         {/* Right: Search, Notifications & User Profile Menu */}
