@@ -675,7 +675,7 @@ const Register: React.FC = () => {
                 Already have an account?{' '}
                 <Link
                   to="/login"
-                  className="font-semibold text-brand-900 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors"
+                  className="font-semibold text-brand-900 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 underline decoration-emerald-500/30 underline-offset-4 transition-colors"
                 >
                   Sign in with credentials
                 </Link>

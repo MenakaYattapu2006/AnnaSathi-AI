@@ -50,13 +50,41 @@ AnnaSathi AI is built on a modern, decoupled three-tier architecture:
 
 ```
 AnnaSathi AI/
-├── backend/                # Node.js + Express backend
-│   ├── src/                # API source code
-│   └── database/           # SQL schema (schema.sql)
-├── ai-service/             # Python FastAPI AI microservice
-├── frontend/               # React + Vite UI
-│   └── src/                # Frontend source code
-└── docs/                   # Documentation
+├── backend/                       # Node.js + Express.js ES Modules Backend
+│   ├── database/
+│   │   ├── migrations/            # Versioned SQL migrations
+│   │   ├── seeds/                 # Demo database seed scripts
+│   │   ├── migrate.js             # Migration runner
+│   │   └── schema.sql             # 22-table PostgreSQL relational schema
+│   ├── src/
+│   │   ├── config/                # Environment configuration & DB connection pool
+│   │   ├── controllers/           # Auth, Donation, NGO, Volunteer, Admin, AI controllers
+│   │   ├── middleware/            # Session Auth, RBAC, CSRF, Error handling
+│   │   ├── routes/                # Express API routes mounted under /api/v1
+│   │   ├── services/              # AI Service, Brevo Email, Supabase Storage
+│   │   ├── sockets/               # Socket.IO real-time telemetry and notifications
+│   │   └── server.js              # Server entry point
+│   └── tests/                     # Node.js automated test suite
+├── ai-service/                    # Python FastAPI AI Microservice
+│   ├── app/
+│   │   ├── routers/               # Demand prediction endpoints
+│   │   ├── schemas/               # Pydantic data schemas
+│   │   ├── services/              # Scikit-learn regression & trend predictor
+│   │   └── main.py                # FastAPI application entry point
+│   ├── tests/                     # Python unit test suite
+│   └── requirements.txt           # Python dependencies
+├── frontend/                      # React 18 + TypeScript + Vite Frontend
+│   ├── src/
+│   │   ├── components/            # Reusable UI components & DeliveryMap (Leaflet)
+│   │   ├── contexts/              # AuthContext with session restoration
+│   │   ├── lib/                   # Universal ApiClient & mock fallback services
+│   │   ├── pages/                 # Donor, NGO, Volunteer, Admin dashboards & auth
+│   │   └── routes/                # Protected role-based routing
+│   └── package.json
+└── docs/                          # Architecture & Operations Documentation
+    ├── API_DOCUMENTATION.md       # Complete REST API reference
+    ├── DATABASE_DOCUMENTATION.md  # Relational database schema reference
+    └── DEPLOYMENT_GUIDE.md        # Production deployment and operations guide
 ```
 
 ---

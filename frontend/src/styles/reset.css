@@ -1,13 +1,5 @@
 /* src/styles/reset.css */
 @tailwind base;
 @layer base {
-  /* Prevent underline on all buttons, links, and navigations on hover/focus */
-  a, button, [role="button"], input[type="button"], input[type="submit"] {
-    text-decoration: none !important;
-  }
-  a:hover, button:hover, [role="button"]:hover,
-  a:focus, button:focus, [role="button"]:focus,
-  a:active, button:active, [role="button"]:active {
-    text-decoration: none !important;
-  }
+  /* Tailwind's preflight already resets most defaults */
 }
