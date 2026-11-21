@@ -198,7 +198,7 @@ export const RouteMapModal: React.FC<RouteMapModalProps> = ({
               type: 'delivery',
             }}
             volunteerLocation={
-              hasGps && volLat != null && volLng != null
+              isRealGps && volLat != null && volLng != null
                 ? {
                     latitude: volLat,
                     longitude: volLng,
