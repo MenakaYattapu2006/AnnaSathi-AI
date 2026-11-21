@@ -196,6 +196,13 @@ export function mapUserFromDb(row: any): User {
     role: row.role,
     phone: row.phone || '',
     status: row.is_active === false ? 'suspended' : (row.status || 'active'),
+    profile: {
+      address: row.address,
+      city: row.city,
+      state: row.state,
+      pincode: row.pincode,
+      organizationName: row.organization_name || row.organizationName,
+    },
     createdAt: row.created_at || row.createdAt || new Date().toISOString(),
   };
 }

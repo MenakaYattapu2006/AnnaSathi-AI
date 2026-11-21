@@ -44,9 +44,9 @@ export const DeliveryMap: React.FC<DeliveryMapProps> = ({
     });
 
     const initialLat =
-      pickupLocation?.latitude || volunteerLocation?.latitude || deliveryLocation?.latitude || 17.0878;
+      pickupLocation?.latitude || deliveryLocation?.latitude || volunteerLocation?.latitude || 16.5378;
     const initialLng =
-      pickupLocation?.longitude || volunteerLocation?.longitude || deliveryLocation?.longitude || 82.0668;
+      pickupLocation?.longitude || deliveryLocation?.longitude || volunteerLocation?.longitude || 81.6233;
 
     if (!mapInstanceRef.current) {
       const map = L.map(mapContainerRef.current, {

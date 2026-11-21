@@ -19,7 +19,8 @@ export async function authenticateSession(req, res, next) {
     const tokenHash = hashSessionToken(token);
 
     const sessionRes = await query(
-      `SELECT s.*, u.id as user_id, u.name, u.email, u.phone, u.role, u.status, u.organization_name
+      `SELECT s.*, u.id as user_id, u.name, u.email, u.phone, u.role, u.status, u.organization_name,
+              u.address, u.city, u.state, u.pincode
        FROM user_sessions s
        JOIN users u ON s.user_id = u.id
        WHERE s.session_token_hash = $1 AND s.expires_at > NOW()`,
@@ -53,6 +54,10 @@ export async function authenticateSession(req, res, next) {
       role: row.role,
       status: row.status,
       organizationName: row.organization_name,
+      address: row.address,
+      city: row.city,
+      state: row.state,
+      pincode: row.pincode,
     };
 
     req.session = {

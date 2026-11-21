@@ -23,6 +23,8 @@ interface RouteMapModalProps {
     latitude: number;
     longitude: number;
     label?: string;
+    address?: string;
+    isRealGps?: boolean;
   };
   isAccepting?: boolean;
 }
@@ -37,12 +39,12 @@ export const RouteMapModal: React.FC<RouteMapModalProps> = ({
 }) => {
   // State for resolved coordinates
   const [pickupCoords, setPickupCoords] = useState<{ latitude: number; longitude: number }>({
-    latitude: 17.0878,
-    longitude: 82.0668,
+    latitude: task?.pickup?.latitude || 0,
+    longitude: task?.pickup?.longitude || 0,
   });
   const [deliveryCoords, setDeliveryCoords] = useState<{ latitude: number; longitude: number }>({
-    latitude: 17.0878,
-    longitude: 82.0668,
+    latitude: task?.delivery?.latitude || 0,
+    longitude: task?.delivery?.longitude || 0,
   });
   const [isResolving, setIsResolving] = useState(false);
 
@@ -88,30 +90,48 @@ export const RouteMapModal: React.FC<RouteMapModalProps> = ({
 
   if (!task) return null;
 
-  // Volunteer rider location (GPS or nearby pickup)
+  // Determine origin for Google Maps:
+  // 1. Volunteer live device GPS (if permitted by device and valid)
+  // 2. Volunteer registered address string (from volunteer profile)
+  // 3. Fallback: Donor Pickup Address (if volunteer location is completely unknown)
   const volLat = volunteerLocation?.latitude;
   const volLng = volunteerLocation?.longitude;
-  const hasGps = Boolean(volLat && volLng && !isNaN(volLat) && !isNaN(volLng));
+  const isRealGps = Boolean(volunteerLocation?.isRealGps && volLat && volLng && volLat !== 0);
+
+  let originParam = '';
+  if (isRealGps) {
+    originParam = `${volLat},${volLng}`;
+  } else if (volunteerLocation?.address && volunteerLocation.address.trim()) {
+    originParam = encodeURIComponent(volunteerLocation.address.trim());
+  } else if (volLat && volLng && volLat !== 0 && (volLat !== 17.0878 || volLng !== 82.0668)) {
+    originParam = `${volLat},${volLng}`;
+  }
 
   // Google Maps Full Delivery Route URL:
-  // Origin: Volunteer Current Location (or Pickup Address if GPS not available)
+  // Origin: Volunteer Location/Address
   // Waypoint: Pickup Address (Donor Location)
   // Destination: Delivery Shelter (NGO Location)
-  const fullRouteGoogleMapsUrl = hasGps
-    ? `https://www.google.com/maps/dir/?api=1&origin=${volLat},${volLng}&destination=${encodeURIComponent(
+  const fullRouteGoogleMapsUrl = originParam
+    ? `https://www.google.com/maps/dir/?api=1&origin=${originParam}&destination=${encodeURIComponent(
         task.delivery.address
       )}&waypoints=${encodeURIComponent(task.pickup.address)}&travelmode=driving`
     : `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(
         task.pickup.address
       )}&destination=${encodeURIComponent(task.delivery.address)}&travelmode=driving`;
 
-  const pickupGoogleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
-    task.pickup.address
-  )}&travelmode=driving`;
+  // Navigate to Pickup Point: from volunteer origin to donor pickup
+  const pickupGoogleMapsUrl = originParam
+    ? `https://www.google.com/maps/dir/?api=1&origin=${originParam}&destination=${encodeURIComponent(
+        task.pickup.address
+      )}&travelmode=driving`
+    : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+        task.pickup.address
+      )}&travelmode=driving`;
 
-  const deliveryGoogleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
-    task.delivery.address
-  )}&travelmode=driving`;
+  // Navigate to Destination Shelter: from donor pickup to NGO shelter
+  const deliveryGoogleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(
+    task.pickup.address
+  )}&destination=${encodeURIComponent(task.delivery.address)}&travelmode=driving`;
 
   return (
     <Modal

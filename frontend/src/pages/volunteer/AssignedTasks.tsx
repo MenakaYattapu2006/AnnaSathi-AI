@@ -21,6 +21,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { apiClient, mapAssignmentFromDb } from '../../lib/apiClient';
 import { mockDataService } from '../../lib/mockDataService';
 import { Loading } from '../../components/common/Loading';
+import { resolveAddressCoordinates } from '../../utils/geocoding';
 import type { Assignment, AssignmentStatus } from '../../types/assignment';
 
 const isProduction = Boolean((import.meta as any).env?.PROD);
@@ -49,37 +50,74 @@ const AssignedTasks: React.FC = () => {
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
-  // Volunteer Live GPS Location
+  // Volunteer Live Location (GPS or registered profile address)
   const [volunteerLocation, setVolunteerLocation] = useState<
-    { latitude: number; longitude: number; label?: string } | undefined
+    { latitude: number; longitude: number; label?: string; address?: string; isRealGps?: boolean } | undefined
   >(undefined);
 
   // Status Filter Tabs
   const [activeTab, setActiveTab] = useState<'all' | 'pending_pickup' | 'in_transit' | 'delivered'>('all');
 
-  // Detect live GPS location on mount
+  // Detect live GPS location on mount, or fall back to volunteer's registered address
   React.useEffect(() => {
+    let resolved = false;
+
+    const setFromRegisteredAddress = async () => {
+      const parts = [
+        user?.profile?.address,
+        user?.profile?.city,
+        user?.profile?.state,
+        user?.profile?.pincode,
+      ].filter(Boolean);
+      const volAddr = parts.join(', ');
+
+      if (volAddr) {
+        try {
+          const coords = await resolveAddressCoordinates(volAddr);
+          if (!resolved) {
+            setVolunteerLocation({
+              latitude: coords.latitude,
+              longitude: coords.longitude,
+              address: volAddr,
+              label: `${user?.name || 'Volunteer Location'} (${volAddr})`,
+              isRealGps: false,
+            });
+          }
+        } catch {
+          if (!resolved) {
+            setVolunteerLocation({
+              latitude: 0,
+              longitude: 0,
+              address: volAddr,
+              label: volAddr,
+              isRealGps: false,
+            });
+          }
+        }
+      }
+    };
+
     if (typeof window !== 'undefined' && 'geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
+          resolved = true;
           setVolunteerLocation({
             latitude: pos.coords.latitude,
             longitude: pos.coords.longitude,
             label: 'Your Live Location (GPS)',
+            isRealGps: true,
           });
         },
         () => {
-          // Standard city fallback
-          setVolunteerLocation({
-            latitude: 17.0878,
-            longitude: 82.0668,
-            label: 'Rider Standby (Surampalem)',
-          });
+          // Fall back to volunteer registered address
+          setFromRegisteredAddress();
         },
-        { timeout: 8000 }
+        { timeout: 5000 }
       );
+    } else {
+      setFromRegisteredAddress();
     }
-  }, []);
+  }, [user]);
 
   const refreshTasks = async () => {
     setIsLoading(true);
