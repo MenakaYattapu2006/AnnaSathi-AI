@@ -287,11 +287,14 @@ export const authController = {
         const vPincode = (registrationData.pincode || user.pincode || '').trim();
         const serviceLoc = [vCity, vPincode].filter(Boolean).join(' - ') || vCity || vPincode || 'Local Service Area';
         const serviceAreas = [serviceLoc];
+        const vehicleType = ['two_wheeler', 'four_wheeler', 'van', 'none'].includes(registrationData.vehicleType)
+          ? registrationData.vehicleType
+          : 'two_wheeler';
 
         await client.query(
           `INSERT INTO volunteers (user_id, name, phone, email, vehicle_type, service_areas, availability, status)
-           VALUES ($1, $2, $3, $4, 'two_wheeler', $5, 'available', 'active')`,
-          [user.id, user.name, user.phone, user.email, serviceAreas]
+           VALUES ($1, $2, $3, $4, $5, $6, 'available', 'active')`,
+          [user.id, user.name, user.phone, user.email, vehicleType, serviceAreas]
         );
       }
 

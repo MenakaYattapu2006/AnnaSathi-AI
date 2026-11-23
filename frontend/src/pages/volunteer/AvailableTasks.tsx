@@ -30,6 +30,8 @@ const AvailableTasks: React.FC = () => {
   const volunteer = user ? mockDataService.getVolunteerByUserId(user.id) : undefined;
 
   const [availableTasks, setAvailableTasks] = useState<Assignment[]>([]);
+  const [isAvailable, setIsAvailable] = useState<boolean>(true);
+  const [isTogglingAvailability, setIsTogglingAvailability] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
   const [mapTask, setMapTask] = useState<Assignment | null>(null);
@@ -112,8 +114,13 @@ const AvailableTasks: React.FC = () => {
     setIsLoading(true);
     try {
       const response = await apiClient.volunteer.getAvailableTasks();
-      if (response?.tasks) {
-        setAvailableTasks(response.tasks.map(mapAssignmentFromDb));
+      if (response) {
+        if (response.isAvailable !== undefined) {
+          setIsAvailable(response.isAvailable);
+        }
+        if (response.tasks) {
+          setAvailableTasks(response.tasks.map(mapAssignmentFromDb));
+        }
         setIsLoading(false);
         return;
       }
@@ -127,6 +134,33 @@ const AvailableTasks: React.FC = () => {
 
     setAvailableTasks(mockDataService.getAvailableAssignments());
     setIsLoading(false);
+  };
+
+  const handleToggleAvailability = async () => {
+    const nextAvailability = isAvailable ? 'offline' : 'available';
+    setIsTogglingAvailability(true);
+    setFeedback(null);
+    try {
+      const res = await apiClient.volunteer.updateAvailability(nextAvailability);
+      if (res?.success) {
+        setIsAvailable(nextAvailability === 'available');
+        setFeedback({
+          type: 'success',
+          message:
+            nextAvailability === 'available'
+              ? 'Status set to Available! Live delivery tasks are now visible.'
+              : 'Status set to Offline / Inactive. Tasks are hidden until you toggle back to Available.',
+        });
+        await refreshTasks();
+      }
+    } catch (err: any) {
+      setFeedback({
+        type: 'error',
+        message: err?.message || 'Failed to update availability status.',
+      });
+    } finally {
+      setIsTogglingAvailability(false);
+    }
   };
 
   React.useEffect(() => {
@@ -248,10 +282,57 @@ const AvailableTasks: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Available Delivery Tasks"
-        description="Surplus food rescue runs ready for volunteer pickup and transport to shelters"
-      />
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <PageHeader
+          title="Available Delivery Tasks"
+          description="Surplus food rescue runs ready for volunteer pickup and transport to shelters"
+          className="mb-0"
+        />
+
+        {/* Status Toggle Switch */}
+        <div className="flex items-center gap-2 bg-surface border border-border px-3 py-1.5 rounded-lg shrink-0">
+          <span className="text-xs font-medium text-secondary-text">My Status:</span>
+          <button
+            type="button"
+            onClick={handleToggleAvailability}
+            disabled={isTogglingAvailability}
+            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+              isAvailable ? 'bg-success' : 'bg-slate-300 dark:bg-slate-700'
+            }`}
+            title="Toggle Available / Offline Status"
+          >
+            <span
+              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
+                isAvailable ? 'translate-x-5' : 'translate-x-0'
+              }`}
+            />
+          </button>
+          <span className={`text-xs font-semibold ${isAvailable ? 'text-success' : 'text-secondary-text'}`}>
+            {isAvailable ? 'Available' : 'Unavailable / Offline'}
+          </span>
+        </div>
+      </div>
+
+      {/* Offline Status Warning Notice */}
+      {!isAvailable && (
+        <div className="p-4 rounded-lg bg-warning/10 border border-warning/30 text-warning flex items-center justify-between">
+          <div className="flex items-center gap-2 text-sm">
+            <AlertCircle size={18} className="shrink-0" />
+            <span>
+              You are currently <strong>Unavailable / Offline</strong>. Available tasks are hidden until you toggle yourself to <strong>Available</strong>.
+            </span>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            className="text-xs border-warning text-warning hover:bg-warning/10"
+            onClick={handleToggleAvailability}
+            disabled={isTogglingAvailability}
+          >
+            Go Online Now
+          </Button>
+        </div>
+      )}
 
       {/* Action Feedback Banner */}
       {feedback && (

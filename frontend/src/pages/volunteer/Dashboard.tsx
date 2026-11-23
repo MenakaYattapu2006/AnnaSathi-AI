@@ -62,6 +62,37 @@ const VolunteerDashboard: React.FC = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
+  const [isTogglingAvailability, setIsTogglingAvailability] = useState(false);
+
+  const handleToggleAvailability = async () => {
+    const currentIsAvailable = volunteer?.availability === 'available';
+    const nextAvailability = currentIsAvailable ? 'offline' : 'available';
+
+    setIsTogglingAvailability(true);
+    setFeedback(null);
+    try {
+      const res = await apiClient.volunteer.updateAvailability(nextAvailability);
+      if (res?.success) {
+        setVolunteer((prev) => (prev ? { ...prev, availability: nextAvailability } : prev));
+        setFeedback({
+          type: 'success',
+          message:
+            nextAvailability === 'available'
+              ? 'You are now Online & Available! Live tasks will be visible.'
+              : 'You are now Offline. You will not receive available tasks until you toggle back to available.',
+        });
+        await loadData();
+      }
+    } catch (err: any) {
+      setFeedback({
+        type: 'error',
+        message: err?.message || 'Failed to update availability status.',
+      });
+    } finally {
+      setIsTogglingAvailability(false);
+    }
+  };
+
   const loadData = useCallback(async () => {
     try {
       const volRes = await apiClient.volunteer.getMe().catch(() => null);
@@ -219,19 +250,29 @@ const VolunteerDashboard: React.FC = () => {
           description={`Welcome back, ${volunteer?.name || user?.name || 'Food Hero'}`}
           className="mb-0"
         />
-        <div className="flex items-center gap-2">
-          <Badge
-            variant={volunteer?.availability === 'available' ? 'success' : 'warning'}
-            size="md"
-            className="capitalize px-3 py-1.5 font-medium flex items-center gap-1.5"
-          >
-            <span
-              className={`h-2 w-2 rounded-full ${
-                volunteer?.availability === 'available' ? 'bg-success' : 'bg-warning'
+        <div className="flex items-center gap-3">
+          {/* Availability Toggle Switch */}
+          <div className="flex items-center gap-2 bg-surface border border-border px-3 py-1.5 rounded-lg">
+            <span className="text-xs font-medium text-secondary-text">Status:</span>
+            <button
+              type="button"
+              onClick={handleToggleAvailability}
+              disabled={isTogglingAvailability}
+              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                volunteer?.availability === 'available' ? 'bg-success' : 'bg-slate-300 dark:bg-slate-700'
               }`}
-            />
-            <span>{volunteer?.availability || 'Available'}</span>
-          </Badge>
+              title="Toggle Online/Offline Availability"
+            >
+              <span
+                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
+                  volunteer?.availability === 'available' ? 'translate-x-5' : 'translate-x-0'
+                }`}
+              />
+            </button>
+            <span className={`text-xs font-semibold ${volunteer?.availability === 'available' ? 'text-success' : 'text-secondary-text'}`}>
+              {volunteer?.availability === 'available' ? 'Available' : 'Unavailable / Offline'}
+            </span>
+          </div>
 
           {volunteer?.vehicleType && (
             <Badge variant="neutral" size="md" className="flex items-center gap-1 px-3 py-1.5">

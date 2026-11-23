@@ -18,6 +18,7 @@ import {
   CheckCircle2,
   RefreshCw,
   Sparkles,
+  Truck,
 } from 'lucide-react';
 import { apiClient } from '../../lib/apiClient';
 import { useAuth } from '../../contexts/AuthContext';
@@ -40,6 +41,7 @@ const Register: React.FC = () => {
   const [state, setState] = useState('');
   const [pincode, setPincode] = useState('');
   const [role, setRole] = useState<UserRole>('donor');
+  const [vehicleType, setVehicleType] = useState<'two_wheeler' | 'four_wheeler' | 'van' | 'none'>('two_wheeler');
   const [showPassword, setShowPassword] = useState(false);
 
   // OTP Fields
@@ -110,6 +112,7 @@ const Register: React.FC = () => {
         phone: phone.trim(),
         password,
         role,
+        vehicleType: role === 'volunteer' ? vehicleType : undefined,
         organizationName: organizationName.trim() || undefined,
         address: address.trim(),
         city: city.trim(),
@@ -152,6 +155,7 @@ const Register: React.FC = () => {
         phone: phone.trim(),
         password,
         role,
+        vehicleType: role === 'volunteer' ? vehicleType : undefined,
         organizationName: organizationName.trim() || undefined,
         address: address.trim(),
         city: city.trim(),
@@ -435,6 +439,34 @@ const Register: React.FC = () => {
                       </button>
                     </div>
                   </div>
+
+                  {/* Registered Vehicle Type (for Volunteer Riders) */}
+                  {role === 'volunteer' && (
+                    <div>
+                      <label
+                        htmlFor="register-vehicle"
+                        className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5"
+                      >
+                        Registered Vehicle Type *
+                      </label>
+                      <div className="relative rounded-lg shadow-xs">
+                        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                          <Truck className="w-4 h-4" />
+                        </div>
+                        <select
+                          id="register-vehicle"
+                          value={vehicleType}
+                          onChange={(e) => setVehicleType(e.target.value as any)}
+                          className="block w-full pl-10 pr-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg focus:border-brand-900 dark:focus:border-emerald-500 focus:ring-2 focus:ring-brand-900/20 bg-slate-50/40 dark:bg-[#131B22] hover:bg-white dark:hover:bg-[#18222b] transition-all outline-none"
+                        >
+                          <option value="two_wheeler">Two-Wheeler (Motorcycle / Scooter / Bike)</option>
+                          <option value="four_wheeler">Four-Wheeler (Car / Auto / Hatchback / SUV)</option>
+                          <option value="van">Cargo Van / Small Commercial Truck</option>
+                          <option value="none">On Foot / Bicycle (Short Distance)</option>
+                        </select>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Organization Name (for NGOs and Commercial Donors) */}
                   {role !== 'volunteer' && (

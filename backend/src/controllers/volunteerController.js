@@ -90,6 +90,26 @@ export const volunteerController = {
    * Get Available Unclaimed Tasks
    */
   async getAvailableTasks(req, res) {
+    // Check if the volunteer is currently marked available
+    const volRes = await query(
+      'SELECT availability, status FROM volunteers WHERE user_id = $1',
+      [req.user.id]
+    );
+
+    // If volunteer marked themselves offline/busy or inactive, do not return tasks
+    if (volRes.rows.length > 0) {
+      const vol = volRes.rows[0];
+      if (vol.availability !== 'available' || vol.status !== 'active') {
+        return res.status(200).json({
+          success: true,
+          tasks: [],
+          isAvailable: false,
+          availability: vol.availability,
+          message: 'You are currently offline or unavailable. Set your status to available to receive tasks.',
+        });
+      }
+    }
+
     const tasksRes = await query(
       `SELECT a.*, d.food_name, d.category, d.quantity, d.unit, d.urgency_score, d.urgency_level,
               d.preparation_time, d.expiry_time, d.dietary_type,
@@ -105,7 +125,12 @@ export const volunteerController = {
        ORDER BY d.urgency_score DESC, a.created_at DESC`
     );
 
-    return res.status(200).json({ success: true, tasks: tasksRes.rows });
+    return res.status(200).json({
+      success: true,
+      tasks: tasksRes.rows,
+      isAvailable: true,
+      availability: 'available',
+    });
   },
 
   /**
