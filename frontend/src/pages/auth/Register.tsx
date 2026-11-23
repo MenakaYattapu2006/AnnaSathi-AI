@@ -206,6 +206,9 @@ const Register: React.FC = () => {
       {/* Subtle Dot Grid Background */}
       <div className="fixed inset-0 grid-bg-pattern pointer-events-none z-0" />
 
+      {/* Dynamic Animated Emerald Rain Background */}
+      <div className="auth-rain-container" />
+
       {/* Ambient Top Lighting */}
       <div className="absolute -top-[300px] left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-emerald-500/10 blur-[130px] rounded-full pointer-events-none" />
 
@@ -301,7 +304,7 @@ const Register: React.FC = () => {
                           setError(null);
                         }}
                         placeholder="e.g. Ramesh Varma"
-                        className="block w-full pl-10 pr-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg focus:border-brand-900 dark:focus:border-emerald-500 focus:ring-2 focus:ring-brand-900/20 bg-slate-50/40 dark:bg-[#131B22] hover:bg-white dark:hover:bg-[#18222b] transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none"
+                        className="block w-full pl-10 pr-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg bg-slate-50/40 dark:bg-[#131B22] hover:bg-white dark:hover:bg-[#18222b] auth-input-glow placeholder:text-slate-400 dark:placeholder:text-slate-500"
                       />
                     </div>
                   </div>
@@ -330,7 +333,7 @@ const Register: React.FC = () => {
                             setError(null);
                           }}
                           placeholder="name@example.com"
-                          className="block w-full pl-10 pr-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg focus:border-brand-900 dark:focus:border-emerald-500 focus:ring-2 focus:ring-brand-900/20 bg-slate-50/40 dark:bg-[#131B22] hover:bg-white dark:hover:bg-[#18222b] transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none"
+                          className="block w-full pl-10 pr-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg bg-slate-50/40 dark:bg-[#131B22] hover:bg-white dark:hover:bg-[#18222b] auth-input-glow placeholder:text-slate-400 dark:placeholder:text-slate-500"
                         />
                       </div>
                     </div>
@@ -357,7 +360,7 @@ const Register: React.FC = () => {
                             setError(null);
                           }}
                           placeholder="9876543210"
-                          className="block w-full pl-10 pr-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg focus:border-brand-900 dark:focus:border-emerald-500 focus:ring-2 focus:ring-brand-900/20 bg-slate-50/40 dark:bg-[#131B22] hover:bg-white dark:hover:bg-[#18222b] transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none"
+                          className="block w-full pl-10 pr-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg bg-slate-50/40 dark:bg-[#131B22] hover:bg-white dark:hover:bg-[#18222b] auth-input-glow placeholder:text-slate-400 dark:placeholder:text-slate-500"
                         />
                       </div>
                     </div>
@@ -385,7 +388,7 @@ const Register: React.FC = () => {
                           setError(null);
                         }}
                         placeholder="At least 8 characters"
-                        className="block w-full pl-10 pr-10 py-2 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg focus:border-brand-900 dark:focus:border-emerald-500 focus:ring-2 focus:ring-brand-900/20 bg-slate-50/40 dark:bg-[#131B22] hover:bg-white dark:hover:bg-[#18222b] transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none"
+                        className="block w-full pl-10 pr-10 py-2 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg bg-slate-50/40 dark:bg-[#131B22] hover:bg-white dark:hover:bg-[#18222b] auth-input-glow placeholder:text-slate-400 dark:placeholder:text-slate-500"
                       />
                       <button
                         type="button"
@@ -457,7 +460,7 @@ const Register: React.FC = () => {
                           id="register-vehicle"
                           value={vehicleType}
                           onChange={(e) => setVehicleType(e.target.value as any)}
-                          className="block w-full pl-10 pr-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg focus:border-brand-900 dark:focus:border-emerald-500 focus:ring-2 focus:ring-brand-900/20 bg-slate-50/40 dark:bg-[#131B22] hover:bg-white dark:hover:bg-[#18222b] transition-all outline-none"
+                          className="block w-full pl-10 pr-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg bg-slate-50/40 dark:bg-[#131B22] hover:bg-white dark:hover:bg-[#18222b] auth-input-glow"
                         >
                           <option value="two_wheeler">Two-Wheeler (Motorcycle / Scooter / Bike)</option>
                           <option value="four_wheeler">Four-Wheeler (Car / Auto / Hatchback / SUV)</option>
@@ -488,7 +491,7 @@ const Register: React.FC = () => {
                           value={organizationName}
                           onChange={(e) => setOrganizationName(e.target.value)}
                           placeholder={role === 'ngo' ? 'e.g. Hope Foundation' : 'e.g. Grand Palace Caterers'}
-                          className="block w-full pl-10 pr-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg focus:border-brand-900 dark:focus:border-emerald-500 focus:ring-2 focus:ring-brand-900/20 bg-slate-50/40 dark:bg-[#131B22] hover:bg-white dark:hover:bg-[#18222b] transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none"
+                          className="block w-full pl-10 pr-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg bg-slate-50/40 dark:bg-[#131B22] hover:bg-white dark:hover:bg-[#18222b] auth-input-glow placeholder:text-slate-400 dark:placeholder:text-slate-500"
                         />
                       </div>
                     </div>
@@ -513,7 +516,7 @@ const Register: React.FC = () => {
                         value={address}
                         onChange={(e) => setAddress(e.target.value)}
                         placeholder="e.g. Aditya Nagar, ADB Road, Surampalem"
-                        className="block w-full pl-10 pr-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg focus:border-brand-900 dark:focus:border-emerald-500 focus:ring-2 focus:ring-brand-900/20 bg-slate-50/40 dark:bg-[#131B22] hover:bg-white dark:hover:bg-[#18222b] transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none"
+                        className="block w-full pl-10 pr-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg bg-slate-50/40 dark:bg-[#131B22] hover:bg-white dark:hover:bg-[#18222b] auth-input-glow placeholder:text-slate-400 dark:placeholder:text-slate-500"
                       />
                     </div>
                   </div>
@@ -534,7 +537,7 @@ const Register: React.FC = () => {
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
                         placeholder="Surampalem"
-                        className="block w-full px-3 py-2 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg focus:border-brand-900 dark:focus:border-emerald-500 focus:ring-2 focus:ring-brand-900/20 bg-slate-50/40 dark:bg-[#131B22] hover:bg-white dark:hover:bg-[#18222b] transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none"
+                        className="block w-full px-3 py-2 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg bg-slate-50/40 dark:bg-[#131B22] hover:bg-white dark:hover:bg-[#18222b] auth-input-glow placeholder:text-slate-400 dark:placeholder:text-slate-500"
                       />
                     </div>
 
@@ -552,7 +555,7 @@ const Register: React.FC = () => {
                         value={state}
                         onChange={(e) => setState(e.target.value)}
                         placeholder="Andhra Pradesh"
-                        className="block w-full px-3 py-2 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg focus:border-brand-900 dark:focus:border-emerald-500 focus:ring-2 focus:ring-brand-900/20 bg-slate-50/40 dark:bg-[#131B22] hover:bg-white dark:hover:bg-[#18222b] transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none"
+                        className="block w-full px-3 py-2 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg bg-slate-50/40 dark:bg-[#131B22] hover:bg-white dark:hover:bg-[#18222b] auth-input-glow placeholder:text-slate-400 dark:placeholder:text-slate-500"
                       />
                     </div>
 
@@ -570,7 +573,7 @@ const Register: React.FC = () => {
                         value={pincode}
                         onChange={(e) => setPincode(e.target.value)}
                         placeholder="533437"
-                        className="block w-full px-3 py-2 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg focus:border-brand-900 dark:focus:border-emerald-500 focus:ring-2 focus:ring-brand-900/20 bg-slate-50/40 dark:bg-[#131B22] hover:bg-white dark:hover:bg-[#18222b] transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none"
+                        className="block w-full px-3 py-2 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg bg-slate-50/40 dark:bg-[#131B22] hover:bg-white dark:hover:bg-[#18222b] auth-input-glow placeholder:text-slate-400 dark:placeholder:text-slate-500"
                       />
                     </div>
                   </div>
@@ -581,7 +584,7 @@ const Register: React.FC = () => {
                     disabled={isSubmitting}
                     className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-brand-900 hover:bg-[#134E3F] dark:bg-emerald-700 dark:hover:bg-emerald-600 text-white text-sm font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-900/40 focus:ring-offset-2 transition-all duration-150 disabled:opacity-60 cursor-pointer mt-5"
                   >
-                    <span>{isSubmitting ? 'Sending Verification Code...' : 'Register & Verify Email via Brevo'}</span>
+                    <span>{isSubmitting ? 'Sending Verification Code...' : 'Register & Verify Email'}</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </form>

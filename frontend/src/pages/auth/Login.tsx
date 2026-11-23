@@ -55,6 +55,9 @@ const Login: React.FC = () => {
       {/* Subtle Dot Grid Background */}
       <div className="fixed inset-0 grid-bg-pattern pointer-events-none z-0" />
 
+      {/* Dynamic Animated Emerald Rain Background */}
+      <div className="auth-rain-container" />
+
       {/* Ambient Top Lighting */}
       <div className="absolute -top-[300px] left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-emerald-500/10 blur-[130px] rounded-full pointer-events-none" />
 
@@ -155,8 +158,8 @@ const Login: React.FC = () => {
                       setEmail(e.target.value);
                       setError(null);
                     }}
-                    placeholder="name@example.com"
-                    className="block w-full pl-10 pr-3.5 py-2.5 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg focus:border-brand-900 dark:focus:border-emerald-500 focus:ring-2 focus:ring-brand-900/20 bg-slate-50/40 dark:bg-[#131B22] hover:bg-white dark:hover:bg-[#18222b] transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none"
+                    placeholder="Enter your email"
+                    className="block w-full pl-10 pr-3.5 py-2.5 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg bg-slate-50/40 dark:bg-[#131B22] hover:bg-white dark:hover:bg-[#18222b] auth-input-glow placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   />
                 </div>
               </div>
@@ -190,8 +193,8 @@ const Login: React.FC = () => {
                       setPassword(e.target.value);
                       setError(null);
                     }}
-                    placeholder="Enter password"
-                    className="block w-full pl-10 pr-10 py-2.5 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg focus:border-brand-900 dark:focus:border-emerald-500 focus:ring-2 focus:ring-brand-900/20 bg-slate-50/40 dark:bg-[#131B22] hover:bg-white dark:hover:bg-[#18222b] transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none"
+                    placeholder="Enter your password"
+                    className="block w-full pl-10 pr-10 py-2.5 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg bg-slate-50/40 dark:bg-[#131B22] hover:bg-white dark:hover:bg-[#18222b] auth-input-glow placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   />
                   <button
                     type="button"
