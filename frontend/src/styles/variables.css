@@ -64,26 +64,38 @@
   --radius-2xl: 1rem;    /* 16px */
 }
 
-/* Dark mode theme tokens */
+/* Dark mode theme tokens – Antigravity Sleek Dark Palette with Tech Blue accents */
 .dark {
-  --color-background: #090D10;
-  --color-surface: #11171D;
-  --color-surface-dim: #131B22;
-  --color-surface-container-lowest: #090D10;
-  --color-surface-container-low: #11171D;
-  --color-surface-container: #131B22;
-  --color-surface-container-high: #1E293B;
-  --color-surface-container-highest: #334155;
+  --color-background: #0B0F17;
+  --color-surface: #111827;
+  --color-surface-dim: #0F172A;
+  --color-surface-container-lowest: #080C14;
+  --color-surface-container-low: #0F172A;
+  --color-surface-container: #1E293B;
+  --color-surface-container-high: #334155;
+  --color-surface-container-highest: #475569;
 
-  --color-on-surface: #f8fafc;
-  --color-on-surface-variant: #94a3b8;
-  --color-on-background: #f8fafc;
-  --color-outline: #475569;
+  --color-primary: #3B82F6;
+  --color-primary-container: #1D4ED8;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #DBEAFE;
+
+  --color-secondary: #0EA5E9;
+  --color-secondary-container: #0369A1;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-container: #E0F2FE;
+
+  --color-on-surface: #F8FAFC;
+  --color-on-surface-variant: #94A3B8;
+  --color-on-background: #F8FAFC;
+  --color-outline: #334155;
   --color-outline-variant: #1E293B;
 
-  --color-primary-text: #f8fafc;
-  --color-secondary-text: #94a3b8;
+  --color-primary-text: #F8FAFC;
+  --color-secondary-text: #94A3B8;
   --color-border: #1E293B;
-  --color-accent: #15803d;
+  --color-accent: #3B82F6;
 }
+
+
 

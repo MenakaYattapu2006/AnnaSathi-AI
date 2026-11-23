@@ -173,15 +173,15 @@ export const AIChatbotModal: React.FC = () => {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-4 right-4 z-50 flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#0f392b]/95 backdrop-blur shadow-lg shadow-[#07241b]/20 text-white border border-[#166534]/80 hover:bg-[#0f392b] transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500/50 group"
+          className="fixed bottom-4 right-4 z-50 flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#0f392b]/95 dark:bg-blue-600/95 backdrop-blur shadow-lg shadow-[#07241b]/20 text-white border border-[#166534]/80 dark:border-blue-400/50 hover:bg-[#0f392b] dark:hover:bg-blue-500 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500/50 group"
           aria-label="Open AnnaSathi AI Assistant"
         >
           <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 dark:bg-cyan-300 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 dark:bg-blue-400" />
           </span>
           <span className="text-xs font-bold tracking-tight">AnnaSathi AI</span>
-          <span className="text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded-full border border-emerald-400/30">
+          <span className="text-[10px] font-semibold bg-emerald-500 dark:bg-blue-400/20 dark:bg-blue-500/20 text-emerald-300 dark:text-cyan-200 px-1.5 py-0.5 rounded-full border border-emerald-400/30 dark:border-cyan-400/30">
             v4.0
           </span>
         </button>
@@ -364,3 +364,7 @@ export const AIChatbotModal: React.FC = () => {
     </>
   );
 };
+
+
+
+

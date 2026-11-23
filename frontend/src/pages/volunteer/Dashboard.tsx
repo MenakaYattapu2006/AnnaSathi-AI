@@ -340,7 +340,7 @@ const VolunteerDashboard: React.FC = () => {
                 size="sm"
                 onClick={() => handlePickup(activeTask.id)}
                 disabled={isUpdating}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-xs"
+                className="bg-emerald-600 hover:bg-emerald-700 dark:bg-blue-600 dark:hover:bg-blue-500 text-white font-semibold shadow-xs"
               >
                 <Truck size={14} className="mr-1.5" />
                 {isUpdating ? 'Marking Picked Up...' : 'Mark Picked Up'}
@@ -646,3 +646,7 @@ const VolunteerDashboard: React.FC = () => {
 };
 
 export default VolunteerDashboard;
+
+
+
+

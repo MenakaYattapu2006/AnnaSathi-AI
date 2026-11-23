@@ -475,7 +475,7 @@ const AssignedTasks: React.FC = () => {
                         size="sm"
                         onClick={() => handlePickup(task.id)}
                         disabled={updatingId === task.id}
-                        className="text-xs w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-medium"
+                        className="text-xs w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 dark:bg-blue-600 dark:hover:bg-blue-500 text-white font-medium"
                       >
                         <Truck size={14} className="mr-1" />
                         {updatingId === task.id ? 'Marking Picked Up...' : 'Mark Picked Up'}
@@ -523,3 +523,7 @@ const AssignedTasks: React.FC = () => {
 };
 
 export default AssignedTasks;
+
+
+
+

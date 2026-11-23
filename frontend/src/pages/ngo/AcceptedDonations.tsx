@@ -392,3 +392,6 @@ const AcceptedDonations: React.FC = () => {
 };
 
 export default AcceptedDonations;
+
+
+

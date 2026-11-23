@@ -230,7 +230,7 @@ export const NGOVerification: React.FC = () => {
         <div
           className={`p-4 rounded-xl flex items-center justify-between text-sm ${
             feedback.type === 'success'
-              ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30'
+              ? 'bg-emerald-50 dark:bg-blue-950/40 text-emerald-800 dark:text-blue-300 border border-emerald-500/30'
               : 'bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border border-rose-500/30'
           }`}
         >
@@ -247,7 +247,7 @@ export const NGOVerification: React.FC = () => {
           onClick={() => setActiveTab('pending')}
           className={`px-4 py-2.5 text-xs sm:text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap ${
             activeTab === 'pending'
-              ? 'border-emerald-600 text-emerald-700 dark:text-emerald-400'
+              ? 'border-emerald-600 text-emerald-700 dark:text-blue-400'
               : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
           }`}
         >
@@ -260,12 +260,12 @@ export const NGOVerification: React.FC = () => {
           onClick={() => setActiveTab('verified')}
           className={`px-4 py-2.5 text-xs sm:text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap ${
             activeTab === 'verified'
-              ? 'border-emerald-600 text-emerald-700 dark:text-emerald-400'
+              ? 'border-emerald-600 text-emerald-700 dark:text-blue-400'
               : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
           }`}
         >
           Verified
-          <span className="px-1.5 py-0.5 rounded-full text-[11px] bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 font-bold">
+          <span className="px-1.5 py-0.5 rounded-full text-[11px] bg-emerald-100 dark:bg-blue-600 text-emerald-700 dark:text-blue-400 font-bold">
             {counts.verified}
           </span>
         </button>
@@ -273,7 +273,7 @@ export const NGOVerification: React.FC = () => {
           onClick={() => setActiveTab('rejected')}
           className={`px-4 py-2.5 text-xs sm:text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap ${
             activeTab === 'rejected'
-              ? 'border-emerald-600 text-emerald-700 dark:text-emerald-400'
+              ? 'border-emerald-600 text-emerald-700 dark:text-blue-400'
               : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
           }`}
         >
@@ -286,7 +286,7 @@ export const NGOVerification: React.FC = () => {
           onClick={() => setActiveTab('all')}
           className={`px-4 py-2.5 text-xs sm:text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap ${
             activeTab === 'all'
-              ? 'border-emerald-600 text-emerald-700 dark:text-emerald-400'
+              ? 'border-emerald-600 text-emerald-700 dark:text-blue-400'
               : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
           }`}
         >
@@ -304,7 +304,7 @@ export const NGOVerification: React.FC = () => {
           placeholder="Search by organization name, registration number, contact person, or city..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-10 pr-4 py-2.5 text-sm bg-white dark:bg-[#11171D] border border-slate-200 dark:border-[#1E293B] rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+          className="w-full pl-10 pr-4 py-2.5 text-sm bg-white dark:bg-[#111827] border border-slate-200 dark:border-[#1E293B] rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
         />
         <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
       </div>
@@ -330,7 +330,7 @@ export const NGOVerification: React.FC = () => {
           size="lg"
         >
           <div className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-slate-50 dark:bg-[#131B22] p-4 rounded-xl border border-slate-200 dark:border-[#1E293B]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-slate-50 dark:bg-[#0F172A] p-4 rounded-xl border border-slate-200 dark:border-[#1E293B]">
               <div>
                 <span className="text-slate-400 block mb-0.5">Registration Number</span>
                 <span className="font-semibold text-slate-800 dark:text-slate-200">{selectedNgo.registrationNumber || 'N/A'}</span>
@@ -453,7 +453,7 @@ export const NGOVerification: React.FC = () => {
               placeholder="e.g. Invalid DARPAN ID / Registration documents mismatch..."
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
-              className="w-full p-2.5 text-xs bg-slate-50 dark:bg-[#131B22] border border-slate-200 dark:border-[#1E293B] rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500"
+              className="w-full p-2.5 text-xs bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-[#1E293B] rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500"
             />
             <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-200 dark:border-[#1E293B]">
               <Button variant="outline" onClick={() => setRejectingNgo(null)}>
@@ -476,3 +476,6 @@ export const NGOVerification: React.FC = () => {
 };
 
 export default NGOVerification;
+
+
+

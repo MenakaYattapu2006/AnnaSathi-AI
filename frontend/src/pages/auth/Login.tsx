@@ -51,23 +51,23 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-between text-slate-900 dark:text-slate-100 font-sans antialiased bg-slate-50 dark:bg-[#090D10] relative selection:bg-brand-900 selection:text-white transition-colors duration-200">
+    <div className="min-h-screen flex flex-col justify-between text-slate-900 dark:text-slate-100 font-sans antialiased bg-slate-50 dark:bg-[#0B0F17] relative selection:bg-brand-900 dark:selection:bg-blue-600 selection:text-white transition-colors duration-200">
       {/* Subtle Dot Grid Background */}
       <div className="fixed inset-0 grid-bg-pattern pointer-events-none z-0" />
 
-      {/* Dynamic Animated Emerald Rain Background */}
+      {/* Dynamic Animated Rain Background */}
       <div className="auth-rain-container" />
 
       {/* Ambient Top Lighting */}
-      <div className="absolute -top-[300px] left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-emerald-500/10 blur-[130px] rounded-full pointer-events-none" />
+      <div className="absolute -top-[300px] left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-emerald-500/10 dark:bg-blue-500/10 blur-[130px] rounded-full pointer-events-none" />
 
       {/* Global Header Bar */}
-      <header className="w-full border-b border-slate-200/80 dark:border-[#1E293B] bg-white/70 dark:bg-[#11171D]/80 backdrop-blur-md sticky top-0 z-50">
+      <header className="w-full border-b border-slate-200/80 dark:border-[#1E293B] bg-white/70 dark:bg-[#111827]/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5 no-underline group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-900 via-emerald-800 to-teal-700 flex items-center justify-center text-white shadow-sm ring-1 ring-emerald-900/10 transition-transform group-hover:scale-105">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-900 via-emerald-800 to-teal-700 dark:from-blue-700 dark:via-blue-600 dark:to-cyan-600 flex items-center justify-center text-white shadow-sm ring-1 ring-emerald-900/10 dark:ring-blue-500/20 transition-transform group-hover:scale-105">
               <svg
-                className="w-5 h-5 text-emerald-300"
+                className="w-5 h-5 text-emerald-300 dark:text-blue-200"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -85,13 +85,13 @@ const Login: React.FC = () => {
           </Link>
 
           <div className="flex items-center gap-4 text-xs font-medium text-slate-600 dark:text-slate-400">
-            <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/60 dark:border-emerald-800/40 text-emerald-800 dark:text-emerald-300">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-blue-950/40 border border-emerald-200/60 dark:border-blue-800/40 text-emerald-800 dark:text-blue-300">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-blue-400 animate-pulse" />
               <span>Zero-Waste Operations Live</span>
             </div>
             <span className="hidden md:inline-block text-slate-300 dark:text-slate-700">|</span>
             <div className="hidden md:flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
-              <ShieldCheck className="w-4 h-4 text-emerald-700 dark:text-emerald-400" />
+              <ShieldCheck className="w-4 h-4 text-emerald-700 dark:text-blue-400" />
               <span>256-Bit TLS Secured</span>
             </div>
           </div>
@@ -102,14 +102,14 @@ const Login: React.FC = () => {
       <main className="flex-grow flex items-center justify-center px-4 sm:px-6 py-12 relative z-10">
         <div className="w-full max-w-md">
           {/* Premium Auth Card */}
-          <div className="bg-white dark:bg-[#11171D] rounded-2xl border border-slate-200/90 dark:border-[#1E293B] shadow-premium p-8 sm:p-10 relative overflow-hidden transition-colors">
+          <div className="bg-white dark:bg-[#111827] rounded-2xl border border-slate-200/90 dark:border-[#1E293B] shadow-premium p-8 sm:p-10 relative overflow-hidden transition-colors">
             {/* Accent Top Bar */}
-            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-brand-900 via-emerald-600 to-teal-500" />
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-brand-900 via-emerald-600 to-teal-500 dark:from-blue-600 dark:via-blue-500 dark:to-cyan-400" />
 
             {/* Header */}
             <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-brand-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800/40 text-brand-900 dark:text-emerald-300 mb-4 shadow-sm">
-                <Lock className="w-6 h-6 text-brand-900 dark:text-emerald-400" />
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-brand-50 dark:bg-blue-950/60 border border-emerald-100 dark:border-blue-800/40 text-brand-900 dark:text-blue-300 mb-4 shadow-sm">
+                <Lock className="w-6 h-6 text-brand-900 dark:text-blue-400" />
               </div>
               <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
                 Welcome to AnnaSathi AI
@@ -159,7 +159,7 @@ const Login: React.FC = () => {
                       setError(null);
                     }}
                     placeholder="Enter your email"
-                    className="block w-full pl-10 pr-3.5 py-2.5 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg bg-slate-50/40 dark:bg-[#131B22] hover:bg-white dark:hover:bg-[#18222b] auth-input-glow placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                    className="block w-full pl-10 pr-3.5 py-2.5 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg bg-slate-50/40 dark:bg-[#0F172A] hover:bg-white dark:hover:bg-[#1E293B] auth-input-glow placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   />
                 </div>
               </div>
@@ -175,7 +175,7 @@ const Login: React.FC = () => {
                   </label>
                   <Link
                     to="/forgot-password"
-                    className="text-xs font-semibold text-brand-900 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:underline transition-colors"
+                    className="text-xs font-semibold text-brand-900 dark:text-blue-400 hover:text-emerald-700 dark:hover:text-blue-400 hover:underline transition-colors"
                   >
                     Forgot password?
                   </Link>
@@ -194,7 +194,7 @@ const Login: React.FC = () => {
                       setError(null);
                     }}
                     placeholder="Enter your password"
-                    className="block w-full pl-10 pr-10 py-2.5 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg bg-slate-50/40 dark:bg-[#131B22] hover:bg-white dark:hover:bg-[#18222b] auth-input-glow placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                    className="block w-full pl-10 pr-10 py-2.5 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg bg-slate-50/40 dark:bg-[#0F172A] hover:bg-white dark:hover:bg-[#1E293B] auth-input-glow placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   />
                   <button
                     type="button"
@@ -211,7 +211,7 @@ const Login: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-brand-900 hover:bg-[#134E3F] dark:bg-emerald-700 dark:hover:bg-emerald-600 text-white text-sm font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-900/40 focus:ring-offset-2 transition-all duration-150 disabled:opacity-60 cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-brand-900 hover:bg-[#134E3F] dark:bg-blue-600 dark:hover:bg-blue-500 text-white text-sm font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-900/40 dark:focus:ring-blue-500/40 focus:ring-offset-2 transition-all duration-150 disabled:opacity-60 cursor-pointer"
               >
                 <span>{isSubmitting ? 'Authenticating...' : 'Sign In to Dashboard'}</span>
                 <ArrowRight className="w-4 h-4" />
@@ -224,7 +224,7 @@ const Login: React.FC = () => {
                 Don't have an account?{' '}
                 <Link
                   to="/register"
-                  className="font-semibold text-brand-900 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 underline decoration-emerald-500/30 underline-offset-4 transition-colors"
+                  className="font-semibold text-brand-900 dark:text-blue-400 hover:text-emerald-700 dark:hover:text-blue-400 underline decoration-emerald-500/30 dark:decoration-blue-500/30 dark:decoration-blue-500/30 underline-offset-4 transition-colors"
                 >
                   Register as a Partner
                 </Link>
@@ -235,7 +235,7 @@ const Login: React.FC = () => {
       </main>
 
       {/* Global Footer */}
-      <footer className="w-full border-t border-slate-200/80 dark:border-[#1E293B] bg-white/60 dark:bg-[#11171D]/60 backdrop-blur-xs py-6 relative z-10">
+      <footer className="w-full border-t border-slate-200/80 dark:border-[#1E293B] bg-white/60 dark:bg-[#111827]/60 backdrop-blur-xs py-6 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
           <div>
             &copy; {new Date().getFullYear()} AnnaSathi AI Technologies Inc. All rights reserved.
@@ -253,3 +253,6 @@ const Login: React.FC = () => {
 };
 
 export default Login;
+
+
+

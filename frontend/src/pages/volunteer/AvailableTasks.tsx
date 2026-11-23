@@ -499,7 +499,7 @@ const AvailableTasks: React.FC = () => {
                   {/* Route Overview */}
                   <div className="space-y-2 text-xs pt-1 border-t border-border">
                     <div className="flex items-start gap-2">
-                      <div className="mt-0.5 h-2 w-2 rounded-full bg-emerald-500 flex-shrink-0" />
+                      <div className="mt-0.5 h-2 w-2 rounded-full bg-emerald-500 dark:bg-blue-400 flex-shrink-0" />
                       <div className="truncate">
                         <span className="text-secondary-text block text-[11px]">Pickup Location:</span>
                         <span className="font-medium text-primary-text">
@@ -569,7 +569,7 @@ const AvailableTasks: React.FC = () => {
                     size="sm"
                     onClick={() => handleAcceptTask(task.id)}
                     disabled={acceptingId === task.id}
-                    className="text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
+                    className="text-xs bg-emerald-600 hover:bg-emerald-700 dark:bg-blue-600 dark:hover:bg-blue-500 text-white"
                   >
                     <CheckCircle2 size={14} className="mr-1" />
                     {acceptingId === task.id ? 'Claiming...' : 'Accept Task'}
@@ -604,3 +604,7 @@ const AvailableTasks: React.FC = () => {
 };
 
 export default AvailableTasks;
+
+
+
+

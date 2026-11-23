@@ -296,7 +296,7 @@ const CreateDonation: React.FC = () => {
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value as FoodCategory)}
-                  className="w-full rounded-md border border-border dark:border-[#1E293B] bg-white dark:bg-[#131B22] text-primary-text dark:text-slate-100 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary"
+                  className="w-full rounded-md border border-border dark:border-[#1E293B] bg-white dark:bg-[#0F172A] text-primary-text dark:text-slate-100 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary"
                 >
                   {FOOD_CATEGORIES.map((cat) => (
                     <option key={cat.value} value={cat.value}>
@@ -356,7 +356,7 @@ const CreateDonation: React.FC = () => {
                 <select
                   value={unit}
                   onChange={(e) => setUnit(e.target.value as QuantityUnit)}
-                  className="w-full rounded-md border border-border dark:border-[#1E293B] bg-white dark:bg-[#131B22] text-primary-text dark:text-slate-100 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary"
+                  className="w-full rounded-md border border-border dark:border-[#1E293B] bg-white dark:bg-[#0F172A] text-primary-text dark:text-slate-100 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary"
                 >
                   {UNITS.map((u) => (
                     <option key={u.value} value={u.value}>
@@ -461,7 +461,7 @@ const CreateDonation: React.FC = () => {
                 placeholder="e.g. Collect from kitchen back entrance. Bring large crates or thermal food carrier."
                 value={specialInstructions}
                 onChange={(e) => setSpecialInstructions(e.target.value)}
-                className="w-full rounded-md border border-border dark:border-[#1E293B] bg-white dark:bg-[#131B22] text-primary-text dark:text-slate-100 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary"
+                className="w-full rounded-md border border-border dark:border-[#1E293B] bg-white dark:bg-[#0F172A] text-primary-text dark:text-slate-100 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary"
               />
             </div>
           </div>
@@ -492,3 +492,6 @@ const CreateDonation: React.FC = () => {
 };
 
 export default CreateDonation;
+
+
+

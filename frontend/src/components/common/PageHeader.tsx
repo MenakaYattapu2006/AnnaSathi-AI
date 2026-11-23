@@ -43,7 +43,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
           {breadcrumb.map((item, idx) => (
             <span key={idx} className="flex items-center">
               {item.href ? (
-                <NavLink to={item.href} className="hover:underline hover:text-emerald-600 dark:hover:text-emerald-400">
+                <NavLink to={item.href} className="hover:underline hover:text-emerald-600 dark:hover:text-blue-400">
                   {item.label}
                 </NavLink>
               ) : (
@@ -68,3 +68,6 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
     </header>
   );
 };
+
+
+

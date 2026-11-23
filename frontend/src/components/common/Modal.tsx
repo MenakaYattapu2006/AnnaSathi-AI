@@ -149,7 +149,7 @@ export const Modal: React.FC<ModalProps> = ({
     >
       <div
         ref={modalRef}
-        className={`bg-white dark:bg-[#11171D] border border-slate-200 dark:border-[#1E293B] rounded-2xl shadow-2xl ${sizeClasses[size]} w-full overflow-hidden text-slate-800 dark:text-slate-100 transition-colors duration-200 ${className}`}
+        className={`bg-white dark:bg-[#111827] border border-slate-200 dark:border-[#1E293B] rounded-2xl shadow-2xl ${sizeClasses[size]} w-full overflow-hidden text-slate-800 dark:text-slate-100 transition-colors duration-200 ${className}`}
         role="document"
         onKeyDown={handleKeyDown}
       >
@@ -170,7 +170,7 @@ export const Modal: React.FC<ModalProps> = ({
         </div>
         <div className="p-6 text-sm leading-relaxed">{children}</div>
         {footerAction && (
-          <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-100 dark:border-[#1E293B] bg-slate-50/50 dark:bg-[#131B22]">
+          <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-100 dark:border-[#1E293B] bg-slate-50/50 dark:bg-[#0F172A]">
             <Button
               variant={footerAction.variant ?? 'primary'}
               onClick={footerAction.onClick}
@@ -183,3 +183,6 @@ export const Modal: React.FC<ModalProps> = ({
     </div>
   );
 };
+
+
+

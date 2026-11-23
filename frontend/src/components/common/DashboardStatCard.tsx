@@ -46,7 +46,7 @@ export const DashboardStatCard: React.FC<DashboardStatCardProps> = ({
   return (
     <Card className="p-5 hover:shadow-md transition-shadow">
       <div className="flex items-center gap-4">
-        {icon && <div className="text-emerald-700 dark:text-emerald-400 text-2xl flex-shrink-0">{icon}</div>}
+        {icon && <div className="text-emerald-700 dark:text-blue-400 text-2xl flex-shrink-0">{icon}</div>}
         <div className="flex-1 min-w-0">
           <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">{title}</p>
           <p className="text-3xl font-extrabold text-slate-900 dark:text-white mt-1 tracking-tight">{value}</p>
@@ -62,3 +62,6 @@ export const DashboardStatCard: React.FC<DashboardStatCardProps> = ({
     </Card>
   );
 };
+
+
+

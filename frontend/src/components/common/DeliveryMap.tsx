@@ -222,7 +222,7 @@ export const DeliveryMap: React.FC<DeliveryMapProps> = ({
   return (
     <div className="relative rounded-xl overflow-hidden border border-slate-200 dark:border-[#1E293B] shadow-sm">
       <div ref={mapContainerRef} style={{ height, width: '100%', zIndex: 1 }} />
-      <div className="absolute bottom-3 left-3 bg-white/95 dark:bg-[#11171D]/95 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-md border border-slate-200 dark:border-[#1E293B] text-xs text-slate-700 dark:text-slate-200 flex flex-wrap items-center gap-3 z-10">
+      <div className="absolute bottom-3 left-3 bg-white/95 dark:bg-[#111827]/95 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-md border border-slate-200 dark:border-[#1E293B] text-xs text-slate-700 dark:text-slate-200 flex flex-wrap items-center gap-3 z-10">
         <span className="flex items-center gap-1.5 font-medium">
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block shadow-xs"></span>
           Pickup (P)
@@ -241,3 +241,6 @@ export const DeliveryMap: React.FC<DeliveryMapProps> = ({
     </div>
   );
 };
+
+
+

@@ -35,7 +35,7 @@ export const Table = <T,>({ columns, data, emptyState, className = '' }: TablePr
   return (
     <div className={`overflow-x-auto rounded-xl border border-slate-200 dark:border-[#1E293B] ${className}`}>
       <table className="min-w-full divide-y divide-slate-200 dark:divide-[#1E293B]">
-        <thead className="bg-slate-50 dark:bg-[#131B22]">
+        <thead className="bg-slate-50 dark:bg-[#0F172A]">
           <tr>
             {columns.map((col, idx) => (
               <th
@@ -49,7 +49,7 @@ export const Table = <T,>({ columns, data, emptyState, className = '' }: TablePr
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-200 dark:divide-[#1E293B] bg-white dark:bg-[#11171D]">
+        <tbody className="divide-y divide-slate-200 dark:divide-[#1E293B] bg-white dark:bg-[#111827]">
           {data.map((row, rowIndex) => (
             <tr
               key={rowIndex}
@@ -72,3 +72,6 @@ export const Table = <T,>({ columns, data, emptyState, className = '' }: TablePr
     </div>
   );
 };
+
+
+

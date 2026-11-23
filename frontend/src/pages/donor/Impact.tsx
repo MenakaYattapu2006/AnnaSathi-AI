@@ -245,3 +245,6 @@ const Impact: React.FC = () => {
 };
 
 export default Impact;
+
+
+

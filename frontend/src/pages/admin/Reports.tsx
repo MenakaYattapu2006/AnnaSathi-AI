@@ -229,12 +229,12 @@ export const Reports: React.FC = () => {
 
         <Card className="p-5">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-lg bg-emerald-500/10 dark:bg-blue-500/15 text-emerald-600 dark:text-blue-400 dark:text-blue-400 flex items-center justify-center">
               <Leaf size={20} />
             </div>
             <div>
               <p className="text-xs text-secondary-text">CO2 Offset (Illustrative)</p>
-              <p className="text-2xl font-bold text-emerald-600">~{stats.co2OffsetKg} kg</p>
+              <p className="text-2xl font-bold text-emerald-600 dark:text-blue-400">~{stats.co2OffsetKg} kg</p>
             </div>
           </div>
           <p className="text-xs text-secondary-text mt-3 pt-2 border-t border-border">
@@ -476,3 +476,7 @@ export const Reports: React.FC = () => {
 };
 
 export default Reports;
+
+
+
+

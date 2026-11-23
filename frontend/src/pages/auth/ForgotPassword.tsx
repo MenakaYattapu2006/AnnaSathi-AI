@@ -121,19 +121,19 @@ const ForgotPassword: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-between text-slate-900 dark:text-slate-100 font-sans antialiased bg-slate-50 dark:bg-[#090D10] relative selection:bg-brand-900 selection:text-white transition-colors duration-200">
+    <div className="min-h-screen flex flex-col justify-between text-slate-900 dark:text-slate-100 font-sans antialiased bg-slate-50 dark:bg-[#0B0F17] relative selection:bg-brand-900 dark:selection:bg-blue-600 selection:text-white transition-colors duration-200">
       {/* Subtle Dot Grid Background */}
       <div className="fixed inset-0 grid-bg-pattern pointer-events-none z-0" />
 
       {/* Ambient Top Lighting */}
-      <div className="absolute -top-[300px] left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-emerald-500/10 blur-[130px] rounded-full pointer-events-none" />
+      <div className="absolute -top-[300px] left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-emerald-500/10 dark:bg-blue-500/15 blur-[130px] rounded-full pointer-events-none" />
 
       {/* Header Bar */}
-      <header className="w-full border-b border-slate-200/80 dark:border-[#1E293B] bg-white/70 dark:bg-[#11171D]/80 backdrop-blur-md sticky top-0 z-50">
+      <header className="w-full border-b border-slate-200/80 dark:border-[#1E293B] bg-white/70 dark:bg-[#111827]/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5 no-underline group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-900 via-emerald-800 to-teal-700 flex items-center justify-center text-white shadow-sm ring-1 ring-emerald-900/10 transition-transform group-hover:scale-105">
-              <KeyRound className="w-5 h-5 text-emerald-300" />
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-900 via-emerald-800 to-teal-700 dark:from-blue-600 dark:via-blue-500 dark:to-cyan-600 flex items-center justify-center text-white shadow-sm ring-1 ring-emerald-900/10 dark:ring-blue-500/20 transition-transform group-hover:scale-105">
+              <KeyRound className="w-5 h-5 text-emerald-300 dark:text-cyan-200" />
             </div>
             <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
               AnnaSathi AI
@@ -141,7 +141,7 @@ const ForgotPassword: React.FC = () => {
           </Link>
 
           <div className="flex items-center gap-3 text-xs font-medium text-slate-600 dark:text-slate-400">
-            <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-blue-400" />
             <span>Brevo Email Verification Protected</span>
           </div>
         </div>
@@ -150,14 +150,14 @@ const ForgotPassword: React.FC = () => {
       {/* Main Content Layout */}
       <main className="flex-grow flex items-center justify-center px-4 sm:px-6 py-12 relative z-10">
         <div className="w-full max-w-md">
-          <div className="bg-white dark:bg-[#11171D] rounded-2xl border border-slate-200/90 dark:border-[#1E293B] shadow-premium p-8 sm:p-10 relative overflow-hidden transition-colors">
+          <div className="bg-white dark:bg-[#111827] rounded-2xl border border-slate-200/90 dark:border-[#1E293B] shadow-premium p-8 sm:p-10 relative overflow-hidden transition-colors">
             {/* Accent Top Bar */}
-            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-brand-900 via-emerald-600 to-teal-500" />
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-brand-900 via-emerald-600 to-teal-500 dark:from-blue-600 dark:via-blue-500 dark:to-cyan-400" />
 
             {/* Header */}
             <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-brand-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800/40 text-brand-900 dark:text-emerald-300 mb-4 shadow-sm">
-                <KeyRound className="w-6 h-6 text-brand-900 dark:text-emerald-400" />
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-brand-50 dark:bg-blue-950/60 dark:bg-blue-950/60 border border-emerald-100 dark:border-blue-800/40 dark:border-blue-800/40 text-brand-900 dark:text-blue-400 dark:text-blue-300 mb-4 shadow-sm">
+                <KeyRound className="w-6 h-6 text-brand-900 dark:text-blue-400 dark:text-blue-400" />
               </div>
               <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
                 {step === 1 ? 'Reset Your Password' : 'Enter Verification Code'}
@@ -171,8 +171,8 @@ const ForgotPassword: React.FC = () => {
 
             {/* Notifications */}
             {success && (
-              <div className="mb-6 bg-emerald-50/90 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 rounded-xl p-3.5 flex items-start gap-3 text-sm">
-                <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
+              <div className="mb-6 bg-emerald-50/90 dark:bg-blue-950/40 dark:bg-blue-950/40 border border-emerald-200 dark:border-blue-800/40 dark:border-blue-800/40 text-emerald-800 dark:text-blue-300 dark:text-blue-300 rounded-xl p-3.5 flex items-start gap-3 text-sm">
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
                 <p className="font-medium leading-relaxed">{success}</p>
               </div>
             )}
@@ -208,7 +208,7 @@ const ForgotPassword: React.FC = () => {
                         setError(null);
                       }}
                       placeholder="name@example.com"
-                      className="block w-full pl-10 pr-3.5 py-2.5 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg focus:border-brand-900 dark:focus:border-emerald-500 focus:ring-2 focus:ring-brand-900/20 bg-slate-50/40 dark:bg-[#131B22] hover:bg-white dark:hover:bg-[#18222b] transition-all placeholder:text-slate-400 outline-none"
+                      className="block w-full pl-10 pr-3.5 py-2.5 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg focus:border-brand-900 dark:focus:border-blue-500 dark:focus:border-blue-500 focus:ring-2 focus:ring-brand-900/20 dark:focus:ring-blue-500/20 bg-slate-50/40 dark:bg-[#0F172A] hover:bg-white dark:hover:bg-[#1E293B] transition-all placeholder:text-slate-400 outline-none"
                     />
                   </div>
                 </div>
@@ -216,7 +216,7 @@ const ForgotPassword: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-brand-900 hover:bg-[#134E3F] dark:bg-emerald-700 dark:hover:bg-emerald-600 text-white text-sm font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-900/40 transition-all disabled:opacity-60 cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-brand-900 hover:bg-[#134E3F] dark:bg-blue-600 dark:hover:bg-blue-500 text-white text-sm font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-900/40 transition-all disabled:opacity-60 cursor-pointer"
                 >
                   <span>{isLoading ? 'Dispatching Reset Code...' : 'Send Recovery Code'}</span>
                   <ArrowRight className="w-4 h-4" />
@@ -246,7 +246,7 @@ const ForgotPassword: React.FC = () => {
                       setError(null);
                     }}
                     placeholder="123456"
-                    className="block w-full py-2.5 px-3 text-center text-xl font-bold tracking-[8px] text-brand-900 dark:text-emerald-400 border border-slate-300 dark:border-[#1E293B] rounded-lg focus:border-brand-900 dark:focus:border-emerald-500 focus:ring-2 focus:ring-brand-900/20 bg-slate-50/40 dark:bg-[#131B22] outline-none"
+                    className="block w-full py-2.5 px-3 text-center text-xl font-bold tracking-[8px] text-brand-900 dark:text-blue-400 dark:text-blue-400 border border-slate-300 dark:border-[#1E293B] rounded-lg focus:border-brand-900 dark:focus:border-blue-500 dark:focus:border-blue-500 focus:ring-2 focus:ring-brand-900/20 dark:focus:ring-blue-500/20 bg-slate-50/40 dark:bg-[#0F172A] outline-none"
                   />
                   <div className="flex items-center justify-between mt-2">
                     <span className="text-[11px] text-slate-400">Valid for 10 minutes</span>
@@ -254,7 +254,7 @@ const ForgotPassword: React.FC = () => {
                       type="button"
                       onClick={handleResendOtp}
                       disabled={resendCooldown > 0 || isLoading}
-                      className="text-xs text-brand-900 dark:text-emerald-400 hover:underline flex items-center gap-1 disabled:opacity-50 cursor-pointer"
+                      className="text-xs text-brand-900 dark:text-blue-400 dark:text-blue-400 hover:underline flex items-center gap-1 disabled:opacity-50 cursor-pointer"
                     >
                       <RefreshCw className={`w-3 h-3 ${isLoading ? 'animate-spin' : ''}`} />
                       <span>{resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend Code'}</span>
@@ -284,7 +284,7 @@ const ForgotPassword: React.FC = () => {
                         setError(null);
                       }}
                       placeholder="Min. 8 characters"
-                      className="block w-full pl-10 pr-10 py-2 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg focus:border-brand-900 dark:focus:border-emerald-500 focus:ring-2 focus:ring-brand-900/20 bg-slate-50/40 dark:bg-[#131B22] outline-none"
+                      className="block w-full pl-10 pr-10 py-2 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg focus:border-brand-900 dark:focus:border-blue-500 dark:focus:border-blue-500 focus:ring-2 focus:ring-brand-900/20 dark:focus:ring-blue-500/20 bg-slate-50/40 dark:bg-[#0F172A] outline-none"
                     />
                     <button
                       type="button"
@@ -318,7 +318,7 @@ const ForgotPassword: React.FC = () => {
                         setError(null);
                       }}
                       placeholder="Confirm password"
-                      className="block w-full pl-10 pr-10 py-2 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg focus:border-brand-900 dark:focus:border-emerald-500 focus:ring-2 focus:ring-brand-900/20 bg-slate-50/40 dark:bg-[#131B22] outline-none"
+                      className="block w-full pl-10 pr-10 py-2 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg focus:border-brand-900 dark:focus:border-blue-500 dark:focus:border-blue-500 focus:ring-2 focus:ring-brand-900/20 dark:focus:ring-blue-500/20 bg-slate-50/40 dark:bg-[#0F172A] outline-none"
                     />
                     <button
                       type="button"
@@ -334,7 +334,7 @@ const ForgotPassword: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full mt-2 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-brand-900 hover:bg-[#134E3F] dark:bg-emerald-700 dark:hover:bg-emerald-600 text-white text-sm font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-900/40 transition-all disabled:opacity-60 cursor-pointer"
+                  className="w-full mt-2 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-brand-900 hover:bg-[#134E3F] dark:bg-blue-600 dark:hover:bg-blue-500 text-white text-sm font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-900/40 transition-all disabled:opacity-60 cursor-pointer"
                 >
                   <span>{isLoading ? 'Updating Password...' : 'Save New Password & Sign In'}</span>
                   <ArrowRight className="w-4 h-4" />
@@ -362,7 +362,7 @@ const ForgotPassword: React.FC = () => {
                 Remember your password?{' '}
                 <Link
                   to="/login"
-                  className="font-semibold text-brand-900 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 underline decoration-emerald-500/30 underline-offset-4 transition-colors"
+                  className="font-semibold text-brand-900 dark:text-blue-400 dark:text-blue-400 hover:text-emerald-700 dark:hover:text-blue-400 underline decoration-emerald-500/30 dark:decoration-blue-500/30 underline-offset-4 transition-colors"
                 >
                   Back to Sign In
                 </Link>
@@ -373,7 +373,7 @@ const ForgotPassword: React.FC = () => {
       </main>
 
       {/* Global Footer */}
-      <footer className="w-full border-t border-slate-200/80 dark:border-[#1E293B] bg-white/60 dark:bg-[#11171D]/60 backdrop-blur-xs py-6 relative z-10">
+      <footer className="w-full border-t border-slate-200/80 dark:border-[#1E293B] bg-white/60 dark:bg-[#111827]/60 backdrop-blur-xs py-6 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
           <div>
             &copy; {new Date().getFullYear()} AnnaSathi AI Technologies Inc. All rights reserved.
@@ -389,3 +389,7 @@ const ForgotPassword: React.FC = () => {
 };
 
 export default ForgotPassword;
+
+
+
+

@@ -350,3 +350,6 @@ export const NGODonationDetailsModal: React.FC<NGODonationDetailsModalProps> = (
     </Modal>
   );
 };
+
+
+

@@ -39,7 +39,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <aside
-      className={`hidden md:flex flex-col w-20 md:w-64 border-r border-slate-200 dark:border-[#1E293B] bg-white dark:bg-[#11171D] flex-shrink-0 min-h-[calc(100vh-4rem)] transition-all duration-200 ${className}`}
+      className={`hidden md:flex flex-col w-20 md:w-64 border-r border-slate-200 dark:border-[#1E293B] bg-white dark:bg-[#111827] flex-shrink-0 min-h-[calc(100vh-4rem)] transition-all duration-200 ${className}`}
       data-purpose="primary-sidebar"
     >
       {/* Navigation Links */}
@@ -52,8 +52,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             title={item.label}
             className={({ isActive }) =>
               isActive
-                ? 'flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-1.5 md:px-3.5 py-2 md:py-2.5 text-xs md:text-sm font-semibold rounded-xl bg-[#0f392b] dark:bg-emerald-950/70 dark:border dark:border-emerald-600/30 text-white shadow-sm shadow-[#0f392b]/20 group transition-all text-center md:text-left'
-                : 'flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-1.5 md:px-3.5 py-2 md:py-2.5 text-xs md:text-sm font-medium rounded-xl text-slate-600 dark:text-slate-400 hover:text-[#0f392b] dark:hover:text-emerald-400 hover:bg-slate-50 dark:hover:bg-[#1A232E] transition-all group text-center md:text-left'
+                ? 'flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-1.5 md:px-3.5 py-2 md:py-2.5 text-xs md:text-sm font-semibold rounded-xl bg-[#0f392b] dark:bg-blue-950/70 dark:border dark:border-blue-500/30 text-white dark:text-blue-200 shadow-sm shadow-[#0f392b]/20 dark:shadow-blue-500/20 group transition-all text-center md:text-left'
+                : 'flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-1.5 md:px-3.5 py-2 md:py-2.5 text-xs md:text-sm font-medium rounded-xl text-slate-600 dark:text-slate-400 hover:text-[#0f392b] dark:hover:text-blue-400 hover:bg-slate-50 dark:hover:bg-[#1E293B] transition-all group text-center md:text-left'
             }
           >
             {({ isActive }) => (
@@ -61,8 +61,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <span
                   className={`flex-shrink-0 ${
                     isActive
-                      ? 'text-emerald-400'
-                      : 'text-slate-400 dark:text-slate-500 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors'
+                      ? 'text-emerald-400 dark:text-blue-400'
+                      : 'text-slate-400 dark:text-slate-500 group-hover:text-emerald-700 dark:group-hover:text-blue-400 transition-colors'
                   }`}
                 >
                   {item.icon}
@@ -83,8 +83,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <span
                     className={`hidden md:inline px-2 py-0.5 text-[11px] font-semibold rounded-full ${
                       isActive
-                        ? 'bg-emerald-800 text-emerald-200'
-                        : 'bg-slate-100 dark:bg-[#1A232E] text-slate-500 dark:text-slate-400'
+                        ? 'bg-emerald-800 dark:bg-blue-900 text-emerald-200 dark:text-blue-200'
+                        : 'bg-slate-100 dark:bg-[#1E293B] text-slate-500 dark:text-slate-400'
                     }`}
                   >
                     {item.badge}
@@ -93,7 +93,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
                 {/* Active indicator dot */}
                 {isActive && (item.badge === undefined || item.badge === null) && (
-                  <span className="hidden md:inline-block w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  <span className="hidden md:inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 dark:bg-blue-400" />
                 )}
               </>
             )}
@@ -103,3 +103,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     </aside>
   );
 };
+
+
+

@@ -142,9 +142,9 @@ export const RouteMapModal: React.FC<RouteMapModalProps> = ({
     >
       <div className="space-y-4">
         {/* Header Task Summary */}
-        <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 bg-slate-50 dark:bg-[#131B22] rounded-xl border border-slate-200 dark:border-[#1E293B]">
+        <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 bg-slate-50 dark:bg-[#0F172A] rounded-xl border border-slate-200 dark:border-[#1E293B]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-blue-400 flex items-center justify-center">
               <Package size={20} />
             </div>
             <div>
@@ -214,9 +214,9 @@ export const RouteMapModal: React.FC<RouteMapModalProps> = ({
         {/* Route Waypoints & Google Maps Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
           {/* Pickup Card */}
-          <div className="p-3.5 rounded-xl border border-emerald-500/30 bg-emerald-50/40 dark:bg-emerald-950/20 text-xs space-y-2">
+          <div className="p-3.5 rounded-xl border border-emerald-500/30 bg-emerald-50/40 dark:bg-blue-950/60 text-xs space-y-2">
             <div className="flex items-center justify-between">
-              <span className="font-semibold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
+              <span className="font-semibold text-emerald-800 dark:text-blue-300 flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
                 Pickup Point (Donor)
               </span>
@@ -224,7 +224,7 @@ export const RouteMapModal: React.FC<RouteMapModalProps> = ({
                 href={pickupGoogleMapsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-[11px] text-emerald-700 dark:text-emerald-400 hover:underline font-medium"
+                className="inline-flex items-center gap-1 text-[11px] text-emerald-700 dark:text-blue-400 hover:underline font-medium"
               >
                 <Navigation size={12} />
                 Navigate Here
@@ -318,3 +318,6 @@ export const RouteMapModal: React.FC<RouteMapModalProps> = ({
     </Modal>
   );
 };
+
+
+
