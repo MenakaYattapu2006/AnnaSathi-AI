@@ -14,6 +14,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { apiClient } from '../../lib/apiClient';
+import { SixDigitOtpInput } from '../../components/auth/SixDigitOtpInput';
 
 const ForgotPassword: React.FC = () => {
   const navigate = useNavigate();
@@ -222,31 +223,27 @@ const ForgotPassword: React.FC = () => {
                 {/* 6-Digit OTP Input */}
                 <div>
                   <label
-                    htmlFor="otp-input"
-                    className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2"
+                    className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2 text-center"
                   >
                     6-Digit Security Code
                   </label>
-                  <input
-                    id="otp-input"
-                    type="text"
-                    required
-                    maxLength={6}
+                  <SixDigitOtpInput
                     value={otp}
-                    onChange={(e) => {
-                      setOtp(e.target.value.replace(/\D/g, ''));
+                    onChange={(val) => {
+                      setOtp(val);
                       setError(null);
                     }}
-                    placeholder="123456"
-                    className="block w-full py-2.5 px-3 text-center text-xl font-bold tracking-[8px] text-brand-900 dark:text-blue-400 dark:text-blue-400 border border-slate-300 dark:border-[#1E293B] rounded-lg focus:border-brand-900 dark:focus:border-blue-500 dark:focus:border-blue-500 focus:ring-2 focus:ring-brand-900/20 dark:focus:ring-blue-500/20 bg-slate-50/40 dark:bg-[#0F172A] outline-none"
+                    disabled={isLoading}
+                    hasError={Boolean(error)}
+                    autoFocus
                   />
-                  <div className="flex items-center justify-between mt-2">
+                  <div className="flex items-center justify-between mt-2.5">
                     <span className="text-[11px] text-slate-400">Valid for 10 minutes</span>
                     <button
                       type="button"
                       onClick={handleResendOtp}
                       disabled={resendCooldown > 0 || isLoading}
-                      className="text-xs text-brand-900 dark:text-blue-400 dark:text-blue-400 hover:underline flex items-center gap-1 disabled:opacity-50 cursor-pointer"
+                      className="text-xs text-brand-900 dark:text-blue-400 hover:underline flex items-center gap-1 disabled:opacity-50 cursor-pointer"
                     >
                       <RefreshCw className={`w-3 h-3 ${isLoading ? 'animate-spin' : ''}`} />
                       <span>{resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend Code'}</span>

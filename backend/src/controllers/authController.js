@@ -83,7 +83,6 @@ export const authController = {
       success: true,
       message: `A 6-digit verification code has been sent to ${normalizedEmail}. Please enter it below to complete registration.`,
       email: normalizedEmail,
-      simulatedOtp: config.isProduction ? undefined : otp,
     });
   },
 
@@ -126,7 +125,6 @@ export const authController = {
     return res.status(200).json({
       success: true,
       message: `New verification code sent to ${normalizedEmail}.`,
-      simulatedOtp: config.isProduction ? undefined : otp,
     });
   },
 

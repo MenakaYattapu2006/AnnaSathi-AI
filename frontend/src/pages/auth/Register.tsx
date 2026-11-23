@@ -17,12 +17,12 @@ import {
   KeyRound,
   CheckCircle2,
   RefreshCw,
-  Sparkles,
   Truck,
 } from 'lucide-react';
 import { apiClient } from '../../lib/apiClient';
 import { useAuth } from '../../contexts/AuthContext';
 import type { UserRole } from '../../types/user';
+import { SixDigitOtpInput } from '../../components/auth/SixDigitOtpInput';
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -46,7 +46,6 @@ const Register: React.FC = () => {
 
   // OTP Fields
   const [otp, setOtp] = useState('');
-  const [simulatedOtp, setSimulatedOtp] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [isResending, setIsResending] = useState(false);
 
@@ -123,10 +122,9 @@ const Register: React.FC = () => {
       if (response?.success) {
         setStep('otp');
         setOtp('');
-        setSimulatedOtp(response?.simulatedOtp || null);
         setResendCooldown(45);
         setSuccessNotice(
-          `A 6-digit verification code has been dispatched via Brevo to ${email.trim()}.`
+          `A 6-digit verification code has been sent to ${email.trim()}.`
         );
       }
     } catch (err: any) {
@@ -187,7 +185,18 @@ const Register: React.FC = () => {
     setError(null);
     setIsResending(true);
 
- 
+    try {
+      const res = await apiClient.auth.resendRegisterOtp(email.trim());
+      if (res?.success) {
+        setResendCooldown(45);
+        setSuccessNotice(`A fresh verification code has been sent to ${email.trim()}.`);
+      }
+    } catch (err: any) {
+      setError(err?.message || 'Failed to resend verification code. Please try again.');
+    } finally {
+      setIsResending(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center text-slate-900 dark:text-slate-100 font-sans antialiased bg-slate-50 dark:bg-[#0B0F17] relative selection:bg-brand-900 dark:selection:bg-blue-600 selection:text-white transition-colors duration-200 px-4 py-8 sm:py-12">
@@ -574,7 +583,7 @@ const Register: React.FC = () => {
                     Verify Your Email
                   </h1>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 max-w-sm mx-auto">
-                    We have dispatched a 6-digit one-time verification code via <strong>Brevo</strong> to:
+                    A 6-digit verification code has been sent to:
                   </p>
                   <p className="text-sm font-semibold text-emerald-700 dark:text-blue-400 mt-1">
                     {email}
@@ -589,50 +598,25 @@ const Register: React.FC = () => {
                   </div>
                 )}
 
-                {/* Developer Simulator Notice if Brevo Key is pending setup */}
-                {simulatedOtp && (
-                  <div className="p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/40 rounded-xl text-amber-900 dark:text-amber-200 text-xs space-y-1">
-                    <div className="flex items-center gap-1.5 font-bold text-amber-800 dark:text-amber-300">
-                      <Sparkles size={14} />
-                      <span>Brevo Email Simulator Active</span>
-                    </div>
-                    <p className="text-[11px] leading-relaxed">
-                      Your verification OTP code is:{' '}
-                      <strong className="font-mono text-sm tracking-widest text-amber-900 dark:text-amber-100 bg-amber-200/50 dark:bg-amber-900/50 px-2 py-0.5 rounded">
-                        {simulatedOtp}
-                      </strong>
-                    </p>
-                  </div>
-                )}
-
                 {/* OTP Form */}
                 <form onSubmit={handleVerifyOtp} className="space-y-5">
                   <div>
                     <label
-                      htmlFor="register-otp"
-                      className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2 text-center"
+                      className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-3 text-center"
                     >
                       Enter 6-Digit Code
                     </label>
-                    <div className="relative max-w-xs mx-auto">
-                      <input
-                        id="register-otp"
-                        type="text"
-                        inputMode="numeric"
-                        pattern="[0-9]*"
-                        maxLength={6}
-                        required
-                        value={otp}
-                        onChange={(e) => {
-                          setOtp(e.target.value.replace(/\D/g, ''));
-                          setError(null);
-                        }}
-                        placeholder="••••••"
-                        autoFocus
-                        className="block w-full py-3 px-4 text-center font-mono text-2xl font-bold tracking-[0.4em] text-slate-900 dark:text-white border-2 border-slate-300 dark:border-[#1E293B] rounded-xl focus:border-emerald-600 dark:focus:border-blue-500 focus:ring-4 focus:ring-emerald-500/20 dark:focus:ring-blue-500/20 bg-slate-50/50 dark:bg-[#0F172A] outline-none transition-all placeholder:tracking-normal placeholder:font-sans placeholder:text-slate-400"
-                      />
-                    </div>
-                    <p className="text-[11px] text-slate-400 dark:text-slate-500 text-center mt-2">
+                    <SixDigitOtpInput
+                      value={otp}
+                      onChange={(val) => {
+                        setOtp(val);
+                        setError(null);
+                      }}
+                      disabled={isVerifying}
+                      hasError={Boolean(error)}
+                      autoFocus
+                    />
+                    <p className="text-[11px] text-slate-400 dark:text-slate-500 text-center mt-2.5">
                       Check your email inbox or spam folder. Code is valid for 10 minutes.
                     </p>
                   </div>
@@ -669,7 +653,7 @@ const Register: React.FC = () => {
                     >
                       <RefreshCw className={`w-3.5 h-3.5 ${isResending ? 'animate-spin' : ''}`} />
                       <span>
-                        {resendCooldown > 0 ? `Resend code in ${resendCooldown}s` : 'Resend Code via Brevo'}
+                        {resendCooldown > 0 ? `Resend code in ${resendCooldown}s` : 'Resend Code'}
                       </span>
                     </button>
                   </div>
@@ -689,9 +673,9 @@ const Register: React.FC = () => {
                 </Link>
               </p>
             </div>
-          </div>
         </div>
       </div>
+    </div>
   );
 };
 
