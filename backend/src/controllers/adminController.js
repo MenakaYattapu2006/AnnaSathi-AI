@@ -136,6 +136,97 @@ export const updateUserStatus = async (req, res, next) => {
   }
 };
 
+// PUT /api/v1/admin/users/:id  (edit any user fields)
+export const updateUserDetails = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { name, email, phone, role, status } = req.body;
+    const fields = [];
+    const params = [];
+    if (name) { params.push(name); fields.push(`name = $${params.length}`); }
+    if (email) { params.push(email); fields.push(`email = $${params.length}`); }
+    if (phone) { params.push(phone); fields.push(`phone = $${params.length}`); }
+    if (role) { params.push(role); fields.push(`role = $${params.length}`); }
+    if (status) { params.push(status); fields.push(`status = $${params.length}`); }
+    if (fields.length === 0) {
+      return res.status(400).json({ success: false, error: 'No fields provided for update' });
+    }
+    params.push(id);
+    const result = await query(
+      `UPDATE users SET ${fields.join(', ')}, updated_at = NOW() WHERE id = $${params.length} RETURNING id, email, name, phone, role, status`,
+      params
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'User not found' });
+    }
+    await query(
+      `INSERT INTO admin_activity_logs (admin_id, action_type, target_id, target_type, description, metadata)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [req.user.id, 'USER_UPDATED', id, 'users', `Admin edited user details`, JSON.stringify(req.body)]
+    );
+    res.status(200).json({ success: true, data: result.rows[0] });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// DELETE /api/v1/admin/users/:id  (remove user completely)
+export const deleteUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (id === req.user.id) {
+      return res.status(400).json({ success: false, error: 'Admin cannot delete own account' });
+    }
+    const result = await query(
+      `DELETE FROM users WHERE id = $1 RETURNING id, email, name`,
+      [id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'User not found' });
+    }
+    await query(
+      `INSERT INTO admin_activity_logs (admin_id, action_type, target_id, target_type, description, metadata)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [req.user.id, 'USER_DELETED', id, 'users', `Admin deleted user`, null]
+    );
+    res.status(200).json({ success: true, message: 'User deleted', data: result.rows[0] });
+  } catch (error) {
+    next(error);
+  }
+};
+export const updateUserStatus = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { is_active, status: reqStatus } = req.body;
+
+    const targetStatus = reqStatus || (is_active === true ? 'active' : is_active === false ? 'suspended' : 'active');
+
+    const result = await query(
+      `UPDATE users SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING id, email, name, role, status, (status = 'active') as is_active`,
+      [targetStatus, id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'User not found' });
+    }
+
+    // Log admin audit action
+    await query(
+      `INSERT INTO admin_activity_logs (admin_id, action_type, target_id, target_type, description, metadata)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [req.user.id, targetStatus === 'active' ? 'USER_ACTIVATED' : 'USER_SUSPENDED', id, 'users', `Admin updated user status to ${targetStatus}`, JSON.stringify({ status: targetStatus })]
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `User status updated to ${targetStatus}`,
+      data: result.rows[0]
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // GET /api/v1/admin/ngos
 export const listNGOs = async (req, res, next) => {
   try {

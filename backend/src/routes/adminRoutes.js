@@ -3,6 +3,8 @@ import {
   getSystemStats,
   listUsers,
   updateUserStatus,
+  updateUserDetails,
+  deleteUser,
   listNGOs,
   reviewNGOVerification,
   listAllDonations,
@@ -19,6 +21,8 @@ router.use(requireRole(['admin']));
 router.get('/stats', getSystemStats);
 router.get('/users', listUsers);
 router.patch('/users/:id/status', updateUserStatus);
+router.put('/users/:id', updateUserDetails);
+router.delete('/users/:id', deleteUser);
 router.get('/ngos', listNGOs);
 router.patch('/ngos/:id/verify', reviewNGOVerification);
 router.get('/donations', listAllDonations);
