@@ -103,7 +103,39 @@ export const listUsers = async (req, res, next) => {
 };
 
 // PATCH /api/v1/admin/users/:id/status
-// Duplicate updateUserStatus removed – original implementation kept above
+// PATCH /api/v1/admin/users/:id/status
+export const updateUserStatus = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { is_active, status: reqStatus } = req.body;
+
+    const targetStatus = reqStatus || (is_active === true ? 'active' : is_active === false ? 'suspended' : 'active');
+
+    const result = await query(
+      `UPDATE users SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING id, email, name, role, status, (status = 'active') as is_active`,
+      [targetStatus, id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'User not found' });
+    }
+
+    // Log admin audit action
+    await query(
+      `INSERT INTO admin_activity_logs (admin_id, action_type, target_id, target_type, description, metadata)`
+      + ` VALUES ($1, $2, $3, $4, $5, $6)`,
+      [req.user.id, targetStatus === 'active' ? 'USER_ACTIVATED' : 'USER_SUSPENDED', id, 'users', `Admin updated user status to ${targetStatus}`, JSON.stringify({ status: targetStatus })]
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `User status updated to ${targetStatus}`,
+      data: result.rows[0]
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 // PUT /api/v1/admin/users/:id  (edit any user fields)
 export const updateUserDetails = async (req, res, next) => {
@@ -163,7 +195,39 @@ export const deleteUser = async (req, res, next) => {
     next(error);
   }
 };
-// Duplicate updateUserStatus removed – original implementation kept above
+// PATCH /api/v1/admin/users/:id/status
+export const updateUserStatus = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { is_active, status: reqStatus } = req.body;
+
+    const targetStatus = reqStatus || (is_active === true ? 'active' : is_active === false ? 'suspended' : 'active');
+
+    const result = await query(
+      `UPDATE users SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING id, email, name, role, status, (status = 'active') as is_active`,
+      [targetStatus, id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'User not found' });
+    }
+
+    // Log admin audit action
+    await query(
+      `INSERT INTO admin_activity_logs (admin_id, action_type, target_id, target_type, description, metadata)`
+      + ` VALUES ($1, $2, $3, $4, $5, $6)`,
+      [req.user.id, targetStatus === 'active' ? 'USER_ACTIVATED' : 'USER_SUSPENDED', id, 'users', `Admin updated user status to ${targetStatus}`, JSON.stringify({ status: targetStatus })]
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `User status updated to ${targetStatus}`,
+      data: result.rows[0]
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 // GET /api/v1/admin/ngos
 export const listNGOs = async (req, res, next) => {
