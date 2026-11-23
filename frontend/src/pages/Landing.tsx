@@ -115,10 +115,6 @@ export const Landing: React.FC = () => {
                 <span className="text-xl font-bold tracking-tight text-[#0f392b] dark:text-blue-400">
                   AnnaSathi AI
                 </span>
-                <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-blue-950/60 text-emerald-700 dark:text-cyan-300 border border-emerald-200 dark:border-blue-800/40/60 dark:border-blue-800/40 dark:border-blue-800/40 text-xs font-semibold shadow-xs">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-50 dark:bg-blue-950/600 dark:bg-blue-400 animate-pulse" />
-                  AI Network
-                </span>
               </div>
             </a>
           </div>
@@ -385,13 +381,13 @@ export const Landing: React.FC = () => {
             <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[700px] h-[360px] bg-emerald-100 dark:bg-blue-950/60/50 dark:bg-blue-950/20 blur-[130px] pointer-events-none rounded-full -z-10" />
             <div className="absolute top-1/3 -right-20 w-[420px] h-[420px] bg-slate-100/60 dark:bg-slate-800/10 blur-[110px] pointer-events-none rounded-full -z-10" />
 
-            <div className="max-w-5xl mx-auto px-4 sm:px-8 lg:px-12">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <ScrollReveal animation="fade-up" duration={700}>
-                <div className="flex flex-col items-center text-center">
-                  {/* Hero Text Content */}
-                  <div className="w-full flex flex-col items-center">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+                  {/* Left Column: Hero Text Content */}
+                  <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left">
                     {/* AI Pill Badge */}
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white dark:bg-[#0F172A] border border-slate-200/80 dark:border-[#1E293B] shadow-sm mb-5 max-w-full">
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white dark:bg-[#0F172A] border border-slate-200/80 dark:border-[#1E293B] shadow-sm mb-5 max-w-full">
                       <span className="w-2 h-2 rounded-full bg-[#15803d] dark:bg-blue-500 animate-pulse shadow-[0_0_8px_#22c55e] shrink-0" />
                       <span className="text-[11px] sm:text-xs font-semibold tracking-wide text-slate-800 dark:text-slate-200 truncate">
                         AI-Powered Hunger Prevention &amp; Food Rescue Network
@@ -399,7 +395,7 @@ export const Landing: React.FC = () => {
                     </div>
 
                     {/* Main Heading with TextType Transition */}
-                    <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-[#0f392b] dark:text-white tracking-tight leading-[1.2] sm:leading-[1.15] mb-5 sm:mb-6 max-w-4xl px-2">
+                    <h1 className="text-3xl sm:text-5xl lg:text-5.5xl font-extrabold text-[#0f392b] dark:text-white tracking-tight leading-[1.2] sm:leading-[1.15] mb-5 sm:mb-6 max-w-2xl">
                       <TextType
                         text="Bridging the Gap Between Food Waste and Hunger."
                         as="span"
@@ -464,12 +460,12 @@ export const Landing: React.FC = () => {
                     </h1>
 
                     {/* Supporting Description */}
-                    <p className="text-sm sm:text-lg text-slate-600 dark:text-slate-400 mb-6 sm:mb-8 max-w-2xl leading-relaxed px-2">
+                    <p className="text-sm sm:text-base lg:text-lg text-slate-600 dark:text-slate-400 mb-6 sm:mb-8 max-w-xl leading-relaxed">
                       Every meal matters. AnnaSathi AI connects surplus food with people who need it through verified NGOs, dedicated volunteers, and intelligent AI-powered food rescue.
                     </p>
 
                     {/* CTA Buttons */}
-                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 mb-6 w-full sm:w-auto px-4 sm:px-0">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3 sm:gap-4 mb-6 w-full sm:w-auto">
                       <Link
                         to={isAuthenticated && user?.role === 'donor' ? '/donor/create-donation' : '/login'}
                         className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-[#15803d] dark:bg-blue-600 text-white font-semibold text-sm hover:bg-[#0f392b] dark:hover:bg-blue-500 transition-all duration-200 shadow-sm hover:shadow-md"
@@ -487,11 +483,62 @@ export const Landing: React.FC = () => {
                     </div>
 
                     {/* Trust Subtext */}
-                    <div className="flex items-center justify-center gap-2 text-slate-600 dark:text-slate-400 pt-2 px-3 text-center">
+                    <div className="flex items-center justify-center lg:justify-start gap-2 text-slate-600 dark:text-slate-400 pt-1 text-center lg:text-left">
                       <Leaf className="w-4 h-4 text-[#15803d] dark:text-blue-400 shrink-0" />
                       <span className="text-xs sm:text-sm font-medium">
                         Together, let's build a world where no meal goes to waste.
                       </span>
+                    </div>
+                  </div>
+
+                  {/* Right Column: Hero Visual Image Card with Floating Badges */}
+                  <div className="lg:col-span-5 w-full relative">
+                    <div className="relative mx-auto max-w-md lg:max-w-none">
+                      {/* Ambient Image Glow */}
+                      <div className="absolute -inset-2 bg-gradient-to-r from-emerald-500/20 via-teal-500/15 to-blue-500/20 dark:from-blue-600/20 dark:via-cyan-500/15 dark:to-indigo-500/20 rounded-3xl blur-xl opacity-75 -z-10" />
+
+                      {/* Main Featured Image Container */}
+                      <div className="relative rounded-2xl overflow-hidden border border-slate-200/90 dark:border-[#1E293B] shadow-2xl bg-white dark:bg-[#111827] group">
+                        <img
+                          src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=1200&auto=format&fit=crop"
+                          alt="Food rescue distribution and community meal sharing"
+                          className="w-full h-[320px] sm:h-[380px] lg:h-[420px] object-cover transition-transform duration-700 group-hover:scale-105"
+                          loading="eager"
+                        />
+                        {/* Gradient overlay on image */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none" />
+
+                        {/* Bottom Tag inside Image */}
+                        <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white text-xs backdrop-blur-md bg-black/40 px-3.5 py-2 rounded-xl border border-white/10">
+                          <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                            <span className="font-medium tracking-wide">Live Food Rescue Logistics</span>
+                          </div>
+                          <span className="font-semibold text-emerald-300">100% Verified</span>
+                        </div>
+                      </div>
+
+                      {/* Floating Badge 1: Top Right - Zero Waste Impact */}
+                      <div className="absolute -top-4 -right-2 sm:-right-4 bg-white/95 dark:bg-[#111827]/95 backdrop-blur-md border border-slate-200 dark:border-[#1E293B] rounded-2xl p-3 shadow-lg flex items-center gap-3 animate-float hidden sm:flex">
+                        <div className="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-blue-950/60 flex items-center justify-center text-[#15803d] dark:text-blue-400">
+                          <Sparkles className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">AI Route Match</div>
+                          <div className="text-xs font-bold text-slate-900 dark:text-white">&lt; 15 Mins Dispatch</div>
+                        </div>
+                      </div>
+
+                      {/* Floating Badge 2: Bottom Left - Community Impact */}
+                      <div className="absolute -bottom-4 -left-2 sm:-left-4 bg-white/95 dark:bg-[#111827]/95 backdrop-blur-md border border-slate-200 dark:border-[#1E293B] rounded-2xl p-3 shadow-lg flex items-center gap-3 hidden sm:flex">
+                        <div className="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-950/40 flex items-center justify-center text-amber-700 dark:text-amber-400">
+                          <HeartHandshake className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Communities Fed</div>
+                          <div className="text-xs font-bold text-slate-900 dark:text-white">98,500+ Nutritious Meals</div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
