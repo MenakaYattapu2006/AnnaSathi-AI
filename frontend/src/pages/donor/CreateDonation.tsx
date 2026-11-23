@@ -49,22 +49,34 @@ const CreateDonation: React.FC = () => {
   };
 
   const [foodName, setFoodName] = useState('');
-  const [category, setCategory] = useState<FoodCategory>('cooked_meals');
-  const [quantity, setQuantity] = useState<number | ''>(50);
-  const [unit, setUnit] = useState<QuantityUnit>('meals');
+  const [category, setCategory] = useState<FoodCategory | ''>('');
+  const [quantity, setQuantity] = useState<number | ''>('');
+  const [unit, setUnit] = useState<QuantityUnit | ''>('');
   const [dietaryType, setDietaryType] = useState<'veg' | 'non-veg'>('veg');
-  const [preparationTime, setPreparationTime] = useState<string>(nowIsoLocal());
-  const [expiryTime, setExpiryTime] = useState<string>(defaultExpiryLocal());
+  const [preparationTime, setPreparationTime] = useState<string>('');
+  const [expiryTime, setExpiryTime] = useState<string>('');
 
-  const [street, setStreet] = useState(user?.profile?.address || 'Road No. 12, Banjara Hills');
-  const [city, setCity] = useState(user?.profile?.city || 'Hyderabad');
-  const [pincode, setPincode] = useState('500034');
-  const [landmark, setLandmark] = useState('Near MLA Colony Gate');
+  const [street, setStreet] = useState(user?.profile?.address || '');
+  const [city, setCity] = useState(user?.profile?.city || '');
+  const [pincode, setPincode] = useState(user?.profile?.pincode || '');
+  const [landmark, setLandmark] = useState('');
   const [specialInstructions, setSpecialInstructions] = useState('');
   const [imageUrl, setImageUrl] = useState('');
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Quick-action time presets
+  const handleSetPrepNow = () => {
+    setPreparationTime(nowIsoLocal());
+  };
+
+  const handleSetExpiryHours = (hours: number) => {
+    const baseTime = preparationTime ? new Date(preparationTime).getTime() : Date.now();
+    const d = new Date(baseTime + hours * 60 * 60 * 1000);
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    setExpiryTime(d.toISOString().slice(0, 16));
+  };
 
   // Real-time rule-based Urgency Score calculation preview
   const [aiUrgency, setAiUrgency] = useState<{
@@ -76,7 +88,7 @@ const CreateDonation: React.FC = () => {
   } | null>(null);
 
   useEffect(() => {
-    if (!preparationTime || !expiryTime) {
+    if (!category || !preparationTime || !expiryTime) {
       setAiUrgency(null);
       return;
     }
@@ -113,11 +125,11 @@ const CreateDonation: React.FC = () => {
         disclaimer: aiUrgency.disclaimer,
       };
     }
-    if (!preparationTime || !expiryTime) {
+    if (!category || !preparationTime || !expiryTime) {
       return {
-        score: 50,
-        level: 'medium' as const,
-        explanation: 'Awaiting valid time window.',
+        score: 0,
+        level: 'low' as const,
+        explanation: 'Select food category and enter preparation & expiry times to compute live urgency.',
         disclaimer: 'DISCLAIMER: Operational dispatch metric, not a certified laboratory food safety test.',
       };
     }
@@ -136,37 +148,58 @@ const CreateDonation: React.FC = () => {
     const newErrors: Record<string, string> = {};
 
     if (!foodName.trim()) {
-      newErrors.foodName = 'Food name or description is required.';
+      newErrors.foodName = 'Enter food item name or description.';
+    }
+
+    if (!category) {
+      newErrors.category = 'Select a food category.';
     }
 
     if (quantity === '' || Number(quantity) <= 0) {
-      newErrors.quantity = 'Quantity must be greater than zero.';
+      newErrors.quantity = 'Enter a valid quantity greater than zero.';
     }
 
-    const prepDate = new Date(preparationTime).getTime();
-    const expiryDate = new Date(expiryTime).getTime();
-    const now = Date.now();
-
-    if (isNaN(prepDate)) {
-      newErrors.preparationTime = 'Valid preparation time is required.';
+    if (!unit) {
+      newErrors.unit = 'Select a unit of measurement.';
     }
 
-    if (isNaN(expiryDate)) {
-      newErrors.expiryTime = 'Valid expiry time is required.';
-    } else {
-      if (expiryDate <= prepDate) {
-        newErrors.expiryTime = 'Expiry time must be later than preparation time.';
+    if (!preparationTime) {
+      newErrors.preparationTime = 'Select preparation date and time.';
+    }
+
+    if (!expiryTime) {
+      newErrors.expiryTime = 'Select expiry date and time.';
+    }
+
+    if (preparationTime && expiryTime) {
+      const prepDate = new Date(preparationTime).getTime();
+      const expiryDate = new Date(expiryTime).getTime();
+      const now = Date.now();
+
+      if (isNaN(prepDate)) {
+        newErrors.preparationTime = 'Valid preparation time is required.';
       }
-      if (expiryDate <= now) {
-        newErrors.expiryTime = 'Expired food cannot be submitted. Expiry must be in the future.';
+
+      if (isNaN(expiryDate)) {
+        newErrors.expiryTime = 'Valid expiry time is required.';
+      } else {
+        if (expiryDate <= prepDate) {
+          newErrors.expiryTime = 'Expiry time must be later than preparation time.';
+        }
+        if (expiryDate <= now) {
+          newErrors.expiryTime = 'Expired food cannot be submitted. Expiry must be in the future.';
+        }
       }
     }
 
     if (!street.trim()) {
-      newErrors.street = 'Pickup address is required.';
+      newErrors.street = 'Enter pickup street address.';
     }
     if (!city.trim()) {
-      newErrors.city = 'City is required.';
+      newErrors.city = 'Enter city name.';
+    }
+    if (pincode.trim() && !/^\d{6}$/.test(pincode.trim())) {
+      newErrors.pincode = 'Pincode must be a 6-digit number.';
     }
 
     setErrors(newErrors);
@@ -175,7 +208,7 @@ const CreateDonation: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validate() || !user) return;
+    if (!validate() || !user || !category || !unit) return;
 
     setIsSubmitting(true);
     setErrors((prev) => {
@@ -282,7 +315,7 @@ const CreateDonation: React.FC = () => {
           <div className="space-y-4">
             <Input
               label="Food Item Name / Description *"
-              placeholder="e.g. Vegetable Dum Biryani, Mixed Dal, Chapati Packets"
+              placeholder="Enter food name or description (e.g. Vegetable Dum Biryani, Mixed Dal)"
               value={foodName}
               onChange={(e) => setFoodName(e.target.value)}
               error={errors.foodName}
@@ -290,27 +323,33 @@ const CreateDonation: React.FC = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-primary-text mb-1">
+                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Food Category *
                 </label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value as FoodCategory)}
-                  className="w-full rounded-md border border-border dark:border-[#1E293B] bg-white dark:bg-[#0F172A] text-primary-text dark:text-slate-100 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary"
+                  className={`w-full rounded-xl border bg-white dark:bg-[#0F172A] text-slate-900 dark:text-slate-100 px-3.5 py-2.5 text-sm transition-all focus:border-emerald-600 dark:focus:border-blue-500 focus:ring-2 focus:ring-emerald-600/20 dark:focus:ring-blue-500/20 ${
+                    errors.category ? 'border-red-500 dark:border-red-500' : 'border-slate-200 dark:border-[#1E293B]'
+                  }`}
                 >
+                  <option value="" disabled>Select food category</option>
                   {FOOD_CATEGORIES.map((cat) => (
                     <option key={cat.value} value={cat.value}>
                       {cat.label}
                     </option>
                   ))}
                 </select>
+                {errors.category && (
+                  <p className="mt-1 text-xs text-red-600 dark:text-red-400 font-medium">{errors.category}</p>
+                )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-primary-text mb-1">
+                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Dietary Preference *
                 </label>
-                <div className="flex gap-4 mt-2">
+                <div className="flex gap-4 mt-2.5">
                   <label className="inline-flex items-center gap-2 text-sm text-primary-text cursor-pointer">
                     <input
                       type="radio"
@@ -343,27 +382,33 @@ const CreateDonation: React.FC = () => {
                 type="number"
                 min="1"
                 step="1"
-                placeholder="e.g. 50"
+                placeholder="Enter quantity (e.g. 50)"
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value === '' ? '' : Number(e.target.value))}
                 error={errors.quantity}
               />
 
               <div>
-                <label className="block text-sm font-medium text-primary-text mb-1">
+                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Unit of Measurement *
                 </label>
                 <select
                   value={unit}
                   onChange={(e) => setUnit(e.target.value as QuantityUnit)}
-                  className="w-full rounded-md border border-border dark:border-[#1E293B] bg-white dark:bg-[#0F172A] text-primary-text dark:text-slate-100 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary"
+                  className={`w-full rounded-xl border bg-white dark:bg-[#0F172A] text-slate-900 dark:text-slate-100 px-3.5 py-2.5 text-sm transition-all focus:border-emerald-600 dark:focus:border-blue-500 focus:ring-2 focus:ring-emerald-600/20 dark:focus:ring-blue-500/20 ${
+                    errors.unit ? 'border-red-500 dark:border-red-500' : 'border-slate-200 dark:border-[#1E293B]'
+                  }`}
                 >
+                  <option value="" disabled>Select unit of measurement</option>
                   {UNITS.map((u) => (
                     <option key={u.value} value={u.value}>
                       {u.label}
                     </option>
                   ))}
                 </select>
+                {errors.unit && (
+                  <p className="mt-1 text-xs text-red-600 dark:text-red-400 font-medium">{errors.unit}</p>
+                )}
               </div>
             </div>
           </div>
@@ -380,21 +425,50 @@ const CreateDonation: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            <Input
-              label="Preparation Time *"
-              type="datetime-local"
-              value={preparationTime}
-              onChange={(e) => setPreparationTime(e.target.value)}
-              error={errors.preparationTime}
-            />
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  Preparation Time *
+                </label>
+                <button
+                  type="button"
+                  onClick={handleSetPrepNow}
+                  className="text-xs text-primary hover:underline font-medium"
+                >
+                  Set to Now
+                </button>
+              </div>
+              <Input
+                type="datetime-local"
+                value={preparationTime}
+                onChange={(e) => setPreparationTime(e.target.value)}
+                error={errors.preparationTime}
+                wrapperClassName="!mb-0"
+              />
+            </div>
 
-            <Input
-              label="Expiry / Best Before Time *"
-              type="datetime-local"
-              value={expiryTime}
-              onChange={(e) => setExpiryTime(e.target.value)}
-              error={errors.expiryTime}
-            />
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  Expiry / Best Before Time *
+                </label>
+                <div className="flex items-center gap-1 text-[11px] text-primary">
+                  <span>Presets:</span>
+                  <button type="button" onClick={() => handleSetExpiryHours(4)} className="hover:underline font-medium">+4h</button>
+                  <span>•</span>
+                  <button type="button" onClick={() => handleSetExpiryHours(6)} className="hover:underline font-medium">+6h</button>
+                  <span>•</span>
+                  <button type="button" onClick={() => handleSetExpiryHours(12)} className="hover:underline font-medium">+12h</button>
+                </div>
+              </div>
+              <Input
+                type="datetime-local"
+                value={expiryTime}
+                onChange={(e) => setExpiryTime(e.target.value)}
+                error={errors.expiryTime}
+                wrapperClassName="!mb-0"
+              />
+            </div>
           </div>
 
           {/* Live Urgency Score Calculation Box */}
@@ -424,7 +498,7 @@ const CreateDonation: React.FC = () => {
           <div className="space-y-4">
             <Input
               label="Pickup Street Address *"
-              placeholder="e.g. Grand Palace Banquet Hall, Road No. 12, Banjara Hills"
+              placeholder="Enter pickup street address (e.g. Building, Flat/Door No., Street/Road, Area)"
               value={street}
               onChange={(e) => setStreet(e.target.value)}
               error={errors.street}
@@ -433,32 +507,33 @@ const CreateDonation: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <Input
                 label="City *"
-                placeholder="e.g. Hyderabad"
+                placeholder="Enter city (e.g. Hyderabad)"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 error={errors.city}
               />
               <Input
                 label="Pincode"
-                placeholder="500034"
+                placeholder="Enter 6-digit pincode (e.g. 500034)"
                 value={pincode}
                 onChange={(e) => setPincode(e.target.value)}
+                error={errors.pincode}
               />
               <Input
                 label="Landmark (Optional)"
-                placeholder="e.g. Near Metro Pillar 42"
+                placeholder="Enter nearby landmark (e.g. Near Metro Pillar 42)"
                 value={landmark}
                 onChange={(e) => setLandmark(e.target.value)}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-primary-text mb-1">
+              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">
                 Additional Pickup Instructions
               </label>
               <textarea
                 rows={2}
-                placeholder="e.g. Collect from kitchen back entrance. Bring large crates or thermal food carrier."
+                placeholder="Enter additional pickup instructions (e.g. Collect from kitchen back entrance, call upon arrival)"
                 value={specialInstructions}
                 onChange={(e) => setSpecialInstructions(e.target.value)}
                 className="w-full rounded-md border border-border dark:border-[#1E293B] bg-white dark:bg-[#0F172A] text-primary-text dark:text-slate-100 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary"
