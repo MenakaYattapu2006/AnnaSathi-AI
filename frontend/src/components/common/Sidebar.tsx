@@ -52,8 +52,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             title={item.label}
             className={({ isActive }) =>
               isActive
-                ? 'flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-1.5 md:px-3.5 py-2 md:py-2.5 text-xs md:text-sm font-semibold rounded-xl bg-[#0f392b] dark:bg-blue-950/70 dark:border dark:border-blue-500/30 text-white dark:text-blue-200 shadow-sm shadow-[#0f392b]/20 dark:shadow-blue-500/20 group transition-all text-center md:text-left'
-                : 'flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-1.5 md:px-3.5 py-2 md:py-2.5 text-xs md:text-sm font-medium rounded-xl text-slate-600 dark:text-slate-400 hover:text-[#0f392b] dark:hover:text-blue-400 hover:bg-slate-50 dark:hover:bg-[#1E293B] transition-all group text-center md:text-left'
+                ? 'flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-1.5 md:px-3.5 py-2 md:py-2.5 text-xs md:text-sm font-bold rounded-xl bg-[#0f392b] dark:bg-blue-950/70 dark:border dark:border-blue-500/30 text-white dark:text-blue-200 shadow-sm shadow-[#0f392b]/20 dark:shadow-blue-500/20 group transition-all duration-200 text-center md:text-left scale-[1.01]'
+                : 'flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-1.5 md:px-3.5 py-2 md:py-2.5 text-xs md:text-sm font-medium rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:font-bold hover:bg-emerald-50/70 dark:hover:bg-blue-950/40 hover:scale-[1.03] hover:shadow-xs transition-all duration-150 group text-center md:text-left'
             }
           >
             {({ isActive }) => (

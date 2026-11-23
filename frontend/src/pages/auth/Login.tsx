@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { BrandLogo } from '../../components/common/BrandLogo';
 import {
   Eye,
   EyeOff,
@@ -63,29 +64,6 @@ const Login: React.FC = () => {
 
       {/* Main Content Layout */}
       <div className="w-full max-w-md relative z-10">
-        {/* Brand Link at top of card */}
-        <div className="flex justify-center mb-6">
-          <Link to="/" className="inline-flex items-center gap-2.5 no-underline group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-900 via-emerald-800 to-teal-700 dark:from-blue-700 dark:via-blue-600 dark:to-cyan-600 flex items-center justify-center text-white shadow-sm ring-1 ring-emerald-900/10 dark:ring-blue-500/20 transition-transform group-hover:scale-105">
-              <svg
-                className="w-5 h-5 text-emerald-300 dark:text-blue-200"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" fill="currentColor" fillOpacity="0.25" />
-                <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
-              </svg>
-            </div>
-            <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
-              AnnaSathi AI
-            </span>
-          </Link>
-        </div>
-
         {/* Premium Auth Card */}
         <div className="bg-white dark:bg-[#111827] rounded-2xl border border-slate-200/90 dark:border-[#1E293B] shadow-premium p-8 sm:p-10 relative overflow-hidden transition-colors">
           {/* Accent Top Bar */}
@@ -93,8 +71,10 @@ const Login: React.FC = () => {
 
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-brand-50 dark:bg-blue-950/60 border border-emerald-100 dark:border-blue-800/40 text-brand-900 dark:text-blue-300 mb-4 shadow-sm">
-              <Lock className="w-6 h-6 text-brand-900 dark:text-blue-400" />
+            <div className="flex justify-center mb-4">
+              <Link to="/" className="inline-flex items-center no-underline transition-transform hover:scale-105">
+                <BrandLogo size="lg" showText={false} />
+              </Link>
             </div>
             <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
               Welcome to AnnaSathi AI

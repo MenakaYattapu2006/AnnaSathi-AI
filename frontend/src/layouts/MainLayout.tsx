@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { Outlet, useNavigate, NavLink } from 'react-router-dom';
+import { Outlet, useNavigate, NavLink, useLocation } from 'react-router-dom';
 import {
   Bell,
   LogOut,
@@ -12,6 +12,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { getNavItems, ROLE_LABELS } from '../routes/navigation';
 import { Sidebar } from '../components/common/Sidebar';
+import { BrandLogo } from '../components/common/BrandLogo';
 import { AIChatbotModal } from '../components/common/AIChatbotModal';
 import { apiClient, mapNotificationFromDb } from '../lib/apiClient';
 import { mockDataService } from '../lib/mockDataService';
@@ -65,6 +66,7 @@ export const MainLayout: React.FC = () => {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -164,11 +166,11 @@ export const MainLayout: React.FC = () => {
     <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0B0F17] text-slate-800 dark:text-slate-100 font-sans antialiased flex flex-col selection:bg-emerald-100 dark:selection:bg-blue-900 selection:text-emerald-900 dark:selection:text-blue-100 transition-colors duration-200">
       {/* ───── Top Header Bar ───── */}
       <header
-        className="sticky top-0 z-40 bg-white/90 dark:bg-[#111827]/90 backdrop-blur-md border-b border-slate-200/80 dark:border-[#1E293B] h-16 flex items-center justify-between px-4 lg:px-7 transition-all duration-200"
+        className="sticky top-0 z-40 bg-white/90 dark:bg-[#111827]/90 backdrop-blur-md border-b border-slate-200/80 dark:border-[#1E293B] h-16 flex items-center justify-between px-3 sm:px-4 lg:px-6 transition-all duration-200"
         data-purpose="global-header"
       >
         {/* Left: Hamburger (Mobile) + Brand Logo & Title */}
-        <div className="flex items-center space-x-3 sm:space-x-6">
+        <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="md:hidden p-2 text-slate-600 dark:text-slate-400 hover:text-[#0f392b] dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-[#1E293B] rounded-lg transition-colors focus:outline-none"
@@ -180,21 +182,9 @@ export const MainLayout: React.FC = () => {
           <NavLink
             to={`/${user.role}/dashboard`}
             aria-label="AnnaSathi AI Dashboard"
-            className="flex items-center gap-2.5 group no-underline"
+            className="flex items-center no-underline"
           >
-            <div className="w-9 h-9 rounded-xl bg-[#0f392b] dark:bg-blue-600 flex items-center justify-center text-emerald-400 dark:text-white shadow-sm shadow-[#07241b]/20 dark:shadow-blue-500/20 group-hover:scale-105 transition-transform duration-200">
-              <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
-              </svg>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-lg font-bold tracking-tight text-[#0f392b] dark:text-blue-400 leading-tight">
-                AnnaSathi <span className="text-emerald-600 dark:text-cyan-400 font-extrabold">AI</span>
-              </span>
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                Zero-Waste Network
-              </span>
-            </div>
+            <BrandLogo size="md" />
           </NavLink>
         </div>
 
@@ -427,12 +417,14 @@ export const MainLayout: React.FC = () => {
           </>
         )}
 
-        {/* Main Content Workspace (Preserves inside content untouched) */}
+        {/* Main Content Workspace (Smooth Page Transition on Navigation) */}
         <main
           className="flex-1 overflow-y-auto custom-scrollbar p-3.5 sm:p-6 lg:p-9 space-y-6 sm:space-y-8 bg-[#f8fafc] dark:bg-[#0B0F17] transition-colors duration-200"
           data-purpose="dashboard-workspace"
         >
-          <Outlet />
+          <div key={location.pathname} className="page-transition-enter">
+            <Outlet />
+          </div>
         </main>
       </div>
 

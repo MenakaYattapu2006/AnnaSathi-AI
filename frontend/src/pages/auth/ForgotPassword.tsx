@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { apiClient } from '../../lib/apiClient';
 import { SixDigitOtpInput } from '../../components/auth/SixDigitOtpInput';
+import { BrandLogo } from '../../components/common/BrandLogo';
 
 const ForgotPassword: React.FC = () => {
   const navigate = useNavigate();
@@ -131,26 +132,16 @@ const ForgotPassword: React.FC = () => {
 
       {/* Main Content Layout */}
       <div className="w-full max-w-md relative z-10">
-        {/* Brand Link at top of card */}
-        <div className="flex justify-center mb-6">
-          <Link to="/" className="inline-flex items-center gap-2.5 no-underline group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-900 via-emerald-800 to-teal-700 dark:from-blue-600 dark:to-cyan-600 flex items-center justify-center text-white shadow-sm ring-1 ring-emerald-900/10 dark:ring-blue-500/20 transition-transform group-hover:scale-105">
-              <KeyRound className="w-5 h-5 text-emerald-300 dark:text-cyan-200" />
-            </div>
-            <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
-              AnnaSathi AI
-            </span>
-          </Link>
-        </div>
-
         <div className="bg-white dark:bg-[#111827] rounded-2xl border border-slate-200/90 dark:border-[#1E293B] shadow-premium p-8 sm:p-10 relative overflow-hidden transition-colors">
             {/* Accent Top Bar */}
             <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-brand-900 via-emerald-600 to-teal-500 dark:from-blue-600 dark:via-blue-500 dark:to-cyan-400" />
 
             {/* Header */}
             <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-brand-50 dark:bg-blue-950/60 dark:bg-blue-950/60 border border-emerald-100 dark:border-blue-800/40 dark:border-blue-800/40 text-brand-900 dark:text-blue-400 dark:text-blue-300 mb-4 shadow-sm">
-                <KeyRound className="w-6 h-6 text-brand-900 dark:text-blue-400 dark:text-blue-400" />
+              <div className="flex justify-center mb-4">
+                <Link to="/" className="inline-flex items-center no-underline transition-transform hover:scale-105">
+                  <BrandLogo size="lg" showText={false} />
+                </Link>
               </div>
               <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
                 {step === 1 ? 'Reset Your Password' : 'Enter Verification Code'}

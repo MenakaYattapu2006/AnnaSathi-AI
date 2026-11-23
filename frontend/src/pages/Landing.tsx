@@ -30,8 +30,9 @@ import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import TextType from '../components/common/TextType';
 import { ScrollReveal } from '../components/common/ScrollReveal';
+import { BrandLogo } from '../components/common/BrandLogo';
 
-export const Landing: React.FC = () => {
+const Landing: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
@@ -91,31 +92,9 @@ export const Landing: React.FC = () => {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 window.history.pushState(null, '', '/');
               }}
-              className="flex items-center gap-3 group no-underline cursor-pointer"
+              className="no-underline cursor-pointer"
             >
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-900 via-emerald-800 to-teal-700 dark:from-blue-600 dark:via-blue-500 dark:to-cyan-500 flex items-center justify-center text-white shadow-sm ring-1 ring-emerald-900/10 dark:ring-blue-500/20 transition-transform group-hover:scale-105">
-                <svg
-                  className="w-5 h-5 text-emerald-300 dark:text-cyan-200"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path
-                    d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"
-                    fill="currentColor"
-                    fillOpacity="0.25"
-                  />
-                  <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
-                </svg>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xl font-bold tracking-tight text-[#0f392b] dark:text-blue-400">
-                  AnnaSathi AI
-                </span>
-              </div>
+              <BrandLogo size="md" />
             </a>
           </div>
 
@@ -124,10 +103,10 @@ export const Landing: React.FC = () => {
             <a
               href="#hero"
               onClick={() => setActiveTab('home')}
-              className={`px-3 py-1.5 transition-all rounded-lg ${
+              className={`px-3 py-1.5 transition-all duration-150 rounded-lg ${
                 activeTab === 'home'
-                  ? 'bg-white dark:bg-[#111827] text-[#0f392b] dark:text-blue-400 font-bold shadow-sm'
-                  : 'hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-[#1A232E]'
+                  ? 'bg-white dark:bg-[#111827] text-[#0f392b] dark:text-blue-400 font-extrabold shadow-sm scale-105'
+                  : 'hover:text-slate-900 dark:hover:text-white hover:font-bold hover:bg-white/80 dark:hover:bg-[#1A232E] hover:scale-105 hover:shadow-xs'
               }`}
             >
               Home
@@ -135,10 +114,10 @@ export const Landing: React.FC = () => {
             <a
               href="#about"
               onClick={() => setActiveTab('about')}
-              className={`px-3 py-1.5 transition-all rounded-lg ${
+              className={`px-3 py-1.5 transition-all duration-150 rounded-lg ${
                 activeTab === 'about'
-                  ? 'bg-white dark:bg-[#111827] text-[#0f392b] dark:text-blue-400 font-bold shadow-sm'
-                  : 'hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-[#1A232E]'
+                  ? 'bg-white dark:bg-[#111827] text-[#0f392b] dark:text-blue-400 font-extrabold shadow-sm scale-105'
+                  : 'hover:text-slate-900 dark:hover:text-white hover:font-bold hover:bg-white/80 dark:hover:bg-[#1A232E] hover:scale-105 hover:shadow-xs'
               }`}
             >
               About Us
@@ -147,10 +126,10 @@ export const Landing: React.FC = () => {
             <a
               href="#ai-features"
               onClick={() => setActiveTab('features')}
-              className={`px-3 py-1.5 transition-all rounded-lg ${
+              className={`px-3 py-1.5 transition-all duration-150 rounded-lg ${
                 activeTab === 'features'
-                  ? 'bg-white dark:bg-[#111827] text-[#0f392b] dark:text-blue-400 font-bold shadow-sm'
-                  : 'hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-[#1A232E]'
+                  ? 'bg-white dark:bg-[#111827] text-[#0f392b] dark:text-blue-400 font-extrabold shadow-sm scale-105'
+                  : 'hover:text-slate-900 dark:hover:text-white hover:font-bold hover:bg-white/80 dark:hover:bg-[#1A232E] hover:scale-105 hover:shadow-xs'
               }`}
             >
               Our Features
@@ -158,10 +137,10 @@ export const Landing: React.FC = () => {
             <a
               href="#mission"
               onClick={() => setActiveTab('mission')}
-              className={`px-3 py-1.5 transition-all rounded-lg ${
+              className={`px-3 py-1.5 transition-all duration-150 rounded-lg ${
                 activeTab === 'mission'
-                  ? 'bg-white dark:bg-[#111827] text-[#0f392b] dark:text-blue-400 font-bold shadow-sm'
-                  : 'hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-[#1A232E]'
+                  ? 'bg-white dark:bg-[#111827] text-[#0f392b] dark:text-blue-400 font-extrabold shadow-sm scale-105'
+                  : 'hover:text-slate-900 dark:hover:text-white hover:font-bold hover:bg-white/80 dark:hover:bg-[#1A232E] hover:scale-105 hover:shadow-xs'
               }`}
             >
               Our Mission
@@ -169,10 +148,10 @@ export const Landing: React.FC = () => {
             <a
               href="#contact"
               onClick={() => setActiveTab('contact')}
-              className={`px-3 py-1.5 transition-all rounded-lg ${
+              className={`px-3 py-1.5 transition-all duration-150 rounded-lg ${
                 activeTab === 'contact'
-                  ? 'bg-white dark:bg-[#111827] text-[#0f392b] dark:text-blue-400 font-bold shadow-sm'
-                  : 'hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-[#1A232E]'
+                  ? 'bg-white dark:bg-[#111827] text-[#0f392b] dark:text-blue-400 font-extrabold shadow-sm scale-105'
+                  : 'hover:text-slate-900 dark:hover:text-white hover:font-bold hover:bg-white/80 dark:hover:bg-[#1A232E] hover:scale-105 hover:shadow-xs'
               }`}
             >
               Contact
@@ -1409,14 +1388,9 @@ export const Landing: React.FC = () => {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                   window.history.pushState(null, '', '/');
                 }}
-                className="flex items-center gap-3 cursor-pointer group no-underline w-fit"
+                className="cursor-pointer no-underline w-fit"
               >
-                <div className="w-8 h-8 rounded-lg bg-[#15803d] dark:bg-blue-500 flex items-center justify-center text-white transition-transform group-hover:scale-105">
-                  <Leaf className="w-4 h-4 text-emerald-200" />
-                </div>
-                <span className="text-xl font-bold text-white tracking-tight group-hover:text-emerald-400 dark:group-hover:text-blue-400 transition-colors">
-                  AnnaSathi AI
-                </span>
+                <BrandLogo size="md" textColor="text-white" />
               </a>
               <p className="text-xs sm:text-sm text-slate-400 max-w-sm leading-relaxed">
                 Connecting surplus food with those who need it through AI, technology, and community collaboration.
@@ -1487,21 +1461,29 @@ export const Landing: React.FC = () => {
           </div>
 
           {/* Sub-footer Strip */}
-          <div className="mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 border-t border-slate-800 dark:border-[#1E293B] text-slate-400 text-xs">
-            <p className="text-center md:text-left">
-              &copy; {new Date().getFullYear()} AnnaSathi AI. All Rights Reserved. Together, let's make every meal count.
+          <div className="mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 border-t border-slate-800 dark:border-[#1E293B] text-slate-400 text-xs sm:text-sm">
+            <p className="text-center md:text-left text-slate-400">
+              &copy; {new Date().getFullYear()} <span className="text-slate-200 font-semibold">AnnaSathi AI</span>. All Rights Reserved. Together, let's make every meal count.
             </p>
-            <div className="flex items-center gap-4">
-              <p className="text-center md:text-left">
-  Developed by{' '}
-  <a href="https://github.com/MenakaYattapu2006" target="_blank" rel="noopener noreferrer" className="underline hover:text-emerald-400">
-    Menaka
-  </a>{' '}
-  |{' '}
-  <a href="https://github.com/PavanputraYarramsetty" target="_blank" rel="noopener noreferrer" className="underline hover:text-emerald-400">
-    Pavanputra
-  </a>
-</p>
+            <div className="flex items-center gap-1.5 text-xs text-slate-400">
+              <span>Developed by</span>
+              <a
+                href="https://github.com/MenakaYattapu2006"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white font-semibold hover:text-emerald-400 transition-colors"
+              >
+                Menaka
+              </a>
+              <span className="text-slate-500">|</span>
+              <a
+                href="https://github.com/PavanputraYarramsetty"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white font-semibold hover:text-emerald-400 transition-colors"
+              >
+                Pavanputra
+              </a>
             </div>
           </div>
         </div>
