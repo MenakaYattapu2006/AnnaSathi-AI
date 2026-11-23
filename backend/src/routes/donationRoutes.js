@@ -4,6 +4,9 @@ import { requireAuth, requireRole } from '../middleware/auth.js';
 
 const router = Router();
 
+// Public live feed endpoint (accessible on landing page without login)
+router.get('/public-activity', donationController.getPublicRecentActivity);
+
 router.use(requireAuth);
 
 router.get('/', donationController.getDonations);

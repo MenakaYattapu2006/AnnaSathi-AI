@@ -329,6 +329,8 @@ export const apiClient = {
 
   // Donation Endpoints
   donations: {
+    getPublicActivity: () => request('/donations/public-activity'),
+
     getAll: (params?: { status?: string; donorId?: string; page?: number; limit?: number }) => {
       const query = new URLSearchParams(params as any).toString();
       return request(`/donations${query ? `?${query}` : ''}`);

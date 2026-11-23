@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowRight,
@@ -21,10 +21,12 @@ import {
   Layers,
   Phone,
   Mail,
+  RefreshCw,
+  Box,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
-import { DeliveryMap } from '../components/common/DeliveryMap';
+import TextType from '../components/common/TextType';
 
 export const Landing: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
@@ -32,7 +34,6 @@ export const Landing: React.FC = () => {
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState<'home' | 'about' | 'how-it-works' | 'features' | 'mission' | 'contact'>('home');
-  const [showLiveMap, setShowLiveMap] = useState<boolean>(false);
 
   return (
     <div className="bg-[#fafaf9] dark:bg-[#0B0F17] font-sans text-slate-800 dark:text-slate-100 antialiased selection:bg-emerald-100 dark:bg-blue-950/60 dark:selection:bg-blue-900 selection:text-emerald-900 dark:selection:text-blue-100 min-h-screen transition-colors duration-200">
@@ -205,17 +206,17 @@ export const Landing: React.FC = () => {
       <main className="w-full pt-20 bg-[#fafaf9] dark:bg-[#0B0F17] transition-colors duration-200">
         <div className="flex flex-col w-full">
           {/* =========================================================================
-              1. HERO SECTION (#hero)
+              1. HERO SECTION (#hero) - Refined layout without photos
           ========================================================================== */}
-          <section className="relative overflow-hidden pt-8 pb-20 lg:pt-14 lg:pb-28 bg-[#fafaf9] dark:bg-[#0B0F17] transition-colors duration-200" id="hero">
+          <section className="relative overflow-hidden pt-12 pb-20 lg:pt-16 lg:pb-28 bg-[#fafaf9] dark:bg-[#0B0F17] transition-colors duration-200" id="hero">
             {/* Ambient glowing backdrop blurs */}
             <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[700px] h-[360px] bg-emerald-100 dark:bg-blue-950/60/50 dark:bg-blue-950/20 blur-[130px] pointer-events-none rounded-full -z-10" />
             <div className="absolute top-1/3 -right-20 w-[420px] h-[420px] bg-slate-100/60 dark:bg-slate-800/10 blur-[110px] pointer-events-none rounded-full -z-10" />
 
-            <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-center">
-                {/* Hero Text Content (6 cols) */}
-                <div className="lg:col-span-6 flex flex-col items-start">
+            <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-12">
+              <div className="flex flex-col items-center text-center">
+                {/* Hero Text Content */}
+                <div className="w-full flex flex-col items-center">
                   {/* AI Pill Badge */}
                   <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white dark:bg-[#0F172A] border border-slate-200/80 dark:border-[#1E293B] shadow-sm mb-6">
                     <span className="w-2 h-2 rounded-full bg-[#15803d] dark:bg-blue-500 animate-pulse shadow-[0_0_8px_#22c55e]" />
@@ -224,26 +225,78 @@ export const Landing: React.FC = () => {
                     </span>
                   </div>
 
-                  {/* Main Heading */}
-                  <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#0f392b] dark:text-white tracking-tight leading-[1.15] mb-6">
-                    Bridging the Gap Between{' '}
-                    <span className="bg-gradient-to-r from-[#15803d] to-[#0f392b] dark:from-blue-400 dark:to-cyan-400 bg-clip-text text-transparent">
-                      Food Waste
-                    </span>{' '}
-                    and{' '}
-                    <span className="bg-gradient-to-r from-emerald-600 to-amber-700 dark:from-cyan-400 dark:to-blue-500 bg-clip-text text-transparent">
-                      Hunger
-                    </span>
-                    .
+                  {/* Main Heading with TextType Transition */}
+                  <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#0f392b] dark:text-white tracking-tight leading-[1.15] mb-6 max-w-4xl">
+                    <TextType
+                      text="Bridging the Gap Between Food Waste and Hunger."
+                      as="span"
+                      typingSpeed={110}
+                      initialDelay={500}
+                      pauseDuration={4500}
+                      deletingSpeed={75}
+                      deleteMode="backspace"
+                      typeEffect="fade"
+                      cursorStyle="bar"
+                      cursorGlide
+                      showCursor
+                      cursorColor="currentColor"
+                      loop
+                    >
+                      {(renderedText) => {
+                        const target = "Bridging the Gap Between Food Waste and Hunger.";
+                        const part1 = "Bridging the Gap Between ";
+                        const part2 = "Food Waste";
+                        const part3 = " and ";
+                        const part4 = "Hunger.";
+
+                        let currentPart1 = "";
+                        let currentPart2 = "";
+                        let currentPart3 = "";
+                        let currentPart4 = "";
+
+                        if (renderedText.length <= part1.length) {
+                          currentPart1 = renderedText;
+                        } else if (renderedText.length <= part1.length + part2.length) {
+                          currentPart1 = part1;
+                          currentPart2 = renderedText.slice(part1.length);
+                        } else if (renderedText.length <= part1.length + part2.length + part3.length) {
+                          currentPart1 = part1;
+                          currentPart2 = part2;
+                          currentPart3 = renderedText.slice(part1.length + part2.length);
+                        } else {
+                          currentPart1 = part1;
+                          currentPart2 = part2;
+                          currentPart3 = part3;
+                          currentPart4 = renderedText.slice(part1.length + part2.length + part3.length);
+                        }
+
+                        return (
+                          <span>
+                            {currentPart1}
+                            {currentPart2 && (
+                              <span className="bg-gradient-to-r from-[#15803d] to-[#0f392b] dark:from-blue-400 dark:to-cyan-400 bg-clip-text text-transparent">
+                                {currentPart2}
+                              </span>
+                            )}
+                            {currentPart3}
+                            {currentPart4 && (
+                              <span className="bg-gradient-to-r from-emerald-600 to-amber-700 dark:from-cyan-400 dark:to-blue-500 bg-clip-text text-transparent">
+                                {currentPart4}
+                              </span>
+                            )}
+                          </span>
+                        );
+                      }}
+                    </TextType>
                   </h1>
 
                   {/* Supporting Description */}
-                  <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 mb-8 max-w-xl leading-relaxed">
+                  <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 mb-8 max-w-2xl leading-relaxed">
                     Every meal matters. AnnaSathi AI connects surplus food with people who need it through verified NGOs, dedicated volunteers, and intelligent AI-powered food rescue.
                   </p>
 
                   {/* CTA Buttons */}
-                  <div className="flex flex-wrap items-center gap-4 mb-6">
+                  <div className="flex flex-wrap items-center justify-center gap-4 mb-6">
                     <Link
                       to={isAuthenticated && user?.role === 'donor' ? '/donor/create-donation' : '/login'}
                       className="inline-flex items-center gap-2 px-6 py-3.5 rounded-lg bg-[#15803d] dark:bg-blue-600 text-white font-semibold text-sm hover:bg-[#0f392b] dark:hover:bg-blue-500 transition-all duration-200 shadow-sm hover:shadow-md"
@@ -261,100 +314,10 @@ export const Landing: React.FC = () => {
                   </div>
 
                   {/* Trust Subtext */}
-                  <div className="flex items-center gap-2.5 text-slate-600 dark:text-slate-400 pt-2">
+                  <div className="flex items-center justify-center gap-2.5 text-slate-600 dark:text-slate-400 pt-2">
                     <Leaf className="w-4 h-4 text-[#15803d] dark:text-blue-400" />
                     <span className="text-sm font-medium">
                       Together, let's build a world where no meal goes to waste.
-                    </span>
-                  </div>
-                </div>
-
-                {/* Hero Visual Area (6 cols) */}
-                <div className="lg:col-span-6 relative">
-                  {/* Toggle between Graphic Showcase & Live Leaflet Map */}
-                  <div className="mb-2 flex justify-end">
-                    <button
-                      type="button"
-                      onClick={() => setShowLiveMap(!showLiveMap)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-[#1E293B] text-xs font-semibold text-emerald-800 dark:text-blue-400 hover:bg-emerald-50 dark:bg-blue-950/60 dark:hover:bg-[#1A232E] transition-colors shadow-xs"
-                    >
-                      <MapPin className="w-3.5 h-3.5 text-emerald-600 dark:text-blue-400" />
-                      <span>{showLiveMap ? 'View Photo Showcase' : 'View Live Leaflet GPS'}</span>
-                    </button>
-                  </div>
-
-                  {showLiveMap ? (
-                    <div className="rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-[#1E293B] bg-white dark:bg-[#111827] p-3 aspect-[16/11]">
-                      <DeliveryMap
-                        pickupLocation={{
-                          latitude: 17.448294,
-                          longitude: 78.391485,
-                          label: 'Grand Kitchen (Madhapur)',
-                          type: 'pickup',
-                        }}
-                        deliveryLocation={{
-                          latitude: 17.432294,
-                          longitude: 78.378485,
-                          label: 'Seva Shelter (Gachibowli)',
-                          type: 'delivery',
-                        }}
-                        volunteerLocation={{
-                          latitude: 17.441294,
-                          longitude: 78.385485,
-                          label: 'Courier #402 (In Transit)',
-                          type: 'volunteer',
-                        }}
-                        height="100%"
-                        showRoute={true}
-                      />
-                    </div>
-                  ) : (
-                    /* Main Hero Image Frame */
-                    <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200/60 dark:border-[#1E293B] bg-slate-100 dark:bg-[#0F172A] aspect-[16/11]">
-                      <img
-                        alt="Community volunteers packing nutritious meal boxes"
-                        className="w-full h-full object-cover"
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbhUOwTkI6A8fbbOJ7TaGfYbNJcdQCjQqRJEIeCVLZiaroSFD_DRffMH6tm5kzlTw_9ad26RqoPPv_M5F4iXJQp6mZR4WejDJNcSnT8rv-j46oh9AY6AXPS9c-rCaoLPFSayKvZFDCBCMZhFSv9Loi8R1Y-MLGPmN2IQlmgP_LJ_rtWs8fxEfTvAtdsmQCjhv7SjxW65lSnAydcCpbP99KEhKIIOKoZMasRWt0x4k"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#0f392b]/60 via-transparent to-transparent" />
-                    </div>
-                  )}
-
-                  {/* Floating Card 1: Top Right (AI Match Verified) */}
-                  <div className="absolute -top-6 -right-2 sm:right-4 bg-white/95 dark:bg-[#111827]/95 border border-slate-200/80 dark:border-[#1E293B] backdrop-blur-md px-4 py-3 rounded-xl shadow-lg flex items-center gap-3.5 z-20 max-w-xs transition-colors">
-                    <div className="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-blue-950/60 border border-emerald-100 dark:border-blue-800/40 flex items-center justify-center shrink-0">
-                      <CheckCircle2 className="w-6 h-6 text-[#15803d] dark:text-blue-400" />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-sm text-[#0f392b] dark:text-white font-bold">AI Match Verified</span>
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#15803d] dark:bg-blue-500" />
-                      </div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 truncate">Hope Kitchen (1.8 km) • 12m ETA</p>
-                    </div>
-                  </div>
-
-                  {/* Floating Card 2: Bottom Left (Urgency Score) */}
-                  <div className="absolute -bottom-6 -left-2 sm:left-4 bg-white/95 dark:bg-[#111827]/95 border border-slate-200/80 dark:border-[#1E293B] backdrop-blur-md px-4 py-3 rounded-xl shadow-lg flex items-center gap-3.5 z-20 max-w-xs transition-colors">
-                    <div className="w-10 h-10 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-100 dark:border-amber-800/40 flex items-center justify-center shrink-0">
-                      <Clock className="w-6 h-6 text-amber-700 dark:text-amber-400" />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-[#0f392b] dark:text-white font-bold">Urgency Score: High</span>
-                        <span className="px-1.5 py-0.5 rounded bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 text-[11px] font-mono font-semibold">
-                          4h left
-                        </span>
-                      </div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 font-mono">Temp: 63°C • Hot Consumable</p>
-                    </div>
-                  </div>
-
-                  {/* Floating Pill 3: Bottom Right (Surplus Rescued) */}
-                  <div className="hidden sm:flex absolute bottom-5 right-5 bg-[#0f392b]/95 dark:bg-blue-950/90 text-white px-3.5 py-2 rounded-full items-center gap-2 shadow-md z-10 backdrop-blur-sm border border-emerald-900/40 dark:border-blue-500/30">
-                    <Leaf className="w-4 h-4 text-emerald-400" />
-                    <span className="text-xs font-semibold tracking-wide">
-                      Surplus Rescued: Fresh Meals &amp; Produce
                     </span>
                   </div>
                 </div>
@@ -482,11 +445,11 @@ export const Landing: React.FC = () => {
           </section>
 
           {/* =========================================================================
-              3. ABOUT ANNASATHI AI (#about)
+              3. ABOUT ANNASATHI AI (#about) - Streamlined photo-free layout
           ========================================================================== */}
           <section className="py-20 lg:py-28 bg-[#fafaf9] dark:bg-[#0B0F17] relative transition-colors duration-200" id="about">
             <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-              <div className="max-w-3xl mb-14">
+              <div className="max-w-3xl mb-12">
                 <span className="text-xs text-[#15803d] dark:text-blue-400 tracking-widest uppercase mb-2 font-bold font-mono block">
                   THE CRISIS &amp; OUR SOLUTION
                 </span>
@@ -495,85 +458,89 @@ export const Landing: React.FC = () => {
                 </h2>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-center">
-                {/* Left: Crisis Points + Solution Statement */}
-                <div className="lg:col-span-6 flex flex-col gap-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="p-5 rounded-xl bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col gap-3 transition-colors">
-                      <span className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-[#1E293B] text-[#0f392b] dark:text-blue-400 flex items-center justify-center">
-                        <Leaf className="w-4 h-4" />
-                      </span>
-                      <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-snug">
-                        Large quantities of surplus food are wasted every day across banquets, hotels, and college canteens.
-                      </p>
-                    </div>
+              {/* 4 Crisis Pillars in a balanced 4-column grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+                <div className="p-6 rounded-2xl bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col gap-3 transition-colors hover:shadow-md">
+                  <span className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-[#1E293B] text-[#0f392b] dark:text-blue-400 flex items-center justify-center shrink-0">
+                    <Leaf className="w-5 h-5" />
+                  </span>
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-white">Surplus Wastage</h4>
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                    Large quantities of surplus food are wasted every day across banquets, hotels, and college canteens.
+                  </p>
+                </div>
 
-                    <div className="p-5 rounded-xl bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col gap-3 transition-colors">
-                      <span className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-[#1E293B] text-[#0f392b] dark:text-blue-400 flex items-center justify-center">
-                        <HeartHandshake className="w-4 h-4" />
-                      </span>
-                      <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-snug">
-                        Many communities and shelter residents still struggle to access fresh, balanced, nutritious meals daily.
-                      </p>
-                    </div>
+                <div className="p-6 rounded-2xl bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col gap-3 transition-colors hover:shadow-md">
+                  <span className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-[#1E293B] text-[#0f392b] dark:text-blue-400 flex items-center justify-center shrink-0">
+                    <HeartHandshake className="w-5 h-5" />
+                  </span>
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-white">Nutritional Gap</h4>
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                    Many communities and shelter residents still struggle to access fresh, balanced, nutritious meals daily.
+                  </p>
+                </div>
 
-                    <div className="p-5 rounded-xl bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col gap-3 transition-colors">
-                      <span className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-[#1E293B] text-[#0f392b] dark:text-blue-400 flex items-center justify-center">
-                        <Radio className="w-4 h-4" />
-                      </span>
-                      <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-snug">
-                        Food donors and humanitarian organizations frequently lack an efficient, real-time bridge to connect.
-                      </p>
-                    </div>
+                <div className="p-6 rounded-2xl bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col gap-3 transition-colors hover:shadow-md">
+                  <span className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-[#1E293B] text-[#0f392b] dark:text-blue-400 flex items-center justify-center shrink-0">
+                    <Radio className="w-5 h-5" />
+                  </span>
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-white">Coordination Chasm</h4>
+                  <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                    Food donors and humanitarian organizations frequently lack an efficient, real-time bridge to connect.
+                  </p>
+                </div>
 
-                    <div className="p-5 rounded-xl bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col gap-3 transition-colors">
-                      <span className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-[#1E293B] text-[#0f392b] dark:text-blue-400 flex items-center justify-center">
-                        <Clock className="w-4 h-4" />
-                      </span>
-                      <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-snug">
-                        Collection and distribution require immediate coordination, temperature tracking, and timely action.
-                      </p>
-                    </div>
-                  </div>
+                <div className="p-6 rounded-2xl bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col gap-3 transition-colors hover:shadow-md">
+                  <span className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-[#1E293B] text-[#0f392b] dark:text-blue-400 flex items-center justify-center shrink-0">
+                    <Clock className="w-5 h-5" />
+                  </span>
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-white">Perishability Windows</h4>
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                    Collection and distribution require immediate coordination, temperature tracking, and timely action.
+                  </p>
+                </div>
+              </div>
 
-                  {/* Highlighted Solution Statement */}
-                  <div className="p-6 rounded-2xl bg-[#0f392b] text-white shadow-md relative overflow-hidden border border-emerald-950">
-                    <div className="flex items-start gap-4">
-                      <Sparkles className="w-7 h-7 text-emerald-300 dark:text-cyan-200 shrink-0 mt-1" />
-                      <div>
-                        <span className="text-base font-bold text-emerald-300 dark:text-cyan-200 block mb-1">
-                          Our Integrated AI Solution
-                        </span>
-                        <p className="text-xs sm:text-sm text-white/90 leading-relaxed">
-                          AnnaSathi AI uses technology and artificial intelligence to connect surplus food donors with verified organizations and volunteers, helping food reach the right destination before it goes to waste.
-                        </p>
-                      </div>
+              {/* Full Width Integrated AI Solution & Real-Time Engine Banner */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+                {/* AI Solution Mission Banner */}
+                <div className="lg:col-span-8 p-6 sm:p-8 rounded-2xl bg-[#0f392b] dark:bg-blue-950/90 text-white shadow-md relative overflow-hidden border border-emerald-950 dark:border-blue-800/40 flex flex-col justify-center">
+                  <div className="flex items-start gap-4">
+                    <Sparkles className="w-8 h-8 text-emerald-300 dark:text-cyan-200 shrink-0 mt-1" />
+                    <div>
+                      <span className="text-lg font-bold text-emerald-300 dark:text-cyan-200 block mb-2">
+                        Our Integrated AI Solution
+                      </span>
+                      <p className="text-sm sm:text-base text-white/90 leading-relaxed">
+                        AnnaSathi AI uses technology and artificial intelligence to connect surplus food donors with verified organizations and volunteers, helping food reach the right destination before it goes to waste.
+                      </p>
                     </div>
                   </div>
                 </div>
 
-                {/* Right: Warehouse Image Frame with Telemetry Overlay */}
-                <div className="lg:col-span-6 relative">
-                  <div className="rounded-2xl overflow-hidden shadow-lg border border-slate-200/80 dark:border-[#1E293B] bg-slate-100 dark:bg-[#0F172A] aspect-[4/3] relative">
-                    <img
-                      alt="Volunteers packing family food boxes in warehouse"
-                      className="w-full h-full object-cover"
-                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVemRBnm5TkJm2BQXOfkXuUpiwDpQwv9gVfXPr1BvoPqnXaQRuvqR9ZiaCwRl-yoyII_eNIqQ-4gTODjuoUwTXqtvrP-LGrCbMXCtoZ2pWaePQzyNrYwAmccQRhiEFgp6ndaW8IgGansdnNnQ-FwF5RMuIug0IB2fsPOiDqEe1bjQJh0Nu5hj0UCWKhA6oqCOQs5CB8YjtgeerajgExO_DDtDQEx7N48pcwZdZhxw"
-                    />
-                    <div className="absolute bottom-6 left-6 right-6 bg-white/95 dark:bg-[#111827]/95 border border-slate-200/80 dark:border-[#1E293B] backdrop-blur-md p-4 rounded-xl shadow-md flex items-center justify-between transition-colors">
-                      <div className="flex items-center gap-3">
-                        <span className="w-3 h-3 rounded-full bg-[#15803d] dark:bg-blue-500 animate-ping" />
-                        <div>
-                          <h4 className="text-xs sm:text-sm font-bold text-[#0f392b] dark:text-white">
-                            Zero-Waste Logistics Engine
-                          </h4>
-                          <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                            Real-time matching active across metropolitan nodes
-                          </p>
-                        </div>
-                      </div>
-                      <Radio className="w-5 h-5 text-[#15803d] dark:text-blue-400" />
+                {/* Zero-Waste Telemetry Engine Card */}
+                <div className="lg:col-span-4 p-6 sm:p-7 rounded-2xl bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col justify-between transition-colors">
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs font-mono font-semibold text-emerald-700 dark:text-blue-400 uppercase tracking-wider">
+                        Active Telemetry
+                      </span>
+                      <span className="flex h-2.5 w-2.5 relative">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 dark:bg-blue-400 opacity-75" />
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 dark:bg-blue-500" />
+                      </span>
                     </div>
+                    <h4 className="text-base font-bold text-[#0f392b] dark:text-white mb-1.5">
+                      Zero-Waste Logistics Engine
+                    </h4>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                      Real-time matching active across metropolitan nodes with end-to-end telemetry and verification.
+                    </p>
+                  </div>
+
+                  <div className="pt-4 mt-4 border-t border-slate-100 dark:border-[#1E293B] flex items-center justify-between text-xs font-mono">
+                    <span className="text-slate-400">Match Reliability:</span>
+                    <span className="font-bold text-emerald-600 dark:text-blue-400">99.8% SLA</span>
                   </div>
                 </div>
               </div>
@@ -730,224 +697,6 @@ export const Landing: React.FC = () => {
                   <div className="mt-4 pt-3 border-t border-slate-100 dark:border-[#1E293B] text-right">
                     <span className="text-[11px] font-mono text-[#15803d] dark:text-blue-400 font-bold">Completed</span>
                   </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* =========================================================================
-              5. OUR FOUR MAIN ROLES (#roles)
-          ========================================================================== */}
-          <section className="py-20 lg:py-28 bg-[#fafaf9] dark:bg-[#0B0F17] relative transition-colors duration-200" id="roles">
-            <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-              <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-16">
-                <span className="text-xs text-[#15803d] dark:text-blue-400 tracking-widest uppercase mb-2 font-bold font-mono">
-                  ECOSYSTEM STAKEHOLDERS
-                </span>
-                <h2 className="text-3xl sm:text-4xl font-bold text-[#0f392b] dark:text-white tracking-tight mb-4">
-                  Designed for Every Hero in the Network
-                </h2>
-                <p className="text-base text-slate-600 dark:text-slate-400 leading-relaxed">
-                  Whether you prepare surplus food, run a shelter, drive a delivery route, or administer safety, AnnaSathi gives you tailor-made tools.
-                </p>
-              </div>
-
-              {/* 4 Visually Distinct Cards (2x2 Grid) */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* CARD 1: Food Donors */}
-                <div className="bg-white dark:bg-[#111827] p-8 rounded-2xl border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col justify-between transition-colors">
-                  <div>
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-[#1E293B] text-xs text-[#0f392b] dark:text-blue-400 font-semibold">
-                        Donors &amp; Partners
-                      </span>
-                      <Building2 className="w-6 h-6 text-[#15803d] dark:text-blue-400" />
-                    </div>
-                    <h3 className="text-xl font-bold text-[#0f392b] dark:text-white mb-3">Donate Surplus Food</h3>
-                    <p className="text-sm text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">
-                      Restaurants, hotels, college canteens, event organizers, and individuals can list surplus food and help prevent unnecessary food waste.
-                    </p>
-                    <ul className="space-y-3 mb-8 text-sm text-slate-700 dark:text-slate-300">
-                      <li className="flex items-center gap-3">
-                        <CheckCircle2 className="w-4 h-4 text-[#15803d] dark:text-blue-400 flex-shrink-0" />
-                        <span>Create food donations in seconds</span>
-                      </li>
-                      <li className="flex items-center gap-3">
-                        <CheckCircle2 className="w-4 h-4 text-[#15803d] dark:text-blue-400 flex-shrink-0" />
-                        <span>Upload food images &amp; freshness indicators</span>
-                      </li>
-                      <li className="flex items-center gap-3">
-                        <CheckCircle2 className="w-4 h-4 text-[#15803d] dark:text-blue-400 flex-shrink-0" />
-                        <span>Specify quantity &amp; expiry details</span>
-                      </li>
-                      <li className="flex items-center gap-3">
-                        <CheckCircle2 className="w-4 h-4 text-[#15803d] dark:text-blue-400 flex-shrink-0" />
-                        <span>Get AI-powered NGO recommendations</span>
-                      </li>
-                      <li className="flex items-center gap-3">
-                        <CheckCircle2 className="w-4 h-4 text-[#15803d] dark:text-blue-400 flex-shrink-0" />
-                        <span>Track donations &amp; delivery progress in real time</span>
-                      </li>
-                      <li className="flex items-center gap-3">
-                        <CheckCircle2 className="w-4 h-4 text-[#15803d] dark:text-blue-400 flex-shrink-0" />
-                        <span>View donation history &amp; total environmental impact</span>
-                      </li>
-                    </ul>
-                  </div>
-                  <Link
-                    to={isAuthenticated && user?.role === 'donor' ? '/donor/create-donation' : '/register'}
-                    className="w-full inline-flex items-center justify-center gap-2 py-3 px-6 rounded-lg bg-[#15803d] dark:bg-blue-500 text-white text-sm font-semibold hover:bg-[#0f392b] transition-colors shadow-sm"
-                  >
-                    <span>Become a Donor</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </div>
-
-                {/* CARD 2: Verified NGOs */}
-                <div className="bg-white dark:bg-[#111827] p-8 rounded-2xl border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col justify-between transition-colors">
-                  <div>
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-[#1E293B] text-xs text-[#0f392b] dark:text-blue-400 font-semibold">
-                        Community Kitchens &amp; Shelters
-                      </span>
-                      <HeartHandshake className="w-6 h-6 text-[#15803d] dark:text-blue-400" />
-                    </div>
-                    <h3 className="text-xl font-bold text-[#0f392b] dark:text-white mb-3">Receive Food Donations</h3>
-                    <p className="text-sm text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">
-                      Verified NGOs, food banks, shelters, and community kitchens can discover suitable food donations and distribute them to communities in need.
-                    </p>
-                    <ul className="space-y-3 mb-8 text-sm text-slate-700 dark:text-slate-300">
-                      <li className="flex items-center gap-3">
-                        <CheckCircle2 className="w-4 h-4 text-[#15803d] dark:text-blue-400 flex-shrink-0" />
-                        <span>Organization registration &amp; instant verification</span>
-                      </li>
-                      <li className="flex items-center gap-3">
-                        <CheckCircle2 className="w-4 h-4 text-[#15803d] dark:text-blue-400 flex-shrink-0" />
-                        <span>Manage food requirements &amp; dining capacity</span>
-                      </li>
-                      <li className="flex items-center gap-3">
-                        <CheckCircle2 className="w-4 h-4 text-[#15803d] dark:text-blue-400 flex-shrink-0" />
-                        <span>Discover nearby donations tailored to your shelter</span>
-                      </li>
-                      <li className="flex items-center gap-3">
-                        <CheckCircle2 className="w-4 h-4 text-[#15803d] dark:text-blue-400 flex-shrink-0" />
-                        <span>Accept or decline suitable donations with 1 click</span>
-                      </li>
-                      <li className="flex items-center gap-3">
-                        <CheckCircle2 className="w-4 h-4 text-[#15803d] dark:text-blue-400 flex-shrink-0" />
-                        <span>Track volunteer deliveries with live arrival telemetry</span>
-                      </li>
-                      <li className="flex items-center gap-3">
-                        <CheckCircle2 className="w-4 h-4 text-[#15803d] dark:text-blue-400 flex-shrink-0" />
-                        <span>Confirm food receipt and log nutritional statistics</span>
-                      </li>
-                    </ul>
-                  </div>
-                  <Link
-                    to="/register"
-                    className="w-full inline-flex items-center justify-center gap-2 py-3 px-6 rounded-lg bg-slate-100 dark:bg-[#0F172A] border border-slate-200 dark:border-[#1E293B] text-[#0f392b] dark:text-blue-400 text-sm font-semibold hover:bg-slate-200 dark:hover:bg-[#1A232E] transition-colors shadow-sm"
-                  >
-                    <span>Register Your NGO</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </div>
-
-                {/* CARD 3: Volunteers */}
-                <div className="bg-white dark:bg-[#111827] p-8 rounded-2xl border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col justify-between transition-colors">
-                  <div>
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-[#1E293B] text-xs text-[#0f392b] dark:text-blue-400 font-semibold">
-                        Rescue Logistics
-                      </span>
-                      <Truck className="w-6 h-6 text-[#15803d] dark:text-blue-400" />
-                    </div>
-                    <h3 className="text-xl font-bold text-[#0f392b] dark:text-white mb-3">Make a Difference</h3>
-                    <p className="text-sm text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">
-                      Volunteers help transport surplus food from donors to verified NGOs and play an indispensable role in completing the rescue process.
-                    </p>
-                    <ul className="space-y-3 mb-8 text-sm text-slate-700 dark:text-slate-300">
-                      <li className="flex items-center gap-3">
-                        <CheckCircle2 className="w-4 h-4 text-[#15803d] dark:text-blue-400 flex-shrink-0" />
-                        <span>Rapid volunteer registration &amp; ID check</span>
-                      </li>
-                      <li className="flex items-center gap-3">
-                        <CheckCircle2 className="w-4 h-4 text-[#15803d] dark:text-blue-400 flex-shrink-0" />
-                        <span>Manage flexible availability &amp; preferred radiuses</span>
-                      </li>
-                      <li className="flex items-center gap-3">
-                        <CheckCircle2 className="w-4 h-4 text-[#15803d] dark:text-blue-400 flex-shrink-0" />
-                        <span>Discover pickup &amp; delivery assignments nearby</span>
-                      </li>
-                      <li className="flex items-center gap-3">
-                        <CheckCircle2 className="w-4 h-4 text-[#15803d] dark:text-blue-400 flex-shrink-0" />
-                        <span>Accept pickup tasks with turnkey route navigation</span>
-                      </li>
-                      <li className="flex items-center gap-3">
-                        <CheckCircle2 className="w-4 h-4 text-[#15803d] dark:text-blue-400 flex-shrink-0" />
-                        <span>Update pickup &amp; delivery status at each checkpoint</span>
-                      </li>
-                      <li className="flex items-center gap-3">
-                        <CheckCircle2 className="w-4 h-4 text-[#15803d] dark:text-blue-400 flex-shrink-0" />
-                        <span>View personal volunteering history &amp; badges earned</span>
-                      </li>
-                    </ul>
-                  </div>
-                  <Link
-                    to="/register"
-                    className="w-full inline-flex items-center justify-center gap-2 py-3 px-6 rounded-lg bg-slate-100 dark:bg-[#0F172A] border border-slate-200 dark:border-[#1E293B] text-[#0f392b] dark:text-blue-400 text-sm font-semibold hover:bg-slate-200 dark:hover:bg-[#1A232E] transition-colors shadow-sm"
-                  >
-                    <span>Become a Volunteer</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </div>
-
-                {/* CARD 4: Administration */}
-                <div className="bg-white dark:bg-[#111827] p-8 rounded-2xl border border-slate-200/80 dark:border-[#1E293B] shadow-sm flex flex-col justify-between transition-colors">
-                  <div>
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-[#1E293B] text-xs text-[#0f392b] dark:text-blue-400 font-semibold">
-                        Governance &amp; Security
-                      </span>
-                      <ShieldCheck className="w-6 h-6 text-[#15803d] dark:text-blue-400" />
-                    </div>
-                    <h3 className="text-xl font-bold text-[#0f392b] dark:text-white mb-3">Responsible Management</h3>
-                    <p className="text-sm text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">
-                      Authorized platform administrators maintain network reliability, enforce strict food safety rules, and oversee all active donations.
-                    </p>
-                    <ul className="space-y-3 mb-8 text-sm text-slate-700 dark:text-slate-300">
-                      <li className="flex items-center gap-3">
-                        <CheckCircle2 className="w-4 h-4 text-[#15803d] dark:text-blue-400 flex-shrink-0" />
-                        <span>Verify NGOs with government NGO-Darpan records</span>
-                      </li>
-                      <li className="flex items-center gap-3">
-                        <CheckCircle2 className="w-4 h-4 text-[#15803d] dark:text-blue-400 flex-shrink-0" />
-                        <span>Manage user permissions &amp; stakeholder accounts</span>
-                      </li>
-                      <li className="flex items-center gap-3">
-                        <CheckCircle2 className="w-4 h-4 text-[#15803d] dark:text-blue-400 flex-shrink-0" />
-                        <span>Monitor live active food donations in transit</span>
-                      </li>
-                      <li className="flex items-center gap-3">
-                        <CheckCircle2 className="w-4 h-4 text-[#15803d] dark:text-blue-400 flex-shrink-0" />
-                        <span>Monitor volunteer dispatch times &amp; route logs</span>
-                      </li>
-                      <li className="flex items-center gap-3">
-                        <CheckCircle2 className="w-4 h-4 text-[#15803d] dark:text-blue-400 flex-shrink-0" />
-                        <span>View platform analytics &amp; regional impact reports</span>
-                      </li>
-                      <li className="flex items-center gap-3">
-                        <CheckCircle2 className="w-4 h-4 text-[#15803d] dark:text-blue-400 flex-shrink-0" />
-                        <span>Review immutable safety audit logs &amp; SLA compliance</span>
-                      </li>
-                    </ul>
-                  </div>
-                  <Link
-                    to="/login"
-                    className="w-full inline-flex items-center justify-center gap-2 py-3 px-6 rounded-lg bg-[#0f392b] dark:bg-blue-600 text-white text-sm font-semibold hover:bg-emerald-950 dark:hover:bg-blue-500 transition-colors shadow-sm"
-                  >
-                    <span>Admin Login</span>
-                    <Lock className="w-4 h-4" />
-                  </Link>
                 </div>
               </div>
             </div>

@@ -1,15 +1,19 @@
 /* src/styles/components.css */
 @layer components {
+
   /* Button base – already have a React component, but expose utility class */
   .btn {
     @apply inline-flex items-center justify-center rounded-md font-medium transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
   }
+
   .btn-primary {
     @apply btn bg-primary text-surface hover:bg-secondary;
   }
+
   .btn-secondary {
     @apply btn bg-secondary text-surface hover:bg-primary;
   }
+
   .btn-outline {
     @apply btn border border-border text-primary hover:bg-primary hover:text-surface;
   }
@@ -23,9 +27,11 @@
   .form-group {
     @apply mb-4;
   }
+
   .form-label {
     @apply block text-sm font-medium text-primary-text mb-1;
   }
+
   .form-input {
     @apply w-full rounded-md border border-border bg-surface-container-low text-primary-text focus:border-primary focus:ring-1 focus:ring-primary disabled:opacity-50;
     padding: 0.5rem 0.75rem;
@@ -221,6 +227,7 @@
         278px 75px,
         426.5px 180px;
     }
+
     to {
       background-position:
         0px 6800px,
@@ -266,12 +273,15 @@
   .badge {
     @apply inline-block px-2 py-0.5 text-xs font-medium rounded-full whitespace-nowrap;
   }
+
   .badge-primary {
     @apply badge bg-primary text-surface;
   }
+
   .badge-secondary {
     @apply badge bg-secondary text-surface;
   }
+
   .badge-accent {
     @apply badge bg-accent text-surface;
   }
@@ -280,15 +290,19 @@
   .table {
     @apply min-w-full divide-y divide-border;
   }
+
   .thead {
     @apply bg-surface;
   }
+
   .th {
     @apply px-4 py-2 text-left text-sm font-medium text-primary-text;
   }
+
   .tr {
     @apply even:bg-surface;
   }
+
   .td {
     @apply px-4 py-2 text-sm text-secondary-text;
   }
@@ -297,6 +311,7 @@
   .nav-link {
     @apply text-primary-text hover:text-primary px-3 py-2 rounded-md font-medium;
   }
+
   .nav-link-active {
     @apply bg-primary text-surface;
   }
@@ -305,9 +320,11 @@
   .dashboard-stat {
     @apply bg-surface rounded-xl shadow p-5 flex flex-col items-start;
   }
+
   .dashboard-stat-value {
     @apply text-3xl font-bold text-primary-text;
   }
+
   .dashboard-stat-label {
     @apply mt-1 text-sm text-secondary-text;
   }
@@ -316,15 +333,19 @@
   .modal-backdrop {
     @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
   }
+
   .modal {
     @apply bg-surface rounded-lg shadow-xl max-w-lg w-full mx-4;
   }
+
   .modal-header {
     @apply flex items-center justify-between p-4 border-b border-border;
   }
+
   .modal-body {
     @apply p-4;
   }
+
   .modal-footer {
     @apply flex justify-end p-4 border-t border-border;
   }
@@ -463,6 +484,3 @@
 .dark .main-content {
   background-color: #090D10 !important;
 }
-
-
-

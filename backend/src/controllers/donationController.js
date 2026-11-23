@@ -309,4 +309,50 @@ export const donationController = {
     const matches = await matchNGOsForDonation(donRes.rows[0]);
     return res.status(200).json({ success: true, matches });
   },
+
+  /**
+   * Get live public stream of recent donations and completed distributions
+   */
+  async getPublicRecentActivity(req, res) {
+    try {
+      const queryStr = `
+        SELECT 
+          d.id,
+          d.food_name,
+          d.category,
+          d.quantity,
+          d.unit,
+          d.number_of_servings,
+          d.status,
+          d.city,
+          d.pickup_address,
+          d.latitude as pickup_latitude,
+          d.longitude as pickup_longitude,
+          d.created_at,
+          u.name as donor_name,
+          u.organization_name as donor_org,
+          n.organization_name as matched_ngo_name,
+          n.street || ', ' || n.city as delivery_address,
+          n.latitude as delivery_latitude,
+          n.longitude as delivery_longitude,
+          a.status as delivery_status,
+          a.delivered_at,
+          v.name as volunteer_name,
+          v.current_latitude as volunteer_latitude,
+          v.current_longitude as volunteer_longitude
+        FROM donations d
+        LEFT JOIN users u ON d.donor_id = u.id
+        LEFT JOIN ngos n ON d.matched_ngo_id = n.id
+        LEFT JOIN assignments a ON d.id = a.donation_id
+        LEFT JOIN volunteers v ON a.volunteer_id = v.id
+        ORDER BY d.created_at DESC
+        LIMIT 10
+      `;
+      const result = await query(queryStr);
+      return res.status(200).json({ success: true, data: result.rows });
+    } catch (err) {
+      console.error('getPublicRecentActivity error:', err);
+      return res.status(200).json({ success: true, data: [] });
+    }
+  },
 };
