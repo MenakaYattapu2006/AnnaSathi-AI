@@ -15,9 +15,9 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
 }) => {
   const sizeMap = {
     sm: { box: 'w-8 h-8', icon: 'w-6 h-6', text: 'text-base' },
-    md: { box: 'w-10 h-10 sm:w-11 sm:h-11', icon: 'w-8 h-8 sm:w-9 sm:h-9', text: 'text-xl sm:text-2xl' },
-    lg: { box: 'w-13 h-13 sm:w-14 sm:h-14', icon: 'w-10 h-10 sm:w-11 sm:h-11', text: 'text-2xl sm:text-3xl' },
-    xl: { box: 'w-16 h-16 sm:w-20 sm:h-20', icon: 'w-13 h-13 sm:w-16 sm:h-16', text: 'text-3xl sm:text-4xl' },
+    md: { box: 'w-9 h-9 sm:w-11 sm:h-11', icon: 'w-7 h-7 sm:w-9 sm:h-9', text: 'text-xl sm:text-2xl' },
+    lg: { box: 'w-10 h-10 sm:w-14 sm:h-14', icon: 'w-7 h-7 sm:w-11 sm:h-11', text: 'text-2xl sm:text-3xl' },
+    xl: { box: 'w-13 h-13 sm:w-20 sm:h-20', icon: 'w-10 h-10 sm:w-16 sm:h-16', text: 'text-3xl sm:text-4xl' },
   };
 
   const currentSize = sizeMap[size] || sizeMap.md;

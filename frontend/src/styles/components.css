@@ -53,13 +53,20 @@
     box-shadow: 0 0 0 1px #3b82f6, 0 0 18px -1px rgba(59, 130, 246, 0.5) !important;
   }
 
-  /* Animated Emerald Rain Background */
+  /* Animated Emerald Rain Background - Disabled on mobile devices for battery and fluid 60fps performance */
   .auth-rain-container {
+    display: none;
     position: fixed;
     inset: 0;
     overflow: hidden;
     pointer-events: none;
     z-index: 0;
+  }
+
+  @media (min-width: 768px) {
+    .auth-rain-container {
+      display: block;
+    }
   }
 
   .auth-rain-container::before {

@@ -53,30 +53,30 @@ const Login: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center text-slate-900 dark:text-slate-100 font-sans antialiased bg-slate-50 dark:bg-[#0B0F17] relative selection:bg-brand-900 dark:selection:bg-blue-600 selection:text-white transition-colors duration-200 px-4 py-8 sm:py-12">
-      {/* Subtle Dot Grid Background */}
-      <div className="fixed inset-0 grid-bg-pattern pointer-events-none z-0" />
+      {/* Subtle Dot Grid Background (hidden on mobile to prevent lag) */}
+      <div className="hidden md:block fixed inset-0 grid-bg-pattern pointer-events-none z-0" />
 
-      {/* Dynamic Animated Rain Background */}
+      {/* Dynamic Animated Rain Background (handled responsive in CSS) */}
       <div className="auth-rain-container" />
 
-      {/* Ambient Top Lighting */}
-      <div className="absolute -top-[300px] left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-emerald-500/10 dark:bg-blue-500/10 blur-[130px] rounded-full pointer-events-none" />
+      {/* Ambient Top Lighting (hidden on mobile for zero lag) */}
+      <div className="hidden md:block absolute -top-[300px] left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-emerald-500/10 dark:bg-blue-500/10 blur-[130px] rounded-full pointer-events-none" />
 
       {/* Main Content Layout */}
       <div className="w-full max-w-md relative z-10">
         {/* Premium Auth Card */}
-        <div className="bg-white dark:bg-[#111827] rounded-2xl border border-slate-200/90 dark:border-[#1E293B] shadow-premium p-8 sm:p-10 relative overflow-hidden transition-colors">
+        <div className="bg-white dark:bg-[#111827] rounded-2xl border border-slate-200/90 dark:border-[#1E293B] shadow-premium p-6 sm:p-10 relative overflow-hidden transition-colors">
           {/* Accent Top Bar */}
           <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-brand-900 via-emerald-600 to-teal-500 dark:from-blue-600 dark:via-blue-500 dark:to-cyan-400" />
 
           {/* Header */}
-          <div className="text-center mb-8">
-            <div className="flex justify-center mb-4">
+          <div className="text-center mb-6 sm:mb-8">
+            <div className="flex justify-center mb-3 sm:mb-4">
               <Link to="/" className="inline-flex items-center no-underline transition-transform hover:scale-105">
                 <BrandLogo size="lg" showText={false} />
               </Link>
             </div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
               Welcome to AnnaSathi AI
             </h1>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5">
