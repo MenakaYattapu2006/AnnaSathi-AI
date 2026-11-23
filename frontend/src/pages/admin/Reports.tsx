@@ -31,7 +31,15 @@ export const Reports: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
 
   // AI Demand Forecast State
-  const [forecastCity, setForecastCity] = useState('Mumbai');
+  const [availableCities, setAvailableCities] = useState<string[]>([
+    'Bhimavaram',
+    'Devarapalli',
+    'Dwaraka Tirumala',
+    'Proddatur',
+    'Surampalem',
+    'Veeravasaram',
+  ]);
+  const [forecastCity, setForecastCity] = useState('Bhimavaram');
   const [forecastZone, setForecastZone] = useState('Central');
   const [forecastDate, setForecastDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [isForecasting, setIsForecasting] = useState(false);
@@ -83,16 +91,23 @@ export const Reports: React.FC = () => {
     let isMounted = true;
     async function loadData() {
       try {
-        const [donRes, ngoRes, userRes] = await Promise.all([
+        const [donRes, ngoRes, userRes, citiesRes] = await Promise.all([
           apiClient.admin.listDonations(),
           apiClient.admin.listNGOs(),
           apiClient.admin.listUsers(),
+          apiClient.admin.getCities().catch(() => null),
         ]);
 
         if (isMounted) {
           if (donRes?.data?.donations) setDonations(donRes.data.donations.map(mapDonationFromDb));
           if (ngoRes?.data) setNgos(ngoRes.data.map(mapNgoFromDb));
           if (userRes?.data?.users) setUsers(userRes.data.users.map(mapUserFromDb));
+          if (citiesRes?.data && Array.isArray(citiesRes.data) && citiesRes.data.length > 0) {
+            setAvailableCities(citiesRes.data);
+            if (!citiesRes.data.includes(forecastCity)) {
+              setForecastCity(citiesRes.data[0]);
+            }
+          }
         }
       } catch (err) {
         console.warn('Failed to load live reports data:', err);
@@ -327,10 +342,11 @@ export const Reports: React.FC = () => {
               onChange={(e) => setForecastCity(e.target.value)}
               className="px-3 py-1.5 text-xs bg-surface rounded-lg border border-border text-primary-text focus:outline-none focus:ring-1 focus:ring-primary"
             >
-              <option value="Mumbai">Mumbai</option>
-              <option value="Delhi">Delhi NCR</option>
-              <option value="Bengaluru">Bengaluru</option>
-              <option value="Hyderabad">Hyderabad</option>
+              {availableCities.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
             </select>
             <select
               value={forecastZone}

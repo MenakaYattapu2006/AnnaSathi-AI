@@ -9,7 +9,8 @@ import {
   reviewNGOVerification,
   listAllDonations,
   getActiveDeliveriesTelemetry,
-  getAuditLogs
+  getAuditLogs,
+  getDistinctCities
 } from '../controllers/adminController.js';
 import { requireAuth, requireRole } from '../middleware/auth.js';
 
@@ -28,5 +29,6 @@ router.patch('/ngos/:id/verify', reviewNGOVerification);
 router.get('/donations', listAllDonations);
 router.get('/telemetry', getActiveDeliveriesTelemetry);
 router.get('/audit-logs', getAuditLogs);
+router.get('/cities', getDistinctCities);
 
 export default router;

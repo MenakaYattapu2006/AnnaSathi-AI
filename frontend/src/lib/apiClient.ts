@@ -489,6 +489,8 @@ export const apiClient = {
 
     getTelemetry: () => request('/admin/telemetry'),
 
+    getCities: () => request('/admin/cities'),
+
     getAuditLogs: (params?: { limit?: number; page?: number }) => {
       const query = new URLSearchParams(params as any).toString();
       return request(`/admin/audit-logs${query ? `?${query}` : ''}`);

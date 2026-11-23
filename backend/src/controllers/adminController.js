@@ -431,3 +431,27 @@ export const getAuditLogs = async (req, res, next) => {
     next(error);
   }
 };
+
+// GET /api/v1/admin/cities
+export const getDistinctCities = async (req, res, next) => {
+  try {
+    const result = await query(
+      `SELECT DISTINCT TRIM(city) as city FROM (
+        SELECT city FROM users WHERE city IS NOT NULL AND TRIM(city) != ''
+        UNION
+        SELECT city FROM ngos WHERE city IS NOT NULL AND TRIM(city) != ''
+        UNION
+        SELECT city FROM donations WHERE city IS NOT NULL AND TRIM(city) != ''
+      ) t WHERE city IS NOT NULL ORDER BY city ASC`
+    );
+
+    const cities = result.rows.map(r => r.city);
+
+    res.status(200).json({
+      success: true,
+      data: cities
+    });
+  } catch (error) {
+    next(error);
+  }
+};
