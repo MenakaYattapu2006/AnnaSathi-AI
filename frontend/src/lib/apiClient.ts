@@ -460,6 +460,17 @@ export const apiClient = {
         body: JSON.stringify({ is_active: isActive }),
       }),
 
+    updateUserDetails: (id: string, data: { name?: string; email?: string; phone?: string; role?: string; status?: string }) =>
+      request(`/admin/users/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      }),
+
+    deleteUser: (id: string) =>
+      request(`/admin/users/${id}`, {
+        method: 'DELETE',
+      }),
+
     listNGOs: (params?: { status?: string; search?: string }) => {
       const query = new URLSearchParams(params as any).toString();
       return request(`/admin/ngos${query ? `?${query}` : ''}`);

@@ -11,6 +11,8 @@ import {
   Phone,
   Calendar,
   CheckCircle,
+  Edit2,
+  Trash2,
 } from 'lucide-react';
 import { PageHeader } from '../../components/common/PageHeader';
 import { Card } from '../../components/common/Card';
@@ -39,6 +41,21 @@ export const UserManagement: React.FC = () => {
     newStatus: UserStatus;
   } | null>(null);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  // Edit User state
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [editFormData, setEditFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    role: 'donor' as UserRole,
+    status: 'active' as UserStatus,
+  });
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  // Delete User state
+  const [deleteConfirmUser, setDeleteConfirmUser] = useState<User | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -114,6 +131,61 @@ export const UserManagement: React.FC = () => {
       setFeedback({ type: 'error', message: err.message || 'Failed to update user status.' });
     } finally {
       setConfirmStatusModal(null);
+    }
+  };
+
+  const handleOpenEdit = (user: User) => {
+    setEditingUser(user);
+    setEditFormData({
+      name: user.name || '',
+      email: user.email || '',
+      phone: user.phone || '',
+      role: user.role,
+      status: user.status,
+    });
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingUser) return;
+    setIsUpdating(true);
+    try {
+      const response = await apiClient.admin.updateUserDetails(editingUser.id, editFormData);
+      if (response?.success) {
+        setFeedback({
+          type: 'success',
+          message: `User ${editFormData.name} successfully updated.`,
+        });
+        setEditingUser(null);
+        loadUsers();
+      } else {
+        setFeedback({ type: 'error', message: response?.error || 'Failed to update user details.' });
+      }
+    } catch (err: any) {
+      setFeedback({ type: 'error', message: err.message || 'Error updating user details.' });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    if (!deleteConfirmUser) return;
+    setIsDeleting(true);
+    try {
+      const response = await apiClient.admin.deleteUser(deleteConfirmUser.id);
+      if (response?.success) {
+        setFeedback({
+          type: 'success',
+          message: `User ${deleteConfirmUser.name} has been permanently deleted.`,
+        });
+        setDeleteConfirmUser(null);
+        loadUsers();
+      } else {
+        setFeedback({ type: 'error', message: response?.error || 'Failed to delete user.' });
+      }
+    } catch (err: any) {
+      setFeedback({ type: 'error', message: err.message || 'Error deleting user.' });
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -211,6 +283,30 @@ export const UserManagement: React.FC = () => {
                 }
               >
                 Activate
+              </Button>
+            )}
+            {!isSelf && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-primary border-primary/40 hover:bg-primary/10 flex items-center gap-1"
+                onClick={() => handleOpenEdit(u)}
+                title="Edit User Details"
+              >
+                <Edit2 size={13} />
+                Edit
+              </Button>
+            )}
+            {!isSelf && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-danger border-danger/40 hover:bg-danger/10 flex items-center gap-1"
+                onClick={() => setDeleteConfirmUser(u)}
+                title="Delete User Completely"
+              >
+                <Trash2 size={13} />
+                Delete
               </Button>
             )}
           </div>
@@ -394,6 +490,121 @@ export const UserManagement: React.FC = () => {
                 onClick={handleStatusChange}
               >
                 Confirm {confirmStatusModal.newStatus}
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* Edit User Modal */}
+      {editingUser && (
+        <Modal
+          isOpen={!!editingUser}
+          onClose={() => setEditingUser(null)}
+          title={`Edit User: ${editingUser.name}`}
+        >
+          <div className="space-y-4 text-sm">
+            <div>
+              <label className="block text-xs font-medium text-secondary-text mb-1">Full Name</label>
+              <input
+                type="text"
+                value={editFormData.name}
+                onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
+                className="w-full px-3 py-2 border border-border rounded-md bg-surface text-primary-text focus:outline-none focus:border-primary"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-secondary-text mb-1">Email Address</label>
+              <input
+                type="email"
+                value={editFormData.email}
+                onChange={(e) => setEditFormData({ ...editFormData, email: e.target.value })}
+                className="w-full px-3 py-2 border border-border rounded-md bg-surface text-primary-text focus:outline-none focus:border-primary"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-secondary-text mb-1">Phone Number</label>
+              <input
+                type="text"
+                value={editFormData.phone}
+                onChange={(e) => setEditFormData({ ...editFormData, phone: e.target.value })}
+                className="w-full px-3 py-2 border border-border rounded-md bg-surface text-primary-text focus:outline-none focus:border-primary"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-secondary-text mb-1">Role</label>
+                <select
+                  value={editFormData.role}
+                  onChange={(e) => setEditFormData({ ...editFormData, role: e.target.value as UserRole })}
+                  className="w-full px-3 py-2 border border-border rounded-md bg-surface text-primary-text focus:outline-none focus:border-primary"
+                >
+                  <option value="donor">Donor</option>
+                  <option value="ngo">NGO</option>
+                  <option value="volunteer">Volunteer</option>
+                  <option value="admin">Administrator</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-secondary-text mb-1">Status</label>
+                <select
+                  value={editFormData.status}
+                  onChange={(e) => setEditFormData({ ...editFormData, status: e.target.value as UserStatus })}
+                  className="w-full px-3 py-2 border border-border rounded-md bg-surface text-primary-text focus:outline-none focus:border-primary"
+                >
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                  <option value="suspended">Suspended</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 pt-3 border-t border-border">
+              <Button variant="outline" onClick={() => setEditingUser(null)} disabled={isUpdating}>
+                Cancel
+              </Button>
+              <Button variant="primary" onClick={handleSaveEdit} disabled={isUpdating}>
+                {isUpdating ? 'Saving...' : 'Save Changes'}
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirmUser && (
+        <Modal
+          isOpen={!!deleteConfirmUser}
+          onClose={() => setDeleteConfirmUser(null)}
+          title="Delete User Account"
+        >
+          <div className="space-y-4">
+            <div className="flex items-start gap-3 p-3 bg-danger/10 border border-danger/30 rounded-lg text-danger">
+              <AlertCircle size={20} className="shrink-0 mt-0.5" />
+              <div className="text-sm">
+                <p className="font-semibold">Irreversible Action</p>
+                <p className="text-xs mt-0.5">
+                  Are you sure you want to permanently delete user{' '}
+                  <strong>{deleteConfirmUser.name}</strong> ({deleteConfirmUser.email})? This will remove all their account records completely.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 pt-3">
+              <Button variant="outline" onClick={() => setDeleteConfirmUser(null)} disabled={isDeleting}>
+                Cancel
+              </Button>
+              <Button
+                variant="outline"
+                className="bg-danger text-white border-danger hover:bg-danger/90"
+                onClick={handleDeleteUser}
+                disabled={isDeleting}
+              >
+                {isDeleting ? 'Deleting...' : 'Delete User Permanently'}
               </Button>
             </div>
           </div>
