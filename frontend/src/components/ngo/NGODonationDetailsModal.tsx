@@ -221,6 +221,25 @@ export const NGODonationDetailsModal: React.FC<NGODonationDetailsModalProps> = (
           </div>
         </div>
 
+        {/* Delivery OTP Card for NGO verification */}
+        {donation.deliveryOtp && (
+          <div className="p-4 rounded-xl border border-indigo-500/30 bg-indigo-50/60 dark:bg-indigo-950/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <span className="text-xs font-bold text-indigo-800 dark:text-indigo-300 uppercase tracking-wider block">
+                Shelter Delivery Confirmation OTP
+              </span>
+              <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
+                Provide this 6-digit code to the volunteer rider upon food handover at your shelter facility.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <span className="px-3.5 py-1.5 rounded-lg bg-indigo-600 text-white font-mono font-bold text-lg tracking-widest shadow-xs">
+                {donation.deliveryOtp}
+              </span>
+            </div>
+          </div>
+        )}
+
         {/* Volunteer Logistics Section */}
         <div className="border border-border rounded-lg p-3.5 space-y-2">
           <h5 className="text-xs font-semibold text-secondary-text uppercase tracking-wider flex items-center gap-1.5">

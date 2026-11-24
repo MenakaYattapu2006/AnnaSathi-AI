@@ -3,6 +3,51 @@ import { query, withTransaction } from '../config/db.js';
 import { validateDonationInput } from '../validators/index.js';
 import { calculateFoodUrgency, matchNGOsForDonation } from '../services/aiService.js';
 
+// Known city / town coordinates dictionary
+const KNOWN_COORDINATES = {
+  'surampalem': { lat: 17.0878, lng: 82.0668 },
+  'aditya': { lat: 17.0878, lng: 82.0668 },
+  'dwaraka tirumala': { lat: 16.9572, lng: 81.2509 },
+  'dwarak': { lat: 16.9572, lng: 81.2509 },
+  'veeravasaram': { lat: 16.5378, lng: 81.6233 },
+  'nandamurugaruvu': { lat: 16.5378, lng: 81.6233 },
+  'bhimavaram': { lat: 16.5449, lng: 81.5212 },
+  'proddatur': { lat: 14.7527, lng: 78.5534 },
+  'kadapa': { lat: 14.4673, lng: 78.8242 },
+  'kakinada': { lat: 16.9891, lng: 82.2475 },
+  'rajahmundry': { lat: 17.0005, lng: 81.8040 },
+  'vijayawada': { lat: 16.5062, lng: 80.6480 },
+  'visakhapatnam': { lat: 17.6868, lng: 83.2185 },
+  'guntur': { lat: 16.3067, lng: 80.4365 },
+  'tirupati': { lat: 13.6288, lng: 79.4192 },
+  'hyderabad': { lat: 17.3850, lng: 78.4867 },
+};
+
+function resolveCoordinates(addressObj = {}) {
+  const { latitude, longitude, street = '', city = '', pincode = '' } = addressObj;
+  const text = `${street} ${city} ${pincode}`.toLowerCase();
+
+  for (const [key, coords] of Object.entries(KNOWN_COORDINATES)) {
+    if (text.includes(key)) {
+      return coords;
+    }
+  }
+
+  // Check pincode prefixes
+  const pin = String(pincode || '').trim();
+  if (pin === '534426') return { lat: 16.9572, lng: 81.2509 }; // Dwaraka Tirumala
+  if (pin === '534243') return { lat: 16.5378, lng: 81.6233 }; // Veeravasaram
+  if (pin === '534201' || pin === '534202') return { lat: 16.5449, lng: 81.5212 }; // Bhimavaram
+  if (pin === '533437') return { lat: 17.0878, lng: 82.0668 }; // Surampalem
+  if (pin.startsWith('516')) return { lat: 14.7527, lng: 78.5534 }; // Proddatur / Kadapa
+
+  if (latitude && longitude && (latitude !== 17.3850 || longitude !== 78.4867)) {
+    return { lat: Number(latitude), lng: Number(longitude) };
+  }
+
+  return { lat: latitude || 17.3850, lng: longitude || 78.4867 };
+}
+
 // Resolve accurate state from address context or pincode
 function resolveState(addressObj = {}) {
   const { state, street = '', city = '', pincode = '' } = addressObj;
@@ -91,6 +136,8 @@ export const donationController = {
       unit,
     });
 
+    const resolvedGeo = resolveCoordinates(pickupAddress);
+
     const donation = await withTransaction(async (client) => {
       const donRes = await client.query(
         `INSERT INTO donations (
@@ -113,8 +160,8 @@ export const donationController = {
           pickupAddress.city,
           resolveState(pickupAddress),
           pickupAddress.pincode || '500001',
-          pickupAddress.latitude || 17.3850,
-          pickupAddress.longitude || 78.4867,
+          resolvedGeo.lat,
+          resolvedGeo.lng,
           pickupAddress.landmark || null,
           urgency.urgencyScore,
           urgency.urgencyLevel,
@@ -154,7 +201,7 @@ export const donationController = {
     const { status, category, search } = req.query;
 
     let sql = `SELECT d.*, n.organization_name as matched_ngo_name,
-                      a.status as assignment_status, a.id as assignment_id,
+                      a.status as assignment_status, a.id as assignment_id, a.verification_otp as pickup_otp,
                       v.name as volunteer_name, v.phone as volunteer_phone
                FROM donations d
                LEFT JOIN ngos n ON d.matched_ngo_id = n.id
@@ -193,7 +240,7 @@ export const donationController = {
     const donRes = await query(
       `SELECT d.*, u.name as donor_name, u.phone as donor_phone, u.organization_name as donor_org,
               n.organization_name as matched_ngo_name, n.contact_phone as ngo_phone,
-              a.id as assignment_id, a.status as assignment_status, a.verification_otp,
+              a.id as assignment_id, a.status as assignment_status, a.verification_otp as pickup_otp,
               v.name as volunteer_name, v.phone as volunteer_phone
        FROM donations d
        JOIN users u ON d.donor_id = u.id

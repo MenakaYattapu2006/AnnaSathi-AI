@@ -141,12 +141,12 @@ const VolunteerDashboard: React.FC = () => {
     loadData();
   }, [loadData]);
 
-  const handlePickup = async (assignmentId: string, notes?: string) => {
+  const handlePickup = async (assignmentId: string, notes?: string, otp?: string) => {
     setIsUpdating(true);
     setFeedback(null);
     try {
       try {
-        const res = await apiClient.volunteer.pickupAssignment(assignmentId, notes);
+        const res = await apiClient.volunteer.pickupAssignment(assignmentId, notes, otp);
         if (res?.success) {
           setFeedback({
             type: 'success',
@@ -157,10 +157,8 @@ const VolunteerDashboard: React.FC = () => {
           return;
         }
       } catch (apiErr: any) {
-        if (isProduction) {
-          setFeedback({ type: 'error', message: apiErr.message || 'Server error: Failed to record pickup.' });
-          return;
-        }
+        setFeedback({ type: 'error', message: apiErr.message || 'Server error: Failed to record pickup.' });
+        throw apiErr;
       }
 
       if (user) {
@@ -172,23 +170,22 @@ const VolunteerDashboard: React.FC = () => {
           });
         } else {
           setFeedback({ type: 'error', message: result.error || 'Failed to record pickup.' });
+          throw new Error(result.error);
         }
       }
       setSelectedAssignment(null);
       await loadData();
-    } catch (err: any) {
-      setFeedback({ type: 'error', message: err.message || 'Failed to record pickup.' });
     } finally {
       setIsUpdating(false);
     }
   };
 
-  const handleDeliver = async (assignmentId: string, notes?: string) => {
+  const handleDeliver = async (assignmentId: string, notes?: string, otp?: string) => {
     setIsUpdating(true);
     setFeedback(null);
     try {
       try {
-        const res = await apiClient.volunteer.deliverAssignment(assignmentId, notes);
+        const res = await apiClient.volunteer.deliverAssignment(assignmentId, notes, otp);
         if (res?.success) {
           setFeedback({
             type: 'success',
@@ -199,10 +196,8 @@ const VolunteerDashboard: React.FC = () => {
           return;
         }
       } catch (apiErr: any) {
-        if (isProduction) {
-          setFeedback({ type: 'error', message: apiErr.message || 'Server error: Failed to record delivery.' });
-          return;
-        }
+        setFeedback({ type: 'error', message: apiErr.message || 'Server error: Failed to record delivery.' });
+        throw apiErr;
       }
 
       if (user) {
@@ -214,12 +209,11 @@ const VolunteerDashboard: React.FC = () => {
           });
         } else {
           setFeedback({ type: 'error', message: result.error || 'Failed to record delivery.' });
+          throw new Error(result.error);
         }
       }
       setSelectedAssignment(null);
       await loadData();
-    } catch (err: any) {
-      setFeedback({ type: 'error', message: err.message || 'Failed to record delivery.' });
     } finally {
       setIsUpdating(false);
     }

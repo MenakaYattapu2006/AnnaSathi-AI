@@ -349,9 +349,17 @@ const AcceptedDonations: React.FC = () => {
                           </span>
                         )}
                       </div>
-                      <span className="text-secondary-text text-[11px]">
-                        Updated {new Date(donation.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </span>
+                      <div className="flex items-center gap-3">
+                        {donation.deliveryOtp && (
+                          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/40 rounded text-xs flex-shrink-0">
+                            <span className="font-semibold text-indigo-800 dark:text-indigo-300">Delivery OTP:</span>
+                            <span className="font-mono font-bold text-indigo-700 dark:text-indigo-400 tracking-wider text-sm">{donation.deliveryOtp}</span>
+                          </div>
+                        )}
+                        <span className="text-secondary-text text-[11px]">
+                          Updated {new Date(donation.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
                     </div>
                   </div>
 

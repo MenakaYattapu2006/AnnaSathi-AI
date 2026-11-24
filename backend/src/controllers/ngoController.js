@@ -172,7 +172,7 @@ export const ngoController = {
 
     const donationsRes = await query(
       `SELECT d.*, u.name as donor_name, u.email as donor_email, u.phone as donor_phone, u.organization_name as donor_org,
-              a.id as assignment_id, a.status as assignment_status, a.volunteer_id,
+              a.id as assignment_id, a.status as assignment_status, a.volunteer_id, a.verification_otp as pickup_otp, a.delivery_otp,
               v.name as volunteer_name, v.phone as volunteer_phone
        FROM donations d
        JOIN users u ON d.donor_id = u.id
@@ -260,14 +260,18 @@ export const ngoController = {
       const donorRes = await client.query('SELECT name, phone FROM users WHERE id = $1', [donation.donor_id]);
       const donor = donorRes.rows[0];
 
+      // Generate distinct secure 6-digit OTPs for Pickup and Delivery
+      const pickupOtp = Math.floor(100000 + Math.random() * 900000).toString();
+      const deliveryOtp = Math.floor(100000 + Math.random() * 900000).toString();
+
       await client.query(
         `INSERT INTO assignments (
            donation_id, ngo_id, status, pickup_address, pickup_contact_person, pickup_contact_phone,
-           estimated_pickup_time, verification_otp, delivery_ngo_name, delivery_address,
+           estimated_pickup_time, verification_otp, delivery_otp, delivery_ngo_name, delivery_address,
            delivery_contact_person, delivery_contact_phone, estimated_delivery_time
-         ) VALUES ($1, $2, 'available', $3, $4, $5, $6, '5821', $7, $8, $9, $10, $11)
+         ) VALUES ($1, $2, 'available', $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
          ON CONFLICT (donation_id) DO UPDATE
-         SET ngo_id = $2, status = 'available', updated_at = NOW()`,
+         SET ngo_id = $2, status = 'available', verification_otp = $7, delivery_otp = $8, updated_at = NOW()`,
         [
           donation.id,
           ngo.id,
@@ -275,6 +279,8 @@ export const ngoController = {
           donor?.name || 'Food Donor',
           donor?.phone || '+91 98765 43210',
           donation.preparation_time,
+          pickupOtp,
+          deliveryOtp,
           ngo.organization_name,
           `${ngo.street}, ${ngo.city}`,
           ngo.contact_person,

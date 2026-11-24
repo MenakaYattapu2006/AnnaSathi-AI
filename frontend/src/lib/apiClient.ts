@@ -69,6 +69,8 @@ export function mapDonationFromDb(row: any): Donation {
     status: row.status,
     specialInstructions: row.special_instructions || row.specialInstructions,
     imageUrl: row.image_url || row.imageUrl,
+    pickupOtp: row.pickup_otp || row.verification_otp || row.pickupOtp,
+    deliveryOtp: row.delivery_otp || row.deliveryOtp,
     donorName: row.donor_name || row.donorName,
     donorPhone: row.donor_phone || row.donorPhone,
     donorEmail: row.donor_email || row.donorEmail,
@@ -171,6 +173,7 @@ export function mapAssignmentFromDb(row: any): Assignment {
       contactPhone: row.delivery_contact_phone || '',
       estimatedDeliveryTime: row.estimated_delivery_time || '',
       actualDeliveryTime: row.actual_delivery_time,
+      deliveryOtp: row.delivery_otp || row.deliveryOtp,
       recipientSignatureName: row.recipient_signature_name,
       latitude: Number(row.delivery_latitude ?? 17.3850),
       longitude: Number(row.delivery_longitude ?? 78.4867),
@@ -444,16 +447,16 @@ export const apiClient = {
         method: 'POST',
       }),
 
-    pickupAssignment: (assignmentId: string, notes?: string) =>
+    pickupAssignment: (assignmentId: string, notes?: string, otp?: string) =>
       request(`/volunteer/pickup/${assignmentId}`, {
         method: 'POST',
-        body: JSON.stringify({ notes }),
+        body: JSON.stringify({ notes, otp }),
       }),
 
-    deliverAssignment: (assignmentId: string, notes?: string) =>
+    deliverAssignment: (assignmentId: string, notes?: string, otp?: string) =>
       request(`/volunteer/deliver/${assignmentId}`, {
         method: 'POST',
-        body: JSON.stringify({ notes }),
+        body: JSON.stringify({ notes, otp }),
       }),
 
     getHistory: () => request('/volunteer/history'),

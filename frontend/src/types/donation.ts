@@ -48,6 +48,8 @@ export interface Donation {
   status: DonationStatus;
   specialInstructions?: string;
   imageUrl?: string;
+  pickupOtp?: string;
+  deliveryOtp?: string;
   donorName?: string;
   donorPhone?: string;
   donorEmail?: string;

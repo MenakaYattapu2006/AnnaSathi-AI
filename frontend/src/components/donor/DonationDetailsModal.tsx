@@ -234,6 +234,25 @@ export const DonationDetailsModal: React.FC<DonationDetailsModalProps> = ({
             </div>
           )}
 
+          {/* Donor Pickup Verification OTP (Shown to donor before pickup) */}
+          {(donation.pickupOtp || assignment?.pickup?.verificationOtp) && donation.status !== 'CREATED' && donation.status !== 'NGO_MATCHED' && donation.status !== 'CANCELLED' && (
+            <div className="p-4 rounded-xl border border-emerald-500/30 bg-emerald-50/60 dark:bg-emerald-950/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <span className="text-xs font-bold text-emerald-800 dark:text-emerald-300 uppercase tracking-wider block">
+                  Pickup Verification OTP
+                </span>
+                <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
+                  Share this 6-digit verification code with the volunteer rider when they arrive to collect the food.
+                </p>
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <span className="px-3.5 py-1.5 rounded-lg bg-emerald-600 text-white font-mono font-bold text-lg tracking-widest shadow-xs">
+                  {donation.pickupOtp || assignment?.pickup?.verificationOtp}
+                </span>
+              </div>
+            </div>
+          )}
+
           {/* Cancellation Option */}
           {isCancellable && (
             <div className="pt-2 border-t border-border flex justify-between items-center">

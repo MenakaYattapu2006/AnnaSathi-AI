@@ -46,6 +46,7 @@ const AssignedTasks: React.FC = () => {
   const [myTasks, setMyTasks] = useState<Assignment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
+  const [activeModalAction, setActiveModalAction] = useState<'pickup' | 'deliver' | undefined>(undefined);
   const [mapTask, setMapTask] = useState<Assignment | null>(null);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
@@ -146,33 +147,35 @@ const AssignedTasks: React.FC = () => {
     refreshTasks();
   }, [user]);
 
-  const handlePickup = async (assignmentId: string, notes?: string) => {
+  const handlePickup = async (assignmentId: string, notes?: string, otp?: string) => {
     if (!user) return;
     setFeedback(null);
     setUpdatingId(assignmentId);
 
     try {
       try {
-        const response = await apiClient.volunteer.pickupAssignment(assignmentId, notes);
+        const response = await apiClient.volunteer.pickupAssignment(assignmentId, notes, otp);
         if (response?.success) {
           setFeedback({
             type: 'success',
-            message: 'Food marked as picked up! Status updated to Picked Up (In Transit).',
+            message: 'Donor OTP verified! Food marked as picked up (In Transit to Shelter).',
           });
           setSelectedAssignment(null);
           await refreshTasks();
           return;
         }
       } catch (apiErr: any) {
-        if (isProduction) {
-          setFeedback({ type: 'error', message: apiErr.message || 'Server error: Failed to record pickup.' });
-          return;
-        }
+        // If the API call returned an error (e.g. invalid OTP, unauthorized, etc.)
+        // Propagate or show the backend error message directly without falling back to mock
+        setFeedback({ type: 'error', message: apiErr.message || 'Server error: Failed to record pickup.' });
+        throw apiErr;
       }
 
+      // Offline dev mock fallback only if API client didn't reject
       const result = mockDataService.pickupAssignment(assignmentId, user.id, notes);
       if (!result.success) {
         setFeedback({ type: 'error', message: result.error || 'Failed to update pickup status.' });
+        throw new Error(result.error);
       } else {
         setFeedback({
           type: 'success',
@@ -181,40 +184,40 @@ const AssignedTasks: React.FC = () => {
         setSelectedAssignment(null);
         await refreshTasks();
       }
-    } catch (err: any) {
-      setFeedback({ type: 'error', message: err.message || 'Failed to update pickup status.' });
     } finally {
       setUpdatingId(null);
     }
   };
 
-  const handleDeliver = async (assignmentId: string, deliveryNotes?: string) => {
+  const handleDeliver = async (assignmentId: string, deliveryNotes?: string, otp?: string) => {
     if (!user) return;
     setFeedback(null);
     setUpdatingId(assignmentId);
 
     try {
       try {
-        const response = await apiClient.volunteer.deliverAssignment(assignmentId, deliveryNotes);
+        const response = await apiClient.volunteer.deliverAssignment(assignmentId, deliveryNotes, otp);
         if (response?.success) {
           setFeedback({
             type: 'success',
-            message: 'Delivery marked as complete! Awaiting NGO final receipt confirmation.',
+            message: 'Shelter OTP verified! Delivery marked as complete. Awaiting NGO receipt confirmation.',
           });
           setSelectedAssignment(null);
           await refreshTasks();
           return;
         }
       } catch (apiErr: any) {
-        if (isProduction) {
-          setFeedback({ type: 'error', message: apiErr.message || 'Server error: Failed to record delivery.' });
-          return;
-        }
+        // If the API call returned an error (e.g. invalid Delivery OTP, unauthorized, etc.)
+        // Propagate or show the backend error message directly without falling back to mock
+        setFeedback({ type: 'error', message: apiErr.message || 'Server error: Failed to record delivery.' });
+        throw apiErr;
       }
 
+      // Offline dev mock fallback only if API client didn't reject
       const result = mockDataService.deliverAssignment(assignmentId, user.id, deliveryNotes);
       if (!result.success) {
         setFeedback({ type: 'error', message: result.error || 'Failed to update delivery status.' });
+        throw new Error(result.error);
       } else {
         setFeedback({
           type: 'success',
@@ -223,8 +226,6 @@ const AssignedTasks: React.FC = () => {
         setSelectedAssignment(null);
         await refreshTasks();
       }
-    } catch (err: any) {
-      setFeedback({ type: 'error', message: err.message || 'Failed to update delivery status.' });
     } finally {
       setUpdatingId(null);
     }
@@ -463,7 +464,10 @@ const AssignedTasks: React.FC = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => setSelectedAssignment(task)}
+                      onClick={() => {
+                        setActiveModalAction(undefined);
+                        setSelectedAssignment(task);
+                      }}
                       className="text-xs w-full sm:w-auto"
                     >
                       <Eye size={14} className="mr-1" />
@@ -473,24 +477,30 @@ const AssignedTasks: React.FC = () => {
                     {canPickup && (
                       <Button
                         size="sm"
-                        onClick={() => handlePickup(task.id)}
+                        onClick={() => {
+                          setActiveModalAction('pickup');
+                          setSelectedAssignment(task);
+                        }}
                         disabled={updatingId === task.id}
                         className="text-xs w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 dark:bg-blue-600 dark:hover:bg-blue-500 text-white font-medium"
                       >
                         <Truck size={14} className="mr-1" />
-                        {updatingId === task.id ? 'Marking Picked Up...' : 'Mark Picked Up'}
+                        Mark Picked Up
                       </Button>
                     )}
 
                     {canDeliver && (
                       <Button
                         size="sm"
-                        onClick={() => handleDeliver(task.id)}
+                        onClick={() => {
+                          setActiveModalAction('deliver');
+                          setSelectedAssignment(task);
+                        }}
                         disabled={updatingId === task.id}
                         className="text-xs w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-medium"
                       >
                         <CheckCircle2 size={14} className="mr-1" />
-                        {updatingId === task.id ? 'Marking Delivered...' : 'Mark Delivered'}
+                        Mark Delivered
                       </Button>
                     )}
                   </div>
@@ -505,10 +515,14 @@ const AssignedTasks: React.FC = () => {
       <TaskDetailsModal
         assignment={selectedAssignment}
         isOpen={!!selectedAssignment}
-        onClose={() => setSelectedAssignment(null)}
+        onClose={() => {
+          setSelectedAssignment(null);
+          setActiveModalAction(undefined);
+        }}
         onPickup={handlePickup}
         onDeliver={handleDeliver}
         currentVolunteerId={volunteer?.id}
+        defaultAction={activeModalAction}
       />
 
       {/* Leaflet Route Map Modal + Google Maps Navigation */}

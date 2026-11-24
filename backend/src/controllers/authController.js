@@ -210,11 +210,35 @@ export const authController = {
         const stateName = registrationData.state || 'Telangana';
         const pin = registrationData.pincode || '500001';
 
-        const isSurampalem =
-          String(streetAddr + ' ' + cityName).toLowerCase().includes('surampalem') ||
-          String(streetAddr + ' ' + cityName).toLowerCase().includes('aditya');
-        const ngoLat = registrationData.latitude || (isSurampalem ? 17.0878 : 17.3850);
-        const ngoLng = registrationData.longitude || (isSurampalem ? 82.0668 : 78.4867);
+        const fullAddrStr = String(streetAddr + ' ' + cityName + ' ' + pin).toLowerCase();
+        let ngoLat = 17.0878;
+        let ngoLng = 82.0668;
+
+        if (fullAddrStr.includes('surampalem') || fullAddrStr.includes('aditya') || pin === '533437') {
+          ngoLat = 17.0878;
+          ngoLng = 82.0668;
+        } else if (fullAddrStr.includes('bhimavaram') || pin === '534201' || pin === '534202') {
+          ngoLat = 16.5449;
+          ngoLng = 81.5212;
+        } else if (fullAddrStr.includes('dwaraka') || pin === '534426') {
+          ngoLat = 16.9572;
+          ngoLng = 81.2509;
+        } else if (fullAddrStr.includes('veeravasaram') || pin === '534243') {
+          ngoLat = 16.5378;
+          ngoLng = 81.6233;
+        } else if (fullAddrStr.includes('proddatur') || fullAddrStr.includes('kadapa') || pin.startsWith('516')) {
+          ngoLat = 14.7527;
+          ngoLng = 78.5534;
+        } else if (fullAddrStr.includes('kakinada')) {
+          ngoLat = 16.9891;
+          ngoLng = 82.2475;
+        } else if (fullAddrStr.includes('hyderabad') || fullAddrStr.includes('secunderabad')) {
+          ngoLat = 17.3850;
+          ngoLng = 78.4867;
+        } else if (registrationData.latitude && registrationData.longitude) {
+          ngoLat = registrationData.latitude;
+          ngoLng = registrationData.longitude;
+        }
 
         const ngoRes = await client.query(
           `INSERT INTO ngos (user_id, organization_name, registration_number, contact_person, contact_phone, contact_email, street, city, state, pincode, latitude, longitude, verification_status)

@@ -179,7 +179,9 @@ const AvailableDonations: React.FC = () => {
             .toLowerCase()
             .includes(q);
           const donor = mockDataService.getUserById(d.donorId);
-          const matchDonor = donor?.name?.toLowerCase().includes(q) || false;
+          const donorOrg = (d.donorOrganization || donor?.profile?.organizationName || '').toLowerCase();
+          const donorName = (d.donorName || donor?.name || '').toLowerCase();
+          const matchDonor = donorName.includes(q) || donorOrg.includes(q);
           if (!matchName && !matchLocation && !matchDonor) return false;
         }
 
@@ -487,8 +489,8 @@ const AvailableDonations: React.FC = () => {
                     </div>
                     <div className="flex items-center gap-1.5">
                       <User size={14} className="text-secondary-text flex-shrink-0" />
-                      <span>
-                        Donor: {donor?.profile?.organizationName || donor?.name || 'Local Food Partner'}
+                      <span className="truncate">
+                        Donor: {donation.donorOrganization || donation.donorName || donor?.profile?.organizationName || donor?.name || 'Authorized Food Donor'}
                       </span>
                     </div>
                   </div>

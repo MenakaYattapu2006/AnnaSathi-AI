@@ -64,6 +64,8 @@ const LOCAL_GEO_CACHE: Record<string, GeoLocation> = {
   'aditya': { latitude: 17.0878, longitude: 82.0668, displayName: 'Aditya Campus, Surampalem' },
 
   // West Godavari & Coastal AP
+  'dwaraka tirumala': { latitude: 16.9572, longitude: 81.2509, displayName: 'Dwaraka Tirumala, Andhra Pradesh' },
+  'dwarak': { latitude: 16.9572, longitude: 81.2509, displayName: 'Dwaraka Tirumala, Andhra Pradesh' },
   'veeravasaram': { latitude: 16.5378, longitude: 81.6233, displayName: 'Veeravasaram, West Godavari' },
   'nandamurugaruvu': { latitude: 16.5378, longitude: 81.6233, displayName: 'Nandamurugaruvu, Veeravasaram' },
   'bhimavaram': { latitude: 16.5449, longitude: 81.5212, displayName: 'Bhimavaram, Andhra Pradesh' },
@@ -72,6 +74,10 @@ const LOCAL_GEO_CACHE: Record<string, GeoLocation> = {
   'narsapur': { latitude: 16.4357, longitude: 81.6961, displayName: 'Narsapur, Andhra Pradesh' },
   'tadepalligudem': { latitude: 16.8126, longitude: 81.5262, displayName: 'Tadepalligudem, Andhra Pradesh' },
   'eluru': { latitude: 16.7107, longitude: 81.0952, displayName: 'Eluru, Andhra Pradesh' },
+
+  // Rayalaseema & Kadapa
+  'proddatur': { latitude: 14.7527, longitude: 78.5534, displayName: 'Proddatur, Kadapa, Andhra Pradesh' },
+  'kadapa': { latitude: 14.4673, longitude: 78.8242, displayName: 'Kadapa, Andhra Pradesh' },
 
   // East Godavari & Kakinada
   'kakinada': { latitude: 16.9891, longitude: 82.2475, displayName: 'Kakinada, Andhra Pradesh' },

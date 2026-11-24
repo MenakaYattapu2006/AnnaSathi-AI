@@ -33,6 +33,7 @@ export interface DeliveryDetails {
   contactPhone: string;
   estimatedDeliveryTime: string;
   actualDeliveryTime?: string;
+  deliveryOtp?: string;
   recipientSignatureName?: string;
   latitude?: number;
   longitude?: number;

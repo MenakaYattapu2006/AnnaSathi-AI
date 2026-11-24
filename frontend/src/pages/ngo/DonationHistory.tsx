@@ -88,7 +88,9 @@ const NGODonationHistory: React.FC = () => {
             .toLowerCase()
             .includes(q);
           const donor = mockDataService.getUserById(d.donorId);
-          const matchDonor = donor?.name?.toLowerCase().includes(q) || false;
+          const donorOrg = (d.donorOrganization || donor?.profile?.organizationName || '').toLowerCase();
+          const donorName = (d.donorName || donor?.name || '').toLowerCase();
+          const matchDonor = donorName.includes(q) || donorOrg.includes(q);
           if (!matchName && !matchLocation && !matchDonor) return false;
         }
 
@@ -269,7 +271,7 @@ const NGODonationHistory: React.FC = () => {
                       <span>•</span>
                       <span className="flex items-center gap-1">
                         <User size={12} />
-                        Donor: {donor?.profile?.organizationName || donor?.name || 'Partner Donor'}
+                        Donor: {donation.donorOrganization || donation.donorName || donor?.profile?.organizationName || donor?.name || 'Authorized Food Donor'}
                       </span>
                       <span>•</span>
                       <span className="flex items-center gap-1">

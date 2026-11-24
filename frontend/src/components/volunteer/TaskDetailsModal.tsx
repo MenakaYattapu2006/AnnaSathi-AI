@@ -11,6 +11,7 @@ import {
   CheckCircle2,
   Truck,
   AlertTriangle,
+  AlertCircle,
   Info,
   ShieldCheck,
   Package,
@@ -25,8 +26,8 @@ interface TaskDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAccept?: (assignmentId: string) => void | Promise<void>;
-  onPickup?: (assignmentId: string, notes?: string) => void | Promise<void>;
-  onDeliver?: (assignmentId: string, notes?: string) => void | Promise<void>;
+  onPickup?: (assignmentId: string, notes?: string, otp?: string) => void | Promise<void>;
+  onDeliver?: (assignmentId: string, notes?: string, otp?: string) => void | Promise<void>;
   currentVolunteerId?: string;
   defaultAction?: 'pickup' | 'deliver';
 }
@@ -56,6 +57,9 @@ export const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
 }) => {
   const [pickupNotes, setPickupNotes] = useState('');
   const [deliveryNotes, setDeliveryNotes] = useState('');
+  const [pickupOtp, setPickupOtp] = useState('');
+  const [deliveryOtp, setDeliveryOtp] = useState('');
+  const [otpError, setOtpError] = useState<string | null>(null);
   const [showPickupInput, setShowPickupInput] = useState(false);
   const [showDeliveryInput, setShowDeliveryInput] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -96,52 +100,54 @@ export const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
       : 'neutral';
 
   const handlePickupSubmit = async () => {
+    setOtpError(null);
+    const cleanOtp = pickupOtp.trim().replace(/\D/g, '');
+    if (cleanOtp.length !== 6) {
+      setOtpError('Please enter the 6-digit verification OTP provided by the food donor.');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       if (onPickup) {
-        await onPickup(assignment.id, pickupNotes);
+        await onPickup(assignment.id, pickupNotes, cleanOtp);
       } else {
-        await apiClient.volunteer.pickupAssignment(assignment.id, pickupNotes);
+        await apiClient.volunteer.pickupAssignment(assignment.id, pickupNotes, cleanOtp);
       }
       setShowPickupInput(false);
       setPickupNotes('');
+      setPickupOtp('');
       onClose();
     } catch (err: any) {
       console.error('Failed to confirm pickup:', err);
-      try {
-        if (currentVolunteerId) {
-          mockDataService.pickupAssignment(assignment.id, currentVolunteerId, pickupNotes);
-        }
-      } catch {}
-      setShowPickupInput(false);
-      setPickupNotes('');
-      onClose();
+      setOtpError(err?.message || 'Invalid Pickup OTP. Please verify with the donor.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleDeliverSubmit = async () => {
+    setOtpError(null);
+    const cleanOtp = deliveryOtp.trim().replace(/\D/g, '');
+    if (cleanOtp.length !== 6) {
+      setOtpError('Please enter the 6-digit confirmation OTP provided by the shelter representative.');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       if (onDeliver) {
-        await onDeliver(assignment.id, deliveryNotes);
+        await onDeliver(assignment.id, deliveryNotes, cleanOtp);
       } else {
-        await apiClient.volunteer.deliverAssignment(assignment.id, deliveryNotes);
+        await apiClient.volunteer.deliverAssignment(assignment.id, deliveryNotes, cleanOtp);
       }
       setShowDeliveryInput(false);
       setDeliveryNotes('');
+      setDeliveryOtp('');
       onClose();
     } catch (err: any) {
       console.error('Failed to confirm delivery:', err);
-      try {
-        if (currentVolunteerId) {
-          mockDataService.deliverAssignment(assignment.id, currentVolunteerId, deliveryNotes);
-        }
-      } catch {}
-      setShowDeliveryInput(false);
-      setDeliveryNotes('');
-      onClose();
+      setOtpError(err?.message || 'Invalid Delivery OTP. Please verify with the shelter representative.');
     } finally {
       setIsSubmitting(false);
     }
@@ -238,14 +244,14 @@ export const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
                 {assignment.pickup.contactPhone}
               </span>
             </div>
-            {assignment.pickup.verificationOtp && (
-              <div className="mt-1 p-1.5 bg-primary/10 rounded text-center border border-primary/20">
-                <span className="text-[10px] text-secondary-text block">Demo Pickup OTP (Simulated)</span>
-                <span className="font-mono font-bold text-sm text-primary tracking-wider">
-                  {assignment.pickup.verificationOtp}
-                </span>
-                <span className="text-[9px] text-secondary-text/80 block mt-0.5">
-                  Illustrative demonstration code only; production verification will use transactional Brevo OTP.
+            {assignment.pickup.actualPickupTime && (
+              <div className="mt-1 p-1.5 bg-emerald-500/10 rounded text-center">
+                <span className="text-[10px] text-emerald-600 dark:text-emerald-400 block">Picked Up On</span>
+                <span className="text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                  {new Date(assignment.pickup.actualPickupTime).toLocaleString([], {
+                    dateStyle: 'medium',
+                    timeStyle: 'short',
+                  })}
                 </span>
               </div>
             )}
@@ -292,69 +298,137 @@ export const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
           </div>
         )}
 
-        {/* Pickup Action Input Form */}
+        {/* Pickup Action Input Form with Donor OTP verification */}
         {showPickupInput && (
-          <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg space-y-3">
-            <h5 className="text-sm font-semibold text-primary-text flex items-center gap-1.5">
-              <Truck size={16} className="text-primary" />
-              <span>Confirm Food Pickup from Donor</span>
-            </h5>
-            <p className="text-xs text-secondary-text">
-              Confirm that you have arrived at the donor facility, inspected packaging, and loaded the food into your vehicle.
+          <div className="p-4 bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-500/30 rounded-xl space-y-3.5">
+            <div className="flex items-center gap-2">
+              <Truck size={18} className="text-emerald-600 dark:text-emerald-400" />
+              <h5 className="text-sm font-bold text-slate-900 dark:text-white">
+                Verify &amp; Confirm Food Pickup
+              </h5>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-300">
+              Ask the food donor at the pickup location for their <strong>6-digit Pickup OTP</strong> to verify and collect this package.
             </p>
-            <input
-              type="text"
-              placeholder="Optional notes (e.g. food packages loaded in insulated bag)..."
-              value={pickupNotes}
-              onChange={(e) => setPickupNotes(e.target.value)}
-              className="w-full text-xs p-2 rounded-md border border-border bg-surface text-primary-text focus:outline-none focus:ring-1 focus:ring-primary"
-            />
-            <div className="flex justify-end gap-2">
-              <Button size="sm" variant="outline" onClick={() => setShowPickupInput(false)} disabled={isSubmitting}>
+
+            {otpError && (
+              <div className="p-2.5 rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-xs text-red-700 dark:text-red-300 flex items-center gap-2">
+                <AlertCircle size={14} className="flex-shrink-0" />
+                <span>{otpError}</span>
+              </div>
+            )}
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+                Enter Donor Pickup OTP *
+              </label>
+              <input
+                type="text"
+                maxLength={6}
+                autoFocus
+                placeholder="6-digit code (e.g. 549281)"
+                value={pickupOtp}
+                onChange={(e) => {
+                  setPickupOtp(e.target.value);
+                  if (otpError) setOtpError(null);
+                }}
+                className="w-full text-center tracking-widest font-mono text-lg font-bold p-2.5 rounded-lg border border-slate-300 dark:border-[#1E293B] bg-white dark:bg-[#0F172A] text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Pickup Notes (Optional)
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. Inspected and safely loaded into thermal bag..."
+                value={pickupNotes}
+                onChange={(e) => setPickupNotes(e.target.value)}
+                className="w-full text-xs p-2 rounded-lg border border-slate-300 dark:border-[#1E293B] bg-white dark:bg-[#0F172A] text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              />
+            </div>
+
+            <div className="flex justify-end gap-2 pt-1">
+              <Button size="sm" variant="outline" onClick={() => { setShowPickupInput(false); setOtpError(null); }} disabled={isSubmitting}>
                 Cancel
               </Button>
               <Button
                 size="sm"
                 onClick={handlePickupSubmit}
-                disabled={isSubmitting}
+                disabled={isSubmitting || pickupOtp.trim().length !== 6}
                 className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-xs"
               >
-                <Truck size={14} className="mr-1" />
-                {isSubmitting ? 'Confirming Pickup...' : 'Confirm Pickup'}
+                <Truck size={14} className="mr-1.5" />
+                {isSubmitting ? 'Verifying OTP...' : 'Verify OTP & Mark Picked Up'}
               </Button>
             </div>
           </div>
         )}
 
-        {/* Delivery Action Input Form */}
+        {/* Delivery Action Input Form with NGO OTP verification */}
         {showDeliveryInput && (
-          <div className="p-4 bg-success/5 border border-success/20 rounded-lg space-y-3">
-            <h5 className="text-sm font-semibold text-primary-text flex items-center gap-1.5">
-              <CheckCircle2 size={16} className="text-success" />
-              <span>Confirm Food Delivery to NGO Shelter</span>
-            </h5>
-            <p className="text-xs text-secondary-text">
-              Confirm that you have safely arrived at the NGO distribution center and handed over the food surplus to the shelter staff.
+          <div className="p-4 bg-indigo-50/60 dark:bg-indigo-950/20 border border-indigo-500/30 rounded-xl space-y-3.5">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 size={18} className="text-indigo-600 dark:text-indigo-400" />
+              <h5 className="text-sm font-bold text-slate-900 dark:text-white">
+                Verify &amp; Confirm Shelter Delivery
+              </h5>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-300">
+              Ask the NGO shelter coordinator at the destination for their <strong>6-digit Delivery Confirmation OTP</strong> to complete handover.
             </p>
-            <input
-              type="text"
-              placeholder="Optional notes (e.g. handed over to kitchen coordinator Meera)..."
-              value={deliveryNotes}
-              onChange={(e) => setDeliveryNotes(e.target.value)}
-              className="w-full text-xs p-2 rounded-md border border-border bg-surface text-primary-text focus:outline-none focus:ring-1 focus:ring-primary"
-            />
-            <div className="flex justify-end gap-2">
-              <Button size="sm" variant="outline" onClick={() => setShowDeliveryInput(false)} disabled={isSubmitting}>
+
+            {otpError && (
+              <div className="p-2.5 rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-xs text-red-700 dark:text-red-300 flex items-center gap-2">
+                <AlertCircle size={14} className="flex-shrink-0" />
+                <span>{otpError}</span>
+              </div>
+            )}
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+                Enter Shelter Delivery OTP *
+              </label>
+              <input
+                type="text"
+                maxLength={6}
+                autoFocus
+                placeholder="6-digit code (e.g. 718392)"
+                value={deliveryOtp}
+                onChange={(e) => {
+                  setDeliveryOtp(e.target.value);
+                  if (otpError) setOtpError(null);
+                }}
+                className="w-full text-center tracking-widest font-mono text-lg font-bold p-2.5 rounded-lg border border-slate-300 dark:border-[#1E293B] bg-white dark:bg-[#0F172A] text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Handover Notes (Optional)
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. Handed over to kitchen staff coordinator..."
+                value={deliveryNotes}
+                onChange={(e) => setDeliveryNotes(e.target.value)}
+                className="w-full text-xs p-2 rounded-lg border border-slate-300 dark:border-[#1E293B] bg-white dark:bg-[#0F172A] text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              />
+            </div>
+
+            <div className="flex justify-end gap-2 pt-1">
+              <Button size="sm" variant="outline" onClick={() => { setShowDeliveryInput(false); setOtpError(null); }} disabled={isSubmitting}>
                 Cancel
               </Button>
               <Button
                 size="sm"
                 onClick={handleDeliverSubmit}
-                disabled={isSubmitting}
+                disabled={isSubmitting || deliveryOtp.trim().length !== 6}
                 className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-xs"
               >
-                <CheckCircle2 size={14} className="mr-1" />
-                {isSubmitting ? 'Confirming Delivery...' : 'Confirm Delivery'}
+                <CheckCircle2 size={14} className="mr-1.5" />
+                {isSubmitting ? 'Verifying OTP...' : 'Verify OTP & Mark Delivered'}
               </Button>
             </div>
           </div>

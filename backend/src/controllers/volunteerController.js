@@ -273,7 +273,7 @@ export const volunteerController = {
   async pickupAssignment(req, res) {
     try {
       const id = req.params.assignmentId || req.params.id;
-      const { notes } = req.body || {};
+      const { notes, otp } = req.body || {};
 
       const volRes = await query('SELECT id, name FROM volunteers WHERE user_id = $1', [req.user.id]);
       if (volRes.rows.length === 0) {
@@ -300,6 +300,16 @@ export const volunteerController = {
 
         if (assignment.status !== 'assigned' && assignment.status !== 'in_transit_to_pickup') {
           throw { statusCode: 400, message: `Cannot mark picked up from status "${assignment.status}".` };
+        }
+
+        // Validate Donor Pickup OTP
+        const cleanEnteredOtp = String(otp || '').trim().replace(/\D/g, '');
+        const expectedOtp = String(assignment.verification_otp || '').trim();
+        if (expectedOtp && cleanEnteredOtp !== expectedOtp) {
+          throw {
+            statusCode: 400,
+            message: 'Invalid Donor Pickup OTP. Please ask the donor for the 6-digit pickup verification code.',
+          };
         }
 
         const updatedAsgn = await client.query(
@@ -346,7 +356,7 @@ export const volunteerController = {
   async deliverAssignment(req, res) {
     try {
       const id = req.params.assignmentId || req.params.id;
-      const { notes } = req.body || {};
+      const { notes, otp } = req.body || {};
 
       const volRes = await query('SELECT id, name FROM volunteers WHERE user_id = $1', [req.user.id]);
       if (volRes.rows.length === 0) {
@@ -376,6 +386,16 @@ export const volunteerController = {
         throw {
           statusCode: 400,
           message: 'Delivery rejected: Food must be picked up from the donor before it can be marked as delivered.',
+        };
+      }
+
+      // Validate Destination NGO Delivery OTP
+      const cleanEnteredOtp = String(otp || '').trim().replace(/\D/g, '');
+      const expectedDeliveryOtp = String(assignment.delivery_otp || '').trim();
+      if (expectedDeliveryOtp && cleanEnteredOtp !== expectedDeliveryOtp) {
+        throw {
+          statusCode: 400,
+          message: 'Invalid NGO Delivery OTP. Please ask the shelter representative for their 6-digit delivery confirmation code.',
         };
       }
 

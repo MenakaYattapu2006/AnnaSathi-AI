@@ -333,6 +333,12 @@ const MyDonations: React.FC = () => {
                       <Calendar size={13} className="text-primary" />
                       <span>Expires: {new Date(d.expiryTime).toLocaleString()}</span>
                     </div>
+                    {d.pickupOtp && (d.status === 'NGO_ACCEPTED' || d.status === 'VOLUNTEER_ASSIGNED') && (
+                      <div className="mt-2 p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/40 flex items-center justify-between text-xs">
+                        <span className="font-semibold text-emerald-800 dark:text-emerald-300">Pickup OTP:</span>
+                        <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400 text-sm tracking-wider">{d.pickupOtp}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
