@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { MainLayout } from '../layouts/MainLayout';
 import { ProtectedRoute } from './ProtectedRoute';
 import { Loading } from '../components/common/Loading';
+import { ErrorBoundary } from '../components/common/ErrorBoundary';
 
 // Public pages (lazy loaded)
 const Landing = lazy(() => import('../pages/Landing'));
@@ -41,9 +42,11 @@ const DeliveryMonitoring = lazy(() => import('../pages/admin/DeliveryMonitoring'
 const Reports = lazy(() => import('../pages/admin/Reports'));
 
 const SuspenseWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <Suspense fallback={<Loading message="Loading page..." className="min-h-[50vh]" />}>
-    {children}
-  </Suspense>
+  <ErrorBoundary>
+    <Suspense fallback={<Loading message="Loading page..." className="min-h-[50vh]" />}>
+      {children}
+    </Suspense>
+  </ErrorBoundary>
 );
 
 export const AppRoutes: React.FC = () => {
