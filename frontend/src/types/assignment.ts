@@ -9,6 +9,10 @@ export type AssignmentStatus =
 
 export interface PickupDetails {
   address: string;
+  street?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
   contactPerson: string;
   contactPhone: string;
   estimatedPickupTime: string;
@@ -21,6 +25,10 @@ export interface PickupDetails {
 export interface DeliveryDetails {
   ngoName: string;
   address: string;
+  street?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
   contactPerson: string;
   contactPhone: string;
   estimatedDeliveryTime: string;

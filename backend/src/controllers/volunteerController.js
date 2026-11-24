@@ -113,8 +113,10 @@ export const volunteerController = {
     const tasksRes = await query(
       `SELECT a.*, d.food_name, d.category, d.quantity, d.unit, d.urgency_score, d.urgency_level,
               d.preparation_time, d.expiry_time, d.dietary_type,
+              d.street as pickup_street, d.city as pickup_city, d.state as pickup_state, d.pincode as pickup_pincode,
               d.latitude as pickup_latitude, d.longitude as pickup_longitude,
               n.organization_name as destination_ngo_name,
+              n.street as delivery_street, n.city as delivery_city, n.state as delivery_state, n.pincode as delivery_pincode,
               n.latitude as delivery_latitude, n.longitude as delivery_longitude
        FROM assignments a
        JOIN donations d ON a.donation_id = d.id
@@ -147,8 +149,10 @@ export const volunteerController = {
     const tasksRes = await query(
       `SELECT a.*, d.food_name, d.category, d.quantity, d.unit, d.urgency_score, d.urgency_level,
               d.preparation_time, d.expiry_time, d.status as donation_status,
+              d.street as pickup_street, d.city as pickup_city, d.state as pickup_state, d.pincode as pickup_pincode,
               d.latitude as pickup_latitude, d.longitude as pickup_longitude,
               n.organization_name as destination_ngo_name,
+              n.street as delivery_street, n.city as delivery_city, n.state as delivery_state, n.pincode as delivery_pincode,
               n.latitude as delivery_latitude, n.longitude as delivery_longitude
        FROM assignments a
        JOIN donations d ON a.donation_id = d.id

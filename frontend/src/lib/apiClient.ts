@@ -148,6 +148,10 @@ export function mapAssignmentFromDb(row: any): Assignment {
     status: row.status || row.assignment_status || 'available',
     pickup: row.pickup || {
       address: row.pickup_address || row.street || '',
+      street: row.pickup_street || row.street || '',
+      city: row.pickup_city || row.city || '',
+      state: row.pickup_state || row.state || '',
+      pincode: row.pickup_pincode || row.pincode || '',
       contactPerson: row.pickup_contact_person || row.contact_person || '',
       contactPhone: row.pickup_contact_phone || row.contact_phone || '',
       estimatedPickupTime: row.estimated_pickup_time || '',
@@ -159,6 +163,10 @@ export function mapAssignmentFromDb(row: any): Assignment {
     delivery: row.delivery || {
       ngoName: row.delivery_ngo_name || row.destination_ngo_name || row.organization_name || '',
       address: row.delivery_address || '',
+      street: row.delivery_street || '',
+      city: row.delivery_city || '',
+      state: row.delivery_state || '',
+      pincode: row.delivery_pincode || '',
       contactPerson: row.delivery_contact_person || '',
       contactPhone: row.delivery_contact_phone || '',
       estimatedDeliveryTime: row.estimated_delivery_time || '',

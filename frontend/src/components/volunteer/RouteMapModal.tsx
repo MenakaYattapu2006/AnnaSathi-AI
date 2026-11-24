@@ -37,6 +37,32 @@ export const RouteMapModal: React.FC<RouteMapModalProps> = ({
   volunteerLocation,
   isAccepting = false,
 }) => {
+  // State for live volunteer location (if not passed as prop or needs prompt)
+  const [internalVolunteerLocation, setInternalVolunteerLocation] = useState(volunteerLocation);
+
+  useEffect(() => {
+    if (volunteerLocation) {
+      setInternalVolunteerLocation(volunteerLocation);
+      return;
+    }
+    // Prompt for live volunteer location if missing
+    if (isOpen && typeof window !== 'undefined' && 'geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setInternalVolunteerLocation({
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude,
+            label: 'Your Live Location (GPS)',
+            isRealGps: true,
+          });
+        },
+        () => {
+          // ignore or keep undefined
+        },
+        { enableHighAccuracy: true, timeout: 6000 }
+      );
+    }
+  }, [isOpen, volunteerLocation]);
   // State for resolved coordinates
   const [pickupCoords, setPickupCoords] = useState<{ latitude: number; longitude: number }>({
     latitude: task?.pickup?.latitude || 0,
@@ -90,48 +116,74 @@ export const RouteMapModal: React.FC<RouteMapModalProps> = ({
 
   if (!task) return null;
 
-  // Determine origin for Google Maps:
+  // Check if task is already delivered
+  const isDelivered = task.status === 'delivered';
+
+  // Helper to format clean query for Google Maps (City, State, Pincode without door/house numbers)
+  const formatCleanAddress = (details?: { street?: string; city?: string; state?: string; pincode?: string; address?: string }) => {
+    if (!details) return '';
+    const city = details.city?.trim();
+    const state = details.state?.trim();
+    const pincode = details.pincode?.trim();
+
+    if (city || pincode || state) {
+      return [city, state, pincode].filter(Boolean).join(', ');
+    }
+
+    // Fallback if structured city/state/pincode not separate: strip house/door numbers if possible
+    const raw = details.address || details.street || '';
+    return raw;
+  };
+
+  const cleanPickupQuery = formatCleanAddress(task.pickup) || task.pickup.address;
+  const cleanDeliveryQuery = formatCleanAddress(task.delivery) || task.delivery.address || task.delivery.ngoName;
+
+  // Determine volunteer origin for maps:
   // 1. Volunteer live device GPS (if permitted by device and valid)
   // 2. Volunteer registered address string (from volunteer profile)
-  // 3. Fallback: Donor Pickup Address (if volunteer location is completely unknown)
-  const volLat = volunteerLocation?.latitude;
-  const volLng = volunteerLocation?.longitude;
-  const isRealGps = Boolean(volunteerLocation?.isRealGps && volLat && volLng && volLat !== 0);
+  const activeVolLocation = internalVolunteerLocation || volunteerLocation;
+  const volLat = activeVolLocation?.latitude;
+  const volLng = activeVolLocation?.longitude;
+  const hasLiveVolunteerCoords = Boolean(volLat && volLng && volLat !== 0);
 
   let originParam = '';
-  if (isRealGps) {
+  if (hasLiveVolunteerCoords) {
     originParam = `${volLat},${volLng}`;
-  } else if (volunteerLocation?.address && volunteerLocation.address.trim()) {
-    originParam = encodeURIComponent(volunteerLocation.address.trim());
-  } else if (volLat && volLng && volLat !== 0 && (volLat !== 17.0878 || volLng !== 82.0668)) {
-    originParam = `${volLat},${volLng}`;
+  } else if (activeVolLocation?.address && activeVolLocation.address.trim()) {
+    originParam = encodeURIComponent(activeVolLocation.address.trim());
   }
 
-  // Google Maps Full Delivery Route URL:
-  // Origin: Volunteer Location/Address
-  // Waypoint: Pickup Address (Donor Location)
-  // Destination: Delivery Shelter (NGO Location)
-  const fullRouteGoogleMapsUrl = originParam
+  // Google Maps Directions:
+  // If task is delivered: Only show 2 points (Pickup -> Destination)
+  // If active/before delivery: Show 3 points:
+  //   1st box (Origin): Volunteer Live Location (e.g. coordinates or current location)
+  //   2nd box (Waypoint): Donor Pickup Location (City, State, Pincode)
+  //   3rd box (Destination): NGO Shelter Location (City, State, Pincode)
+  const fullRouteGoogleMapsUrl = isDelivered
+    ? `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(
+        cleanPickupQuery
+      )}&destination=${encodeURIComponent(cleanDeliveryQuery)}&travelmode=driving`
+    : originParam
     ? `https://www.google.com/maps/dir/?api=1&origin=${originParam}&destination=${encodeURIComponent(
-        task.delivery.address
-      )}&waypoints=${encodeURIComponent(task.pickup.address)}&travelmode=driving`
+        cleanDeliveryQuery
+      )}&waypoints=${encodeURIComponent(cleanPickupQuery)}&travelmode=driving`
     : `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(
-        task.pickup.address
-      )}&destination=${encodeURIComponent(task.delivery.address)}&travelmode=driving`;
+        cleanPickupQuery
+      )}&destination=${encodeURIComponent(cleanDeliveryQuery)}&travelmode=driving`;
 
   // Navigate to Pickup Point: from volunteer origin to donor pickup
   const pickupGoogleMapsUrl = originParam
     ? `https://www.google.com/maps/dir/?api=1&origin=${originParam}&destination=${encodeURIComponent(
-        task.pickup.address
+        cleanPickupQuery
       )}&travelmode=driving`
     : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
-        task.pickup.address
+        cleanPickupQuery
       )}&travelmode=driving`;
 
   // Navigate to Destination Shelter: from donor pickup to NGO shelter
   const deliveryGoogleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(
-    task.pickup.address
-  )}&destination=${encodeURIComponent(task.delivery.address)}&travelmode=driving`;
+    cleanPickupQuery
+  )}&destination=${encodeURIComponent(cleanDeliveryQuery)}&travelmode=driving`;
 
   return (
     <Modal
@@ -198,11 +250,11 @@ export const RouteMapModal: React.FC<RouteMapModalProps> = ({
               type: 'delivery',
             }}
             volunteerLocation={
-              isRealGps && volLat != null && volLng != null
+              !isDelivered && hasLiveVolunteerCoords && volLat != null && volLng != null
                 ? {
                     latitude: volLat,
                     longitude: volLng,
-                    label: volunteerLocation?.label || 'Your Live Location (GPS)',
+                    label: activeVolLocation?.label || 'Volunteer Current Live Location',
                     type: 'volunteer',
                   }
                 : undefined
