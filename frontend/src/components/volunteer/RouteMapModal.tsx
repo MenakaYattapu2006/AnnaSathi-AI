@@ -116,14 +116,35 @@ export const RouteMapModal: React.FC<RouteMapModalProps> = ({
 
     const resolveLocations = async () => {
       try {
+        // Construct the full donation pickup address specifying street, city, state and pincode entered when the donation was created
+        const pickupAddressParts = [
+          task.pickup.street,
+          task.pickup.city,
+          task.pickup.state,
+          task.pickup.pincode,
+        ].filter(Boolean);
+        const fullPickupAddress = pickupAddressParts.length > 0
+          ? pickupAddressParts.join(', ')
+          : task.pickup.address;
+
+        const deliveryAddressParts = [
+          task.delivery.street,
+          task.delivery.city,
+          task.delivery.state,
+          task.delivery.pincode,
+        ].filter(Boolean);
+        const fullDeliveryAddress = deliveryAddressParts.length > 0
+          ? `${task.delivery.ngoName ? task.delivery.ngoName + ', ' : ''}${deliveryAddressParts.join(', ')}`
+          : (task.delivery.address || task.delivery.ngoName);
+
         const [pLoc, dLoc] = await Promise.all([
           resolveAddressCoordinates(
-            task.pickup.address,
+            fullPickupAddress,
             task.pickup.latitude,
             task.pickup.longitude
           ),
           resolveAddressCoordinates(
-            task.delivery.address || task.delivery.ngoName,
+            fullDeliveryAddress,
             task.delivery.latitude,
             task.delivery.longitude
           ),

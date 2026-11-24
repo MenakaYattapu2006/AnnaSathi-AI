@@ -217,7 +217,8 @@ const CreateDonation: React.FC = () => {
       return copy;
     });
 
-    const fullAddress = `${street.trim()}, ${city.trim()}`;
+    const resolvedState = resolveStateFromLocation(`${street.trim()} ${city.trim()}`, pincode.trim());
+    const fullAddress = [street.trim(), city.trim(), resolvedState, pincode.trim()].filter(Boolean).join(', ');
     const coords = await resolveAddressCoordinates(fullAddress);
 
     const donationPayload = {
@@ -232,7 +233,7 @@ const CreateDonation: React.FC = () => {
       pickupAddress: {
         street: street.trim(),
         city: city.trim(),
-        state: resolveStateFromLocation(fullAddress, pincode.trim()),
+        state: resolvedState,
         pincode: pincode.trim() || '500001',
         latitude: coords.latitude,
         longitude: coords.longitude,
