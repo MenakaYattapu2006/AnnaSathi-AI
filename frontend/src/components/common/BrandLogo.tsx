@@ -92,14 +92,11 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
       {/* Brand Typography */}
       {showText && (
         <span
-          className={`font-black tracking-tight ${currentSize.text} ${
-            textColor || 'text-[#0f392b] dark:text-white'
+          className={`font-extrabold tracking-tight font-display ${currentSize.text} ${
+            textColor || 'text-[#0f392b]'
           }`}
         >
-          AnnaSathi{' '}
-          <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-amber-600 dark:from-blue-400 dark:via-cyan-400 dark:to-teal-300 bg-clip-text text-transparent">
-            AI
-          </span>
+          AnnaSathi
         </span>
       )}
     </div>
