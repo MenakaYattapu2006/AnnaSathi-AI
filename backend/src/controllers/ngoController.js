@@ -143,7 +143,7 @@ export const ngoController = {
 
     // Query uncancelled, unexpired food in CREATED or NGO_MATCHED status
     const donationsRes = await query(
-      `SELECT d.*, u.name as donor_name, u.phone as donor_phone, u.organization_name as donor_org
+      `SELECT d.*, u.name as donor_name, u.email as donor_email, u.phone as donor_phone, u.organization_name as donor_org
        FROM donations d
        JOIN users u ON d.donor_id = u.id
        WHERE (d.status = 'CREATED' OR (d.status = 'NGO_MATCHED' AND (d.matched_ngo_id = $1 OR d.matched_ngo_id IS NULL)))
@@ -171,7 +171,7 @@ export const ngoController = {
     const ngoId = ngoRes.rows[0].id;
 
     const donationsRes = await query(
-      `SELECT d.*, u.name as donor_name, u.phone as donor_phone, u.organization_name as donor_org,
+      `SELECT d.*, u.name as donor_name, u.email as donor_email, u.phone as donor_phone, u.organization_name as donor_org,
               a.id as assignment_id, a.status as assignment_status, a.volunteer_id,
               v.name as volunteer_name, v.phone as volunteer_phone
        FROM donations d

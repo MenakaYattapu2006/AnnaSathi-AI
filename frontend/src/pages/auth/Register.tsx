@@ -18,6 +18,8 @@ import {
   CheckCircle2,
   RefreshCw,
   Truck,
+  Utensils,
+  Snowflake,
 } from 'lucide-react';
 import { apiClient } from '../../lib/apiClient';
 import { useAuth } from '../../contexts/AuthContext';
@@ -43,6 +45,8 @@ const Register: React.FC = () => {
   const [pincode, setPincode] = useState('');
   const [role, setRole] = useState<UserRole>('donor');
   const [vehicleType, setVehicleType] = useState<'two_wheeler' | 'four_wheeler' | 'van' | 'none'>('two_wheeler');
+  const [maxDailyMeals, setMaxDailyMeals] = useState('100');
+  const [hasColdStorage, setHasColdStorage] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   // OTP Fields
@@ -118,6 +122,8 @@ const Register: React.FC = () => {
         city: city.trim(),
         state: state.trim(),
         pincode: pincode.trim(),
+        maxDailyMeals: role === 'ngo' ? (parseInt(maxDailyMeals, 10) || 100) : undefined,
+        hasColdStorage: role === 'ngo' ? hasColdStorage : undefined,
       });
 
       if (response?.success) {
@@ -160,6 +166,8 @@ const Register: React.FC = () => {
         city: city.trim(),
         state: state.trim(),
         pincode: pincode.trim(),
+        maxDailyMeals: role === 'ngo' ? (parseInt(maxDailyMeals, 10) || 100) : undefined,
+        hasColdStorage: role === 'ngo' ? hasColdStorage : undefined,
       });
 
       if (response?.success) {
@@ -530,6 +538,61 @@ const Register: React.FC = () => {
                       />
                     </div>
                   </div>
+
+                  {/* NGO Capacity & Cold Storage (only when registering as NGO / Shelter) */}
+                  {role === 'ngo' && (
+                    <div className="p-3.5 bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/40 rounded-xl space-y-3">
+                      <div className="flex items-center gap-2 text-xs font-bold text-emerald-800 dark:text-emerald-300 uppercase tracking-wider">
+                        <Utensils className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                        <span>Daily Meal Capacity & Storage</span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label
+                            htmlFor="register-meals"
+                            className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1"
+                          >
+                            Daily Meal Capacity (meals/day) *
+                          </label>
+                          <input
+                            id="register-meals"
+                            type="number"
+                            min="1"
+                            max="50000"
+                            required
+                            value={maxDailyMeals}
+                            onChange={(e) => setMaxDailyMeals(e.target.value)}
+                            placeholder="e.g. 100"
+                            className="block w-full px-3 py-2 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg bg-white dark:bg-[#0F172A] auth-input-glow"
+                          />
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                            Number of meals your shelter/NGO can distribute or serve daily.
+                          </p>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                            Cold Storage Facility *
+                          </label>
+                          <div className="relative rounded-lg shadow-xs">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                              <Snowflake className="w-4 h-4 text-blue-500" />
+                            </div>
+                            <select
+                              value={hasColdStorage ? 'true' : 'false'}
+                              onChange={(e) => setHasColdStorage(e.target.value === 'true')}
+                              className="block w-full pl-9 pr-3 py-2 text-sm text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-[#1E293B] rounded-lg bg-white dark:bg-[#0F172A] auth-input-glow"
+                            >
+                              <option value="false">No cold storage on-site</option>
+                              <option value="true">Yes, cold storage available</option>
+                            </select>
+                          </div>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                            Enables matching with temperature-sensitive surplus food.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Submit Button */}
                   <button

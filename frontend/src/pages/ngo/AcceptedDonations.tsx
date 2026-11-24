@@ -313,10 +313,10 @@ const AcceptedDonations: React.FC = () => {
                       </div>
 
                       <div>
-                        <span className="block text-secondary-text/80">Donor Organization:</span>
+                        <span className="block text-secondary-text/80">Donor:</span>
                         <span className="font-medium text-primary-text flex items-center gap-1">
                           <User size={13} className="text-secondary-text" />
-                          {donor?.profile?.organizationName || donor?.name || 'Food Donor'}
+                          {donation.donorOrganization || donation.donorName || donor?.profile?.organizationName || donor?.name || 'Food Donor'}
                         </span>
                       </div>
 
@@ -333,9 +333,15 @@ const AcceptedDonations: React.FC = () => {
                     <div className="mt-2 p-2.5 bg-surface-container-low rounded-md flex items-center justify-between text-xs">
                       <div className="flex items-center gap-2">
                         <Truck size={15} className="text-primary flex-shrink-0" />
-                        {volunteer ? (
+                        {donation.volunteerName || volunteer ? (
                           <span>
-                            Volunteer: <strong>{volunteer.name}</strong> ({volunteer.phone}) • Vehicle: {volunteer.vehicleType}
+                            Volunteer: <strong>{donation.volunteerName || volunteer?.name}</strong>{' '}
+                            {donation.volunteerPhone || volunteer?.phone ? `(${donation.volunteerPhone || volunteer?.phone})` : ''}
+                            {volunteer?.vehicleType && ` • Vehicle: ${volunteer.vehicleType}`}
+                          </span>
+                        ) : donation.status === 'RECEIPT_CONFIRMED' || donation.status === 'DELIVERED' ? (
+                          <span className="text-emerald-700 font-medium">
+                            ✓ Food rescue transport fulfilled &amp; received
                           </span>
                         ) : (
                           <span className="text-secondary-text italic">

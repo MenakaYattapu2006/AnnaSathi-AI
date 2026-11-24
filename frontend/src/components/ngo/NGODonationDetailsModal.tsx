@@ -206,16 +206,17 @@ export const NGODonationDetailsModal: React.FC<NGODonationDetailsModalProps> = (
               <User size={14} className="text-primary" />
               <span>Donor Contact</span>
             </h5>
-            <p className="text-sm font-medium text-primary-text">
-              {donor?.name || 'Authorized Food Donor'}
+            <p className="text-sm font-semibold text-primary-text">
+              {donation.donorName || donor?.name || 'Authorized Food Donor'}
             </p>
-            {donor?.profile?.organizationName && (
+            {(donation.donorOrganization || donor?.profile?.organizationName) && (
               <p className="text-xs text-secondary-text font-medium">
-                {donor.profile.organizationName}
+                {donation.donorOrganization || donor?.profile?.organizationName}
               </p>
             )}
             <p className="text-xs text-secondary-text">
-              {donor?.phone || '+91 98000 00000'} • {donor?.email || 'donor@example.com'}
+              {donation.donorPhone || donor?.phone || 'Phone upon dispatch'}
+              {(donation.donorEmail || donor?.email) && ` • ${donation.donorEmail || donor?.email}`}
             </p>
           </div>
         </div>
@@ -226,18 +227,29 @@ export const NGODonationDetailsModal: React.FC<NGODonationDetailsModalProps> = (
             <Truck size={14} className="text-primary" />
             <span>Volunteer Dispatch Status</span>
           </h5>
-          {volunteer ? (
+          {donation.volunteerName || volunteer ? (
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-sm">
               <div>
-                <p className="font-semibold text-primary-text">{volunteer.name}</p>
+                <p className="font-semibold text-primary-text">
+                  {donation.volunteerName || volunteer?.name}
+                </p>
                 <p className="text-xs text-secondary-text">
-                  Contact: {volunteer.phone} • Vehicle: {volunteer.vehicleType}
+                  Contact: {donation.volunteerPhone || volunteer?.phone}
+                  {volunteer?.vehicleType && ` • Vehicle: ${volunteer.vehicleType}`}
                 </p>
               </div>
               <Badge variant="info" size="sm" className="capitalize">
-                {assignment?.status ? assignment.status.replace(/_/g, ' ') : 'Assigned'}
+                {donation.volunteerStatus
+                  ? donation.volunteerStatus.replace(/_/g, ' ')
+                  : assignment?.status
+                  ? assignment.status.replace(/_/g, ' ')
+                  : 'Assigned'}
               </Badge>
             </div>
+          ) : donation.status === 'RECEIPT_CONFIRMED' || donation.status === 'DELIVERED' ? (
+            <p className="text-xs text-emerald-800 bg-emerald-50 p-2.5 rounded-md border border-emerald-200">
+              ✓ Food rescue and delivery successfully completed and fulfilled.
+            </p>
           ) : (
             <p className="text-xs text-secondary-text">
               No volunteer has been dispatched yet. Volunteer coordination will be automated upon

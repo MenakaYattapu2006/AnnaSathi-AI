@@ -236,11 +236,15 @@ export const authController = {
           ]
         );
 
+        // Capacity configuration from registration or fallback defaults
+        const initialMaxMeals = Math.max(1, parseInt(registrationData.maxDailyMeals, 10) || 100);
+        const initialColdStorage = Boolean(registrationData.hasColdStorage);
+
         // Seed initial capacity record
         await client.query(
           `INSERT INTO ngo_capacity (ngo_id, max_daily_meals, current_available_capacity, has_cold_storage)
-           VALUES ($1, 100, 100, FALSE)`,
-          [ngoRes.rows[0].id]
+           VALUES ($1, $2, $3, $4)`,
+          [ngoRes.rows[0].id, initialMaxMeals, initialMaxMeals, initialColdStorage]
         );
 
         // Notify all platform administrators about the new pending verification request

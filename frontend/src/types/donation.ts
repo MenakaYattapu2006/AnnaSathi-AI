@@ -48,6 +48,13 @@ export interface Donation {
   status: DonationStatus;
   specialInstructions?: string;
   imageUrl?: string;
+  donorName?: string;
+  donorPhone?: string;
+  donorEmail?: string;
+  donorOrganization?: string;
+  volunteerName?: string;
+  volunteerPhone?: string;
+  volunteerStatus?: string;
   createdAt: string;
   updatedAt: string;
 }

@@ -15,6 +15,7 @@ import {
   ShieldCheck,
   Package,
 } from 'lucide-react';
+import { DonationProgressTracker } from '../donor/DonationProgressTracker';
 import { mockDataService } from '../../lib/mockDataService';
 import { apiClient } from '../../lib/apiClient';
 import type { Assignment, AssignmentStatus } from '../../types/assignment';
@@ -162,6 +163,22 @@ export const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
           <Badge variant={statusConfig.variant} size="sm">
             {statusConfig.label}
           </Badge>
+        </div>
+
+        {/* Lifecycle Progress Tracker */}
+        <div className="p-4 bg-surface rounded-xl border border-border shadow-xs">
+          <DonationProgressTracker
+            status={
+              donation?.status ||
+              (assignment.status === 'delivered'
+                ? 'DELIVERED'
+                : assignment.status === 'picked_up'
+                ? 'PICKED_UP'
+                : assignment.status === 'assigned'
+                ? 'VOLUNTEER_ASSIGNED'
+                : 'NGO_ACCEPTED')
+            }
+          />
         </div>
 
         {/* Food & Urgency Details */}

@@ -19,7 +19,7 @@ import { Card } from '../../components/common/Card';
 import { Badge } from '../../components/common/Badge';
 import { Button } from '../../components/common/Button';
 import { DashboardStatCard } from '../../components/common/DashboardStatCard';
-import { apiClient } from '../../lib/apiClient';
+import { apiClient, mapDonationFromDb } from '../../lib/apiClient';
 import type { AdminDashboardStats, AdminActivityLogEntry } from '../../types';
 
 const isProduction = Boolean((import.meta as any).env?.PROD);
@@ -103,7 +103,9 @@ export const AdminDashboard: React.FC = () => {
             userRoleDistribution: userRows.map((u: any) => ({ role: u.role, count: Number(u.count) })),
             foodCategoryDistribution: [],
             ngoVerificationDistribution: ngoRows.map((n: any) => ({ status: n.verification_status, count: Number(n.count) })),
-            recentDonations: [],
+            recentDonations: Array.isArray(statsRes.data.recentDonations)
+              ? statsRes.data.recentDonations.map(mapDonationFromDb)
+              : [],
             recentUsers: [],
           });
 
@@ -355,30 +357,36 @@ export const AdminDashboard: React.FC = () => {
             </NavLink>
           </div>
           <div className="divide-y divide-border/60">
-            {stats.recentDonations.map((d) => (
-              <div key={d.id} className="py-2.5 flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-primary-text">{d.foodName}</p>
-                  <p className="text-xs text-secondary-text">
-                    {d.quantity} {d.unit} • {d.pickupAddress.city} • Urgency: {d.urgencyScore}/100
-                  </p>
+            {stats.recentDonations.length === 0 ? (
+              <p className="text-xs text-secondary-text py-4 text-center">
+                No recent donations found. New donations created by donors will appear here in real time.
+              </p>
+            ) : (
+              stats.recentDonations.map((d) => (
+                <div key={d.id} className="py-2.5 flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-primary-text">{d.foodName}</p>
+                    <p className="text-xs text-secondary-text">
+                      {d.quantity} {d.unit} • {d.pickupAddress?.city || 'Local'} • Urgency: {d.urgencyScore || 0}/100
+                    </p>
+                  </div>
+                  <Badge
+                    size="sm"
+                    variant={
+                      d.status === 'RECEIPT_CONFIRMED'
+                        ? 'success'
+                        : d.status === 'CANCELLED'
+                        ? 'danger'
+                        : d.status === 'NGO_ACCEPTED'
+                        ? 'warning'
+                        : 'neutral'
+                    }
+                  >
+                    {d.status.replace(/_/g, ' ')}
+                  </Badge>
                 </div>
-                <Badge
-                  size="sm"
-                  variant={
-                    d.status === 'RECEIPT_CONFIRMED'
-                      ? 'success'
-                      : d.status === 'CANCELLED'
-                      ? 'danger'
-                      : d.status === 'NGO_ACCEPTED'
-                      ? 'warning'
-                      : 'neutral'
-                  }
-                >
-                  {d.status.replace(/_/g, ' ')}
-                </Badge>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </Card>
 

@@ -59,7 +59,10 @@ const adminNav: SidebarNavItem[] = [
 ];
 
 /** Returns the sidebar navigation items for a given user role. */
-export const getNavItems = (role: UserRole): SidebarNavItem[] => {
+export const getNavItems = (
+  role: UserRole,
+  badges?: { pendingNGOs?: number; unreadNotifications?: number; [key: string]: number | undefined }
+): SidebarNavItem[] => {
   switch (role) {
     case 'donor':
       return donorNav;
@@ -68,7 +71,19 @@ export const getNavItems = (role: UserRole): SidebarNavItem[] => {
     case 'volunteer':
       return volunteerNav;
     case 'admin':
-      return adminNav;
+      return [
+        { label: 'Dashboard', href: '/admin/dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
+        { label: 'User Management', href: '/admin/users', icon: <Users className="w-5 h-5" /> },
+        {
+          label: 'NGO Verification',
+          href: '/admin/ngo-verification',
+          icon: <ShieldCheck className="w-5 h-5" />,
+          badge: badges?.pendingNGOs !== undefined ? badges.pendingNGOs : 0,
+        },
+        { label: 'Donation Management', href: '/admin/donations', icon: <Package className="w-5 h-5" /> },
+        { label: 'Delivery Monitoring', href: '/admin/deliveries', icon: <Truck className="w-5 h-5" /> },
+        { label: 'Reports & Analytics', href: '/admin/reports', icon: <BarChart3 className="w-5 h-5" /> },
+      ];
   }
 };
 

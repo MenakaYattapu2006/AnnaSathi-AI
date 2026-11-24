@@ -1,6 +1,52 @@
-// Intelligent geocoding utility for AnnaSathi AI
-// Resolves real geographical coordinates (latitude, longitude) from addresses
-// with instant built-in dictionary support and OpenStreetMap Nominatim fallback.
+/**
+ * Accurately determines whether a location/city/pincode belongs to Andhra Pradesh or Telangana.
+ */
+export function resolveStateFromLocation(locationText: string, pincode?: string): string {
+  const text = `${locationText || ''} ${pincode || ''}`.toLowerCase();
+
+  // Explicit mention
+  if (text.includes('andhra') || text.includes('ap')) return 'Andhra Pradesh';
+  if (text.includes('telangana') || text.includes('ts')) return 'Telangana';
+
+  // Known Andhra Pradesh cities, towns, and regions
+  const apKeywords = [
+    'veeravasaram', 'nandamurugaruvu', 'surampalem', 'aditya', 'kakinada', 'rajahmundry',
+    'rajamahendravaram', 'bhimavaram', 'palakollu', 'tanuku', 'narsapur', 'tadepalligudem',
+    'eluru', 'vijayawada', 'guntur', 'visakhapatnam', 'vizag', 'tirupati', 'nellore',
+    'kurnool', 'anantapur', 'kadapa', 'proddatur', 'chittoor', 'ongole', 'srikakulam',
+    'vizianagaram', 'machilipatnam', 'tenali', 'samalkot', 'peddapuram', 'amalapuram'
+  ];
+
+  for (const kw of apKeywords) {
+    if (text.includes(kw)) {
+      return 'Andhra Pradesh';
+    }
+  }
+
+  // Pincode prefixes: 53xxxx (Coastal AP, Godavari, Vizag), 51xxxx / 52xxxx (Rayalaseema & Coastal AP)
+  const pin = (pincode || '').trim();
+  if (pin.length === 6 && /^\d+$/.test(pin)) {
+    // 50xxxx is mostly Telangana (Hyderabad, Rangareddy, Warangal)
+    if (pin.startsWith('50')) return 'Telangana';
+    // 51xxxx, 52xxxx, 53xxxx are Andhra Pradesh
+    if (pin.startsWith('51') || pin.startsWith('52') || pin.startsWith('53')) return 'Andhra Pradesh';
+  }
+
+  // Known Telangana cities
+  const tsKeywords = [
+    'hyderabad', 'secunderabad', 'warangal', 'karimnagar', 'khammam', 'nizamabad',
+    'mahbubnagar', 'nalgonda', 'adilabad', 'ramagundam', 'siddipet', 'medak',
+    'rangareddy', 'hitec city', 'gachibowli', 'madhapur', 'banjara hills', 'jubilee hills'
+  ];
+
+  for (const kw of tsKeywords) {
+    if (text.includes(kw)) {
+      return 'Telangana';
+    }
+  }
+
+  return 'Andhra Pradesh';
+}
 
 export interface GeoLocation {
   latitude: number;

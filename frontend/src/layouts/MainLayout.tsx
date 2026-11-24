@@ -71,6 +71,35 @@ export const MainLayout: React.FC = () => {
   const [notifMenuOpen, setNotifMenuOpen] = useState(false);
   const notifMenuRef = useRef<HTMLDivElement>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [pendingNGOsCount, setPendingNGOsCount] = useState<number>(0);
+
+  // Load pending NGO count for Admin navigation badge
+  useEffect(() => {
+    if (user?.role !== 'admin') return;
+
+    let isMounted = true;
+    const fetchPendingNGOs = async () => {
+      try {
+        const statsRes = await apiClient.admin.getStats();
+        if (statsRes?.data?.ngos && isMounted) {
+          const pending = statsRes.data.ngos.find(
+            (n: any) => n.verification_status?.toLowerCase() === 'pending'
+          )?.count;
+          setPendingNGOsCount(Number(pending || 0));
+        }
+      } catch (err) {
+        // graceful fallback
+      }
+    };
+
+    fetchPendingNGOs();
+    // Poll occasionally to keep badge updated
+    const interval = setInterval(fetchPendingNGOs, 30000);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [user?.role]);
 
   const loadNotifications = useCallback(async () => {
     try {
@@ -145,7 +174,7 @@ export const MainLayout: React.FC = () => {
 
   if (!user) return null;
 
-  const navItems = getNavItems(user.role);
+  const navItems = getNavItems(user.role, { pendingNGOs: pendingNGOsCount });
   const sidebarItems = navItems.map((item) => ({
     label: item.label,
     href: item.href,

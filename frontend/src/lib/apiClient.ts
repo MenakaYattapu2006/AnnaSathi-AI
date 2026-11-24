@@ -9,6 +9,7 @@ import type { Volunteer } from '../types/volunteer';
 import type { Assignment } from '../types/assignment';
 import type { Notification } from '../types/notification';
 import type { User } from '../types/user';
+import { resolveStateFromLocation } from '../utils/geocoding';
 
 const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || (
   typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1'
@@ -54,7 +55,9 @@ export function mapDonationFromDb(row: any): Donation {
     pickupAddress: row.pickupAddress || {
       street: row.street || row.pickup_address || '',
       city: row.city || '',
-      state: row.state || 'Telangana',
+      state: row.state && row.state !== 'Telangana'
+        ? row.state
+        : resolveStateFromLocation(`${row.street || ''} ${row.city || ''}`, row.pincode),
       pincode: row.pincode || '',
       latitude: Number(row.latitude) || 17.385,
       longitude: Number(row.longitude) || 78.4867,
@@ -66,6 +69,13 @@ export function mapDonationFromDb(row: any): Donation {
     status: row.status,
     specialInstructions: row.special_instructions || row.specialInstructions,
     imageUrl: row.image_url || row.imageUrl,
+    donorName: row.donor_name || row.donorName,
+    donorPhone: row.donor_phone || row.donorPhone,
+    donorEmail: row.donor_email || row.donorEmail,
+    donorOrganization: row.donor_org || row.donorOrganization,
+    volunteerName: row.volunteer_name || row.volunteerName,
+    volunteerPhone: row.volunteer_phone || row.volunteerPhone,
+    volunteerStatus: row.assignment_status || row.volunteerStatus,
     createdAt: row.created_at || row.createdAt || new Date().toISOString(),
     updatedAt: row.updated_at || row.updatedAt || new Date().toISOString(),
   };

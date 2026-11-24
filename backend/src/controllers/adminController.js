@@ -33,6 +33,16 @@ export const getSystemStats = async (req, res, next) => {
       `SELECT count(*)::int as count FROM assignments WHERE status IN ('assigned', 'in_transit_to_pickup', 'picked_up', 'in_transit_to_drop')`
     );
 
+    const recentDonationsResult = await query(
+      `SELECT d.*, u.name as donor_name, u.email as donor_email, u.phone as donor_phone,
+              n.organization_name as matched_ngo_name
+       FROM donations d
+       JOIN users u ON d.donor_id = u.id
+       LEFT JOIN ngos n ON d.matched_ngo_id = n.id
+       ORDER BY d.created_at DESC
+       LIMIT 10`
+    );
+
     res.status(200).json({
       success: true,
       data: {
@@ -41,7 +51,8 @@ export const getSystemStats = async (req, res, next) => {
         ngos: ngoStats.rows,
         assignments: assignmentStats.rows,
         totalMealsRescued: Number(totalMealsRescued.rows[0]?.total_rescued || 0),
-        activeDeliveriesCount: Number(activeDeliveries.rows[0]?.count || 0)
+        activeDeliveriesCount: Number(activeDeliveries.rows[0]?.count || 0),
+        recentDonations: recentDonationsResult.rows
       }
     });
   } catch (error) {

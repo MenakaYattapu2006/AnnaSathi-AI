@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { Button } from './Button';
 
@@ -139,9 +140,9 @@ export const Modal: React.FC<ModalProps> = ({
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 bg-slate-900/60 dark:bg-black/70 backdrop-blur-xs flex items-center justify-center z-50 p-4 transition-all"
+      className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-[9999] p-4 sm:p-6 transition-all"
       onMouseDown={handleBackdropClick}
       aria-modal="true"
       role="dialog"
@@ -149,28 +150,30 @@ export const Modal: React.FC<ModalProps> = ({
     >
       <div
         ref={modalRef}
-        className={`bg-white dark:bg-[#111827] border border-slate-200 dark:border-[#1E293B] rounded-2xl shadow-2xl ${sizeClasses[size]} w-full overflow-hidden text-slate-800 dark:text-slate-100 transition-colors duration-200 ${className}`}
+        className={`bg-white border border-slate-200 rounded-2xl shadow-2xl ${sizeClasses[size]} w-full max-h-[90vh] flex flex-col overflow-hidden text-slate-800 transition-all ${className}`}
         role="document"
         onKeyDown={handleKeyDown}
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-[#1E293B]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white flex-shrink-0">
           {title && (
-            <h2 id="modal-title" className="text-base font-bold text-slate-900 dark:text-white">
+            <h2 id="modal-title" className="text-base font-bold text-slate-900 truncate pr-2">
               {title}
             </h2>
           )}
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#1A232E] transition-colors"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors flex-shrink-0 ml-auto"
             aria-label="Close modal"
           >
             <X size={18} />
           </button>
         </div>
-        <div className="p-6 text-sm leading-relaxed">{children}</div>
+        <div className="p-6 text-sm leading-relaxed overflow-y-auto custom-scrollbar flex-1 bg-white">
+          {children}
+        </div>
         {footerAction && (
-          <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-100 dark:border-[#1E293B] bg-slate-50/50 dark:bg-[#0F172A]">
+          <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-100 bg-slate-50 flex-shrink-0">
             <Button
               variant={footerAction.variant ?? 'primary'}
               onClick={footerAction.onClick}
@@ -180,7 +183,8 @@ export const Modal: React.FC<ModalProps> = ({
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

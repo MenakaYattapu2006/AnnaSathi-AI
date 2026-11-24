@@ -325,61 +325,74 @@ export const DonationManagement: React.FC = () => {
         <Modal
           isOpen={!!selectedDonation}
           onClose={() => setSelectedDonation(null)}
-          title={`Donation Audit: #${selectedDonation.id} - ${selectedDonation.foodName}`}
+          title={`Donation Audit: ${selectedDonation.foodName}`}
+          size="lg"
         >
-          <div className="space-y-4 text-sm">
+          <div className="space-y-5 text-sm">
+            {/* Header info badge & ID */}
+            <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-border/60">
+              <span className="font-mono text-xs text-secondary-text bg-surface px-2.5 py-1 rounded-md border border-border">
+                ID: {selectedDonation.id}
+              </span>
+              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+                {selectedDonation.status.replace(/_/g, ' ')}
+              </span>
+            </div>
+
             {/* Progress Tracker */}
-            <div className="p-4 bg-surface-hover rounded-lg border border-border/60">
+            <div className="p-4 bg-surface rounded-xl border border-border shadow-xs">
               <DonationProgressTracker status={selectedDonation.status} />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 bg-surface/50 p-4 rounded-xl border border-border/80">
               <div>
-                <span className="text-xs text-secondary-text block">Category & Diet</span>
-                <span className="text-primary-text font-medium capitalize">
+                <span className="text-xs text-secondary-text block mb-0.5">Category & Diet</span>
+                <span className="text-primary-text font-semibold capitalize">
                   {selectedDonation.category.replace(/_/g, ' ')} ({selectedDonation.dietaryType})
                 </span>
               </div>
               <div>
-                <span className="text-xs text-secondary-text block">Quantity</span>
+                <span className="text-xs text-secondary-text block mb-0.5">Quantity</span>
                 <span className="text-primary-text font-bold">
                   {selectedDonation.quantity} {selectedDonation.unit}{' '}
                   {selectedDonation.numberOfServings ? `(~${selectedDonation.numberOfServings} servings)` : ''}
                 </span>
               </div>
               <div>
-                <span className="text-xs text-secondary-text block">Preparation Time</span>
-                <span className="text-primary-text">
+                <span className="text-xs text-secondary-text block mb-0.5">Preparation Time</span>
+                <span className="text-primary-text font-medium">
                   {new Date(selectedDonation.preparationTime).toLocaleString()}
                 </span>
               </div>
               <div>
-                <span className="text-xs text-secondary-text block">Expiry Deadline</span>
-                <span className="text-primary-text font-medium text-danger">
+                <span className="text-xs text-secondary-text block mb-0.5">Expiry Deadline</span>
+                <span className="text-danger font-semibold">
                   {new Date(selectedDonation.expiryTime).toLocaleString()}
                 </span>
               </div>
             </div>
 
-            <div className="p-3 bg-surface-hover rounded-md text-xs space-y-1">
-              <p className="font-semibold text-primary-text">Pickup Address</p>
-              <p className="text-secondary-text">
+            <div className="p-4 bg-surface rounded-xl border border-border text-xs space-y-1.5">
+              <p className="font-semibold text-primary-text text-sm">Pickup Address</p>
+              <p className="text-secondary-text text-xs leading-relaxed">
                 {selectedDonation.pickupAddress.street}, {selectedDonation.pickupAddress.city},{' '}
                 {selectedDonation.pickupAddress.state} {selectedDonation.pickupAddress.pincode}
               </p>
               {selectedDonation.pickupAddress.landmark && (
-                <p className="text-secondary-text">Landmark: {selectedDonation.pickupAddress.landmark}</p>
+                <p className="text-secondary-text text-xs font-medium">
+                  <span className="text-primary-text font-semibold">Landmark:</span> {selectedDonation.pickupAddress.landmark}
+                </p>
               )}
             </div>
 
             {selectedDonation.specialInstructions && (
-              <div className="p-3 bg-surface-hover rounded-md text-xs">
-                <span className="font-semibold text-primary-text block mb-0.5">Instructions & Audit Notes:</span>
-                <p className="text-secondary-text">{selectedDonation.specialInstructions}</p>
+              <div className="p-3.5 bg-amber-50/70 border border-amber-200/80 rounded-xl text-xs">
+                <span className="font-semibold text-amber-900 block mb-1">Instructions &amp; Audit Notes:</span>
+                <p className="text-amber-800 leading-relaxed">{selectedDonation.specialInstructions}</p>
               </div>
             )}
 
-            <div className="flex justify-end gap-3 pt-3 border-t border-border">
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-border">
               <Button variant="outline" onClick={() => setSelectedDonation(null)}>
                 Close
               </Button>

@@ -3,6 +3,61 @@ import { query, withTransaction } from '../config/db.js';
 import { validateDonationInput } from '../validators/index.js';
 import { calculateFoodUrgency, matchNGOsForDonation } from '../services/aiService.js';
 
+// Resolve accurate state from address context or pincode
+function resolveState(addressObj = {}) {
+  const { state, street = '', city = '', pincode = '' } = addressObj;
+  const pin = String(pincode || '').trim();
+  
+  // Andhra Pradesh postal codes start with 51, 52, 53
+  if (/^5[1-3]\d{4}$/.test(pin)) {
+    return 'Andhra Pradesh';
+  }
+  // Telangana postal codes start with 50
+  if (/^50\d{4}$/.test(pin)) {
+    return 'Telangana';
+  }
+
+  const text = `${street} ${city} ${state || ''}`.toLowerCase();
+  if (
+    text.includes('andhra') ||
+    text.includes('veeravasaram') ||
+    text.includes('surampalem') ||
+    text.includes('kakinada') ||
+    text.includes('rajahmundry') ||
+    text.includes('visakhapatnam') ||
+    text.includes('vijayawada') ||
+    text.includes('guntur') ||
+    text.includes('tirupati') ||
+    text.includes('nellore') ||
+    text.includes('kurnool') ||
+    text.includes('kadapa') ||
+    text.includes('proddatur') ||
+    text.includes('bhimavaram') ||
+    text.includes('eluru') ||
+    text.includes('anantapur') ||
+    text.includes('dwaraka tirumala')
+  ) {
+    return 'Andhra Pradesh';
+  }
+  if (
+    text.includes('telangana') ||
+    text.includes('hyderabad') ||
+    text.includes('secunderabad') ||
+    text.includes('warangal') ||
+    text.includes('karimnagar') ||
+    text.includes('nizamabad') ||
+    text.includes('khammam')
+  ) {
+    return 'Telangana';
+  }
+
+  if (state && state.trim().length > 0 && state.trim().toLowerCase() !== 'telangana') {
+    return state.trim();
+  }
+
+  return 'Andhra Pradesh';
+}
+
 export const donationController = {
   /**
    * Create a new surplus food donation (Donor role)
@@ -56,7 +111,7 @@ export const donationController = {
           expiryTime,
           pickupAddress.street,
           pickupAddress.city,
-          pickupAddress.state || 'Telangana',
+          resolveState(pickupAddress),
           pickupAddress.pincode || '500001',
           pickupAddress.latitude || 17.3850,
           pickupAddress.longitude || 78.4867,
