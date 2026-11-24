@@ -52,20 +52,11 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center text-slate-900 dark:text-slate-100 font-sans antialiased bg-slate-50 dark:bg-[#0B0F17] relative selection:bg-brand-900 dark:selection:bg-blue-600 selection:text-white transition-colors duration-200 px-4 py-8 sm:py-12">
-      {/* Subtle Dot Grid Background (hidden on mobile to prevent lag) */}
-      <div className="hidden md:block fixed inset-0 grid-bg-pattern pointer-events-none z-0" />
-
-      {/* Dynamic Animated Rain Background (handled responsive in CSS) */}
-      <div className="auth-rain-container" />
-
-      {/* Ambient Top Lighting (hidden on mobile for zero lag) */}
-      <div className="hidden md:block absolute -top-[300px] left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-emerald-500/10 dark:bg-blue-500/10 blur-[130px] rounded-full pointer-events-none" />
-
+    <div className="min-h-screen flex items-center justify-center text-slate-900 font-sans antialiased bg-slate-50 relative selection:bg-brand-900 selection:text-white px-4 py-8 sm:py-12">
       {/* Main Content Layout */}
       <div className="w-full max-w-md relative z-10">
         {/* Premium Auth Card */}
-        <div className="bg-white dark:bg-[#111827] rounded-2xl border border-slate-200/90 dark:border-[#1E293B] shadow-premium p-6 sm:p-10 relative overflow-hidden transition-colors">
+        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-premium p-6 sm:p-10 relative overflow-hidden">
           {/* Accent Top Bar */}
           <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-brand-900 via-emerald-600 to-teal-500 dark:from-blue-600 dark:via-blue-500 dark:to-cyan-400" />
 
