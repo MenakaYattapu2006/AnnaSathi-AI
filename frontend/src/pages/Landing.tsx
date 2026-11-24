@@ -1432,24 +1432,8 @@ const Landing: React.FC = () => {
               &copy; {new Date().getFullYear()} <span className="text-slate-200 font-semibold">AnnaSathi AI</span>. All Rights Reserved. Together, let's make every meal count.
             </p>
             <div className="flex items-center gap-1.5 text-xs text-slate-400">
-              <span>Developed by</span>
-              <a
-                href="https://github.com/MenakaYattapu2006"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white font-semibold hover:text-emerald-400 transition-colors"
-              >
-                Menaka
-              </a>
-              <span className="text-slate-500">|</span>
-              <a
-                href="https://github.com/PavanputraYarramsetty"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white font-semibold hover:text-emerald-400 transition-colors"
-              >
-                Pavanputra
-              </a>
+              <span>Made with</span>
+              <span className="text-red-500 animate-pulse">❤️</span>
             </div>
           </div>
         </div>
