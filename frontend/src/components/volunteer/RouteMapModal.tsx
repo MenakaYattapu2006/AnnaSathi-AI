@@ -37,16 +37,21 @@ export const RouteMapModal: React.FC<RouteMapModalProps> = ({
   volunteerLocation,
   isAccepting = false,
 }) => {
-  // State for live volunteer location (if not passed as prop or needs prompt)
+  // State for live volunteer location (prefer exact device GPS)
   const [internalVolunteerLocation, setInternalVolunteerLocation] = useState(volunteerLocation);
 
   useEffect(() => {
-    if (volunteerLocation) {
+    // If a confirmed real GPS was already passed in, prioritize it
+    if (volunteerLocation?.isRealGps) {
       setInternalVolunteerLocation(volunteerLocation);
       return;
     }
-    // Prompt for live volunteer location if missing
+
+    let watchId: number | undefined;
+
+    // Prompt for live volunteer device GPS whenever modal is open
     if (isOpen && typeof window !== 'undefined' && 'geolocation' in navigator) {
+      // 1. Immediate high-accuracy current position
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           setInternalVolunteerLocation({
@@ -57,11 +62,40 @@ export const RouteMapModal: React.FC<RouteMapModalProps> = ({
           });
         },
         () => {
-          // ignore or keep undefined
+          // If GPS denied/failed, fall back to passed volunteer location (e.g. profile city)
+          if (volunteerLocation) {
+            setInternalVolunteerLocation(volunteerLocation);
+          }
         },
-        { enableHighAccuracy: true, timeout: 6000 }
+        { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
       );
+
+      // 2. Real-time position tracking as volunteer moves
+      try {
+        watchId = navigator.geolocation.watchPosition(
+          (pos) => {
+            setInternalVolunteerLocation({
+              latitude: pos.coords.latitude,
+              longitude: pos.coords.longitude,
+              label: 'Your Live Location (GPS)',
+              isRealGps: true,
+            });
+          },
+          () => {},
+          { enableHighAccuracy: true, maximumAge: 5000 }
+        );
+      } catch {
+        // Ignore watchPosition errors
+      }
+    } else if (volunteerLocation) {
+      setInternalVolunteerLocation(volunteerLocation);
     }
+
+    return () => {
+      if (watchId !== undefined && typeof navigator !== 'undefined' && 'geolocation' in navigator) {
+        navigator.geolocation.clearWatch(watchId);
+      }
+    };
   }, [isOpen, volunteerLocation]);
   // State for resolved coordinates
   const [pickupCoords, setPickupCoords] = useState<{ latitude: number; longitude: number }>({

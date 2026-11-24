@@ -96,14 +96,23 @@ const LOCAL_GEO_CACHE: Record<string, GeoLocation> = {
   'nellore': { latitude: 14.4426, longitude: 79.9865, displayName: 'Nellore, Andhra Pradesh' },
   'kurnool': { latitude: 15.8281, longitude: 78.0373, displayName: 'Kurnool, Andhra Pradesh' },
 
-  // Telangana
-  'hyderabad': { latitude: 17.3850, longitude: 78.4867, displayName: 'Hyderabad, Telangana' },
-  'secunderabad': { latitude: 17.4399, longitude: 78.4983, displayName: 'Secunderabad, Telangana' },
+  // Telangana & Hyderabad Metro Areas
+  'jubilee enclave': { latitude: 17.4483, longitude: 78.3915, displayName: 'Jubilee Enclave, HITEC City, Madhapur' },
+  'jubliee enclave': { latitude: 17.4483, longitude: 78.3915, displayName: 'Jubilee Enclave, HITEC City, Madhapur' },
+  'hitec city': { latitude: 17.4435, longitude: 78.3772, displayName: 'HITEC City, Hyderabad' },
+  'hiteccity': { latitude: 17.4435, longitude: 78.3772, displayName: 'HITEC City, Hyderabad' },
+  'madhapur': { latitude: 17.4483, longitude: 78.3915, displayName: 'Madhapur, Hyderabad' },
+  'gachibowli': { latitude: 17.4401, longitude: 78.3489, displayName: 'Gachibowli, Hyderabad' },
+  'kondapur': { latitude: 17.4646, longitude: 78.3582, displayName: 'Kondapur, Hyderabad' },
+  'kukatpally': { latitude: 17.4933, longitude: 78.4018, displayName: 'Kukatpally, Hyderabad' },
+  'miyapur': { latitude: 17.4968, longitude: 78.3614, displayName: 'Miyapur, Hyderabad' },
   'banjara hills': { latitude: 17.4156, longitude: 78.4357, displayName: 'Banjara Hills, Hyderabad' },
   'jubilee hills': { latitude: 17.4319, longitude: 78.4073, displayName: 'Jubilee Hills, Hyderabad' },
-  'hitec city': { latitude: 17.4435, longitude: 78.3772, displayName: 'HITEC City, Hyderabad' },
-  'gachibowli': { latitude: 17.4401, longitude: 78.3489, displayName: 'Gachibowli, Hyderabad' },
-  'madhapur': { latitude: 17.4483, longitude: 78.3915, displayName: 'Madhapur, Hyderabad' },
+  'secunderabad': { latitude: 17.4399, longitude: 78.4983, displayName: 'Secunderabad, Telangana' },
+  'begumpet': { latitude: 17.4438, longitude: 78.4682, displayName: 'Begumpet, Hyderabad' },
+  'ameerpet': { latitude: 17.4375, longitude: 78.4482, displayName: 'Ameerpet, Hyderabad' },
+  'charminar': { latitude: 17.3616, longitude: 78.4747, displayName: 'Charminar, Hyderabad' },
+  'hyderabad': { latitude: 17.3850, longitude: 78.4867, displayName: 'Hyderabad, Telangana' },
   'warangal': { latitude: 17.9689, longitude: 79.5941, displayName: 'Warangal, Telangana' },
   'karimnagar': { latitude: 18.4386, longitude: 79.1288, displayName: 'Karimnagar, Telangana' },
   'nizamabad': { latitude: 18.6725, longitude: 78.0941, displayName: 'Nizamabad, Telangana' },
@@ -122,7 +131,7 @@ const RUNTIME_CACHE = new Map<string, GeoLocation>();
 
 /**
  * Check if the given coordinates appear to be dummy/placeholder defaults
- * (i.e. Banjara Hills 17.4156/78.4357 or Charminar 17.3850/78.4867 when the address is NOT in Hyderabad)
+ * or mismatch the actual town/city mentioned in the address.
  */
 export function isPlaceholderCoordinate(
   lat: number | undefined,
@@ -133,18 +142,43 @@ export function isPlaceholderCoordinate(
     return true;
   }
 
-  // Exact dummy values used throughout platform seeds
+  // Exact dummy values used throughout platform seeds & initial migrations
   const isDefaultDonorCoords = Math.abs(lat - 17.4156) < 0.0005 && Math.abs(lng - 78.4357) < 0.0005;
   const isDefaultNgoCoords = Math.abs(lat - 17.3850) < 0.0005 && Math.abs(lng - 78.4867) < 0.0005;
+  const isDefaultVeeravasaram = Math.abs(lat - 16.5378) < 0.0005 && Math.abs(lng - 81.6233) < 0.0005;
+  const isDefaultRajahmundry = Math.abs(lat - 17.0005) < 0.0005 && Math.abs(lng - 81.8040) < 0.0005;
 
-  if (isDefaultDonorCoords || isDefaultNgoCoords) {
-    // If the address text clearly points to somewhere outside Hyderabad (e.g. Surampalem, Veeravasaram, Kakinada),
-    // treat the Hyderabad coordinates as an inaccurate placeholder
-    if (addressText) {
-      const lower = addressText.toLowerCase();
+  if (addressText) {
+    const lower = addressText.toLowerCase();
+
+    // 1. If coordinates are Veeravasaram (16.5378/81.6233), but address is NOT Veeravasaram:
+    if (isDefaultVeeravasaram && !lower.includes('veeravasaram') && !lower.includes('nandamuru')) {
+      return true;
+    }
+
+    // 2. If coordinates are Rajahmundry (17.0005/81.8040), but address is NOT Rajahmundry/Rajahmahendravaram:
+    if (isDefaultRajahmundry && !lower.includes('rajahmundry') && !lower.includes('rajamahendravaram')) {
+      return true;
+    }
+
+    // 3. If coordinates are default Hyderabad, but address is clearly outside Hyderabad:
+    if (isDefaultDonorCoords || isDefaultNgoCoords) {
       const isActuallyHyderabad = lower.includes('hyderabad') || lower.includes('secunderabad') || lower.includes('telangana');
       if (!isActuallyHyderabad) {
         return true;
+      }
+    }
+
+    // 4. If address clearly has a specific known campus/town keyword (e.g. surampalem, aditya, hitec city, madhapur),
+    // check if the provided coordinate deviates by more than 0.3 degrees (~30km) from the true location.
+    for (const [key, knownLoc] of Object.entries(LOCAL_GEO_CACHE)) {
+      if (lower.includes(key)) {
+        const dist = Math.abs(lat - knownLoc.latitude) + Math.abs(lng - knownLoc.longitude);
+        if (dist > 0.3) {
+          // Inaccurate / mismatched coordinate for this known location
+          return true;
+        }
+        break;
       }
     }
   }
@@ -203,7 +237,8 @@ export async function resolveAddressCoordinates(
         .map((p) => p.trim())
         .filter(Boolean);
 
-      const searchQuery = queryParts.slice(-2).join(', ') || clean;
+      // Try the most specific city/town part first, then fall back to full query
+      const searchQuery = queryParts.slice(-3).join(', ') || clean;
 
       const res = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(

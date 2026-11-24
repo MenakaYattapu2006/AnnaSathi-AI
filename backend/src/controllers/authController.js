@@ -232,6 +232,29 @@ export const authController = {
         } else if (fullAddrStr.includes('kakinada')) {
           ngoLat = 16.9891;
           ngoLng = 82.2475;
+        } else if (fullAddrStr.includes('rajahmundry') || fullAddrStr.includes('rajamahendravaram')) {
+          ngoLat = 17.0005;
+          ngoLng = 81.8040;
+        } else if (
+          fullAddrStr.includes('madhapur') ||
+          fullAddrStr.includes('hitec city') ||
+          fullAddrStr.includes('jubilee') ||
+          fullAddrStr.includes('jubliee')
+        ) {
+          ngoLat = 17.4483;
+          ngoLng = 78.3915;
+        } else if (fullAddrStr.includes('gachibowli')) {
+          ngoLat = 17.4401;
+          ngoLng = 78.3489;
+        } else if (fullAddrStr.includes('kondapur')) {
+          ngoLat = 17.4646;
+          ngoLng = 78.3582;
+        } else if (fullAddrStr.includes('kukatpally')) {
+          ngoLat = 17.4933;
+          ngoLng = 78.4018;
+        } else if (fullAddrStr.includes('banjara hills')) {
+          ngoLat = 17.4156;
+          ngoLng = 78.4357;
         } else if (fullAddrStr.includes('hyderabad') || fullAddrStr.includes('secunderabad')) {
           ngoLat = 17.3850;
           ngoLng = 78.4867;

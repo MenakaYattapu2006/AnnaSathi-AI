@@ -5,21 +5,57 @@ import { calculateFoodUrgency, matchNGOsForDonation } from '../services/aiServic
 
 // Known city / town coordinates dictionary
 const KNOWN_COORDINATES = {
+  // East Godavari & Surampalem Campuses
+  'aditya university': { lat: 17.0878, lng: 82.0668 },
+  'aditya engineering college': { lat: 17.0878, lng: 82.0668 },
   'surampalem': { lat: 17.0878, lng: 82.0668 },
   'aditya': { lat: 17.0878, lng: 82.0668 },
+
+  // West Godavari & Coastal AP
   'dwaraka tirumala': { lat: 16.9572, lng: 81.2509 },
   'dwarak': { lat: 16.9572, lng: 81.2509 },
   'veeravasaram': { lat: 16.5378, lng: 81.6233 },
   'nandamurugaruvu': { lat: 16.5378, lng: 81.6233 },
   'bhimavaram': { lat: 16.5449, lng: 81.5212 },
+  'palakollu': { lat: 16.5273, lng: 81.7337 },
+  'tanuku': { lat: 16.7570, lng: 81.6811 },
+  'narsapur': { lat: 16.4357, lng: 81.6961 },
+  'tadepalligudem': { lat: 16.8126, lng: 81.5262 },
+  'eluru': { lat: 16.7107, lng: 81.0952 },
+
+  // Rayalaseema & Kadapa
   'proddatur': { lat: 14.7527, lng: 78.5534 },
   'kadapa': { lat: 14.4673, lng: 78.8242 },
+
+  // East Godavari & Kakinada
   'kakinada': { lat: 16.9891, lng: 82.2475 },
   'rajahmundry': { lat: 17.0005, lng: 81.8040 },
+  'rajamahendravaram': { lat: 17.0005, lng: 81.8040 },
+  'peddapuram': { lat: 17.0805, lng: 82.1388 },
+  'samalkot': { lat: 17.0544, lng: 82.1706 },
+  'amalapuram': { lat: 16.5787, lng: 82.0061 },
+
+  // Other Major AP Hubs
   'vijayawada': { lat: 16.5062, lng: 80.6480 },
   'visakhapatnam': { lat: 17.6868, lng: 83.2185 },
+  'vizag': { lat: 17.6868, lng: 83.2185 },
   'guntur': { lat: 16.3067, lng: 80.4365 },
   'tirupati': { lat: 13.6288, lng: 79.4192 },
+  'nellore': { lat: 14.4426, lng: 79.9865 },
+  'kurnool': { lat: 15.8281, lng: 78.0373 },
+
+  // Telangana & Hyderabad Metro Areas
+  'jubilee enclave': { lat: 17.4483, lng: 78.3915 },
+  'jubliee enclave': { lat: 17.4483, lng: 78.3915 },
+  'hitec city': { lat: 17.4435, lng: 78.3772 },
+  'hiteccity': { lat: 17.4435, lng: 78.3772 },
+  'madhapur': { lat: 17.4483, lng: 78.3915 },
+  'gachibowli': { lat: 17.4401, lng: 78.3489 },
+  'kondapur': { lat: 17.4646, lng: 78.3582 },
+  'kukatpally': { lat: 17.4933, lng: 78.4018 },
+  'banjara hills': { lat: 17.4156, lng: 78.4357 },
+  'jubilee hills': { lat: 17.4319, lng: 78.4073 },
+  'secunderabad': { lat: 17.4399, lng: 78.4983 },
   'hyderabad': { lat: 17.3850, lng: 78.4867 },
 };
 
@@ -27,13 +63,14 @@ function resolveCoordinates(addressObj = {}) {
   const { latitude, longitude, street = '', city = '', pincode = '' } = addressObj;
   const text = `${street} ${city} ${pincode}`.toLowerCase();
 
+  // 1. High precision address text keyword match
   for (const [key, coords] of Object.entries(KNOWN_COORDINATES)) {
     if (text.includes(key)) {
       return coords;
     }
   }
 
-  // Check pincode prefixes
+  // 2. Check pincode prefixes
   const pin = String(pincode || '').trim();
   if (pin === '534426') return { lat: 16.9572, lng: 81.2509 }; // Dwaraka Tirumala
   if (pin === '534243') return { lat: 16.5378, lng: 81.6233 }; // Veeravasaram
@@ -41,11 +78,25 @@ function resolveCoordinates(addressObj = {}) {
   if (pin === '533437') return { lat: 17.0878, lng: 82.0668 }; // Surampalem
   if (pin.startsWith('516')) return { lat: 14.7527, lng: 78.5534 }; // Proddatur / Kadapa
 
-  if (latitude && longitude && (latitude !== 17.3850 || longitude !== 78.4867)) {
-    return { lat: Number(latitude), lng: Number(longitude) };
+  // 3. If explicit non-placeholder coordinates provided, use them
+  if (latitude && longitude && !isNaN(latitude) && !isNaN(longitude) && (latitude !== 0 || longitude !== 0)) {
+    const isDefaultDonorCoords = Math.abs(Number(latitude) - 17.4156) < 0.0005 && Math.abs(Number(longitude) - 78.4357) < 0.0005;
+    const isDefaultNgoCoords = Math.abs(Number(latitude) - 17.3850) < 0.0005 && Math.abs(Number(longitude) - 78.4867) < 0.0005;
+    const isDefaultVeeravasaram = Math.abs(Number(latitude) - 16.5378) < 0.0005 && Math.abs(Number(longitude) - 81.6233) < 0.0005;
+
+    const isHydAddress = text.includes('hyderabad') || text.includes('secunderabad') || text.includes('telangana');
+    const isVeeravasaramAddress = text.includes('veeravasaram') || text.includes('nandamuru');
+
+    if (
+      !(isDefaultDonorCoords && !isHydAddress) &&
+      !(isDefaultNgoCoords && !isHydAddress) &&
+      !(isDefaultVeeravasaram && !isVeeravasaramAddress)
+    ) {
+      return { lat: Number(latitude), lng: Number(longitude) };
+    }
   }
 
-  return { lat: latitude || 17.3850, lng: longitude || 78.4867 };
+  return { lat: latitude || 17.0878, lng: longitude || 82.0668 };
 }
 
 // Resolve accurate state from address context or pincode
