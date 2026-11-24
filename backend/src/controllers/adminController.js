@@ -392,13 +392,16 @@ export const listAllDonations = async (req, res, next) => {
 export const getActiveDeliveriesTelemetry = async (req, res, next) => {
   try {
     const activeAssignments = await query(
-      `SELECT a.id, a.id as assignment_id, a.status, a.status as assignment_status, a.assigned_at, a.assigned_at as created_at,
-              a.notes,
+      `SELECT a.id, a.id as assignment_id, a.status, a.status as assignment_status, a.assigned_at, a.created_at,
+              a.notes, a.verification_otp, a.delivery_otp, a.picked_up_at, a.delivered_at,
+              a.actual_pickup_time, a.actual_delivery_time,
               d.id as donation_id, d.food_name, d.food_name as donation_title, d.category as food_category, d.quantity, d.unit,
-              a.pickup_address, d.latitude as pickup_latitude, d.longitude as pickup_longitude,
-              d.contact_person as pickup_contact_person, d.contact_phone as pickup_contact_phone,
+              d.urgency_score, d.urgency_level, d.dietary_type,
+              a.pickup_address, d.street as pickup_street, d.city as pickup_city, d.state as pickup_state, d.pincode as pickup_pincode,
+              d.latitude as pickup_latitude, d.longitude as pickup_longitude,
+              a.pickup_contact_person, a.pickup_contact_phone,
               n.id as ngo_id, n.organization_name as delivery_ngo_name,
-              n.street || ', ' || n.city as delivery_address,
+              a.delivery_address, n.street as delivery_street, n.city as delivery_city, n.state as delivery_state, n.pincode as delivery_pincode,
               n.contact_person as delivery_contact_person, n.contact_phone as delivery_contact_phone,
               n.latitude as delivery_latitude, n.longitude as delivery_longitude,
               v.id as volunteer_id, v.name as volunteer_name, v.phone as volunteer_phone,
@@ -407,7 +410,7 @@ export const getActiveDeliveriesTelemetry = async (req, res, next) => {
        JOIN donations d ON a.donation_id = d.id
        JOIN ngos n ON a.ngo_id = n.id
        LEFT JOIN volunteers v ON a.volunteer_id = v.id
-       ORDER BY a.assigned_at DESC`
+       ORDER BY a.created_at DESC`
     );
 
     res.status(200).json({

@@ -39,8 +39,8 @@ export const DeliveryMonitoring: React.FC = () => {
     setIsLoading(true);
     try {
       const [telemetryRes, donRes] = await Promise.all([
-        apiClient.admin.getTelemetry(),
-        apiClient.admin.listDonations(),
+        apiClient.admin.getTelemetry().catch(() => null),
+        apiClient.admin.listDonations().catch(() => null),
       ]);
 
       if (telemetryRes?.data) {
@@ -55,9 +55,14 @@ export const DeliveryMonitoring: React.FC = () => {
       }
     } catch (err) {
       console.warn('Failed to load live delivery telemetry:', err);
-    } finally {
-      setIsLoading(false);
     }
+
+    // Fallback to local mock data if backend not reachable
+    if (!isProduction) {
+      setAssignments(mockDataService.getAssignments());
+      setDonations(mockDataService.getDonations());
+    }
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -110,12 +115,15 @@ export const DeliveryMonitoring: React.FC = () => {
       header: 'Task / Food Details',
       accessor: (a) => {
         const donation = donations.find((d) => d.id === a.donationId);
+        const foodTitle = a.foodName || donation?.foodName || 'Surplus Food';
+        const qty = a.quantity || donation?.quantity;
+        const unit = a.unit || donation?.unit || 'units';
         return (
           <div>
-            <p className="font-semibold text-primary-text">{donation?.foodName || 'Food Item'}</p>
-            <p className="text-xs text-secondary-text">Assignment: #{a.id}</p>
+            <p className="font-semibold text-primary-text">{foodTitle}</p>
+            <p className="text-xs text-secondary-text">Assignment: #{a.id.slice(0, 8)}</p>
             <p className="text-xs text-secondary-text">
-              Donation: #{a.donationId} {donation ? `(${donation.quantity} ${donation.unit})` : ''}
+              Donation: #{a.donationId.slice(0, 8)} {qty ? `(${qty} ${unit})` : ''}
             </p>
           </div>
         );
@@ -132,10 +140,12 @@ export const DeliveryMonitoring: React.FC = () => {
           );
         }
         const vol = mockDataService.getVolunteerById(a.volunteerId);
+        const volName = a.volunteerName || vol?.name || a.volunteerId;
+        const volPhone = a.volunteerPhone || vol?.phone || 'Field Volunteer';
         return (
           <div>
-            <p className="font-medium text-primary-text text-sm">{vol?.name || a.volunteerId}</p>
-            <p className="text-xs text-secondary-text">{vol?.phone || 'Field Volunteer'}</p>
+            <p className="font-medium text-primary-text text-sm">{volName}</p>
+            <p className="text-xs text-secondary-text">{volPhone}</p>
           </div>
         );
       },

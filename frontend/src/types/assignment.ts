@@ -59,4 +59,6 @@ export interface Assignment {
   urgencyLevel?: string;
   dietaryType?: string;
   expiryTime?: string;
+  volunteerName?: string;
+  volunteerPhone?: string;
 }

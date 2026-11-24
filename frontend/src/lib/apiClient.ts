@@ -190,6 +190,8 @@ export function mapAssignmentFromDb(row: any): Assignment {
     urgencyLevel: row.urgency_level || row.urgencyLevel || 'MEDIUM',
     dietaryType: row.dietary_type || row.dietaryType || 'Veg',
     expiryTime: row.expiry_time || row.expiryTime || new Date().toISOString(),
+    volunteerName: row.volunteer_name || row.volunteerName,
+    volunteerPhone: row.volunteer_phone || row.volunteerPhone,
   };
 }
 
