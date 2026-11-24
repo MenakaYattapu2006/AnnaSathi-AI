@@ -15,6 +15,7 @@ import {
   Info,
   ShieldCheck,
   Package,
+  Phone,
 } from 'lucide-react';
 import { DonationProgressTracker } from '../donor/DonationProgressTracker';
 import { mockDataService } from '../../lib/mockDataService';
@@ -99,9 +100,10 @@ export const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
       ? 'info'
       : 'neutral';
 
-  const handlePickupSubmit = async () => {
+  const handlePickupSubmit = async (customOtp?: string) => {
     setOtpError(null);
-    const cleanOtp = pickupOtp.trim().replace(/\D/g, '');
+    const otpToUse = customOtp !== undefined ? customOtp : pickupOtp;
+    const cleanOtp = otpToUse.trim().replace(/\D/g, '');
     if (cleanOtp.length !== 6) {
       setOtpError('Please enter the 6-digit verification OTP provided by the food donor.');
       return;
@@ -126,9 +128,10 @@ export const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
     }
   };
 
-  const handleDeliverSubmit = async () => {
+  const handleDeliverSubmit = async (customOtp?: string) => {
     setOtpError(null);
-    const cleanOtp = deliveryOtp.trim().replace(/\D/g, '');
+    const otpToUse = customOtp !== undefined ? customOtp : deliveryOtp;
+    const cleanOtp = otpToUse.trim().replace(/\D/g, '');
     if (cleanOtp.length !== 6) {
       setOtpError('Please enter the 6-digit confirmation OTP provided by the shelter representative.');
       return;
@@ -240,9 +243,15 @@ export const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
             <p className="text-xs text-secondary-text">{assignment.pickup.address}</p>
             <div className="text-xs text-secondary-text pt-1 border-t border-border/50">
               <span className="block">Contact: {assignment.pickup.contactPerson}</span>
-              <span className="block font-medium text-primary-text">
-                {assignment.pickup.contactPhone}
-              </span>
+              {assignment.pickup.contactPhone && (
+                <a
+                  href={`tel:${assignment.pickup.contactPhone.replace(/\s+/g, '')}`}
+                  className="inline-flex items-center gap-1 font-semibold text-emerald-700 hover:text-emerald-800 hover:underline mt-0.5"
+                >
+                  <Phone size={12} className="text-emerald-600" />
+                  {assignment.pickup.contactPhone}
+                </a>
+              )}
             </div>
             {assignment.pickup.actualPickupTime && (
               <div className="mt-1 p-1.5 bg-emerald-500/10 rounded text-center">
@@ -269,9 +278,15 @@ export const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
             <p className="text-xs text-secondary-text">{assignment.delivery.address}</p>
             <div className="text-xs text-secondary-text pt-1 border-t border-border/50">
               <span className="block">Receiver: {assignment.delivery.contactPerson}</span>
-              <span className="block font-medium text-primary-text">
-                {assignment.delivery.contactPhone}
-              </span>
+              {assignment.delivery.contactPhone && (
+                <a
+                  href={`tel:${assignment.delivery.contactPhone.replace(/\s+/g, '')}`}
+                  className="inline-flex items-center gap-1 font-semibold text-emerald-700 hover:text-emerald-800 hover:underline mt-0.5"
+                >
+                  <Phone size={12} className="text-emerald-600" />
+                  {assignment.delivery.contactPhone}
+                </a>
+              )}
             </div>
             {assignment.delivery.actualDeliveryTime && (
               <div className="mt-1 p-1.5 bg-success/10 rounded text-center">
@@ -329,8 +344,12 @@ export const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
                 placeholder="6-digit code (e.g. 549281)"
                 value={pickupOtp}
                 onChange={(e) => {
-                  setPickupOtp(e.target.value);
+                  const val = e.target.value.replace(/\D/g, '');
+                  setPickupOtp(val);
                   if (otpError) setOtpError(null);
+                  if (val.length === 6) {
+                    handlePickupSubmit(val);
+                  }
                 }}
                 className="w-full text-center tracking-widest font-mono text-lg font-bold p-2.5 rounded-lg border border-slate-300 dark:border-[#1E293B] bg-white dark:bg-[#0F172A] text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
@@ -397,8 +416,12 @@ export const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
                 placeholder="6-digit code (e.g. 718392)"
                 value={deliveryOtp}
                 onChange={(e) => {
-                  setDeliveryOtp(e.target.value);
+                  const val = e.target.value.replace(/\D/g, '');
+                  setDeliveryOtp(val);
                   if (otpError) setOtpError(null);
+                  if (val.length === 6) {
+                    handleDeliverSubmit(val);
+                  }
                 }}
                 className="w-full text-center tracking-widest font-mono text-lg font-bold p-2.5 rounded-lg border border-slate-300 dark:border-[#1E293B] bg-white dark:bg-[#0F172A] text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />

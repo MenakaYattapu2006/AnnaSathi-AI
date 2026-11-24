@@ -241,3 +241,35 @@ export async function resolveAddressCoordinates(
     longitude: providedLng && !isNaN(providedLng) ? providedLng : 78.4867,
   };
 }
+
+/**
+ * Calculates the great-circle distance between two GPS coordinates in kilometers.
+ */
+export function calculateDistanceKm(
+  lat1?: number,
+  lon1?: number,
+  lat2?: number,
+  lon2?: number
+): number | null {
+  if (
+    lat1 == null || lon1 == null || lat2 == null || lon2 == null ||
+    lat1 === 0 || lon1 === 0 || lat2 === 0 || lon2 === 0 ||
+    isNaN(lat1) || isNaN(lon1) || isNaN(lat2) || isNaN(lon2)
+  ) {
+    return null;
+  }
+
+  const toRad = (value: number) => (value * Math.PI) / 180;
+  const R = 6371; // Earth radius in km
+
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const d = R * c;
+
+  return Math.round(d * 10) / 10;
+}
+

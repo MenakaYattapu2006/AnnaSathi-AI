@@ -16,12 +16,14 @@ import {
   Building2,
   X,
   Package,
+  Copy,
+  Check,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { apiClient, mapAssignmentFromDb } from '../../lib/apiClient';
 import { mockDataService } from '../../lib/mockDataService';
 import { Loading } from '../../components/common/Loading';
-import { resolveAddressCoordinates } from '../../utils/geocoding';
+import { resolveAddressCoordinates, calculateDistanceKm } from '../../utils/geocoding';
 import type { Assignment, AssignmentStatus } from '../../types/assignment';
 
 const isProduction = Boolean((import.meta as any).env?.PROD);
@@ -58,6 +60,13 @@ const AssignedTasks: React.FC = () => {
 
   // Status Filter Tabs
   const [activeTab, setActiveTab] = useState<'all' | 'pending_pickup' | 'in_transit' | 'delivered'>('all');
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const handleCopy = (text: string, id: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   // Detect live GPS location on mount, or fall back to volunteer's registered address
   React.useEffect(() => {
@@ -120,17 +129,17 @@ const AssignedTasks: React.FC = () => {
     }
   }, [user]);
 
-  const refreshTasks = async () => {
-    setIsLoading(true);
+  const refreshTasks = async (silent = false) => {
+    if (!silent) setIsLoading(true);
     try {
       const response = await apiClient.volunteer.getAssignedTasks();
       if (response?.tasks) {
         setMyTasks(response.tasks.map(mapAssignmentFromDb));
-        setIsLoading(false);
+        if (!silent) setIsLoading(false);
         return;
       }
     } catch (err: any) {
-      if (isProduction) {
+      if (isProduction && !silent) {
         setFeedback({ type: 'error', message: err.message || 'Failed to load assigned tasks from server.' });
         setIsLoading(false);
         return;
@@ -140,11 +149,18 @@ const AssignedTasks: React.FC = () => {
     if (user) {
       setMyTasks(mockDataService.getAssignmentsByVolunteer(user.id));
     }
-    setIsLoading(false);
+    if (!silent) setIsLoading(false);
   };
 
   React.useEffect(() => {
     refreshTasks();
+
+    // Auto-polling: Refresh active volunteer tasks silently every 15 seconds
+    const pollTimer = setInterval(() => {
+      refreshTasks(true);
+    }, 15000);
+
+    return () => clearInterval(pollTimer);
   }, [user]);
 
   const handlePickup = async (assignmentId: string, notes?: string, otp?: string) => {
@@ -351,6 +367,10 @@ const AssignedTasks: React.FC = () => {
             const canPickup = task.status === 'assigned' || task.status === 'in_transit_to_pickup';
             const canDeliver = task.status === 'picked_up' || task.status === 'in_transit_to_drop';
 
+            const pickupDist = volunteerLocation?.latitude && volunteerLocation?.longitude && task.pickup.latitude && task.pickup.longitude
+              ? calculateDistanceKm(volunteerLocation.latitude, volunteerLocation.longitude, task.pickup.latitude, task.pickup.longitude)
+              : null;
+
             return (
               <Card
                 key={task.id}
@@ -366,6 +386,12 @@ const AssignedTasks: React.FC = () => {
                       <Badge variant={conf.variant} size="sm">
                         {conf.label}
                       </Badge>
+                      {pickupDist != null && (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/80">
+                          <MapPin size={11} className="text-emerald-600" />
+                          {pickupDist} km away
+                        </span>
+                      )}
                       {donation?.category && (
                         <Badge variant="neutral" size="sm" className="capitalize">
                           {donation.category.replace(/_/g, ' ')}
@@ -376,10 +402,26 @@ const AssignedTasks: React.FC = () => {
                     {/* Route Details */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                       <div className="bg-surface-container-low p-3 rounded-md space-y-1">
-                        <span className="font-semibold text-secondary-text block uppercase text-[10px] flex items-center gap-1">
-                          <MapPin size={12} className="text-primary" />
-                          <span>Pickup Point (Donor)</span>
-                        </span>
+                        <div className="flex items-center justify-between">
+                          <span className="font-semibold text-secondary-text block uppercase text-[10px] flex items-center gap-1">
+                            <MapPin size={12} className="text-primary" />
+                            <span>Pickup Point (Donor)</span>
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleCopy(task.pickup.address, `pickup-${task.id}`)}
+                            title="Copy pickup address"
+                            className="text-secondary-text hover:text-primary transition-colors p-1"
+                          >
+                            {copiedId === `pickup-${task.id}` ? (
+                              <span className="text-emerald-700 flex items-center gap-0.5 text-[10px]">
+                                <Check size={11} /> Copied
+                              </span>
+                            ) : (
+                              <Copy size={12} />
+                            )}
+                          </button>
+                        </div>
                         <p className="font-medium text-primary-text">{task.pickup.address}</p>
                         <p className="text-secondary-text">
                           Contact: {task.pickup.contactPerson} ({task.pickup.contactPhone})
@@ -392,10 +434,26 @@ const AssignedTasks: React.FC = () => {
                       </div>
 
                       <div className="bg-surface-container-low p-3 rounded-md space-y-1">
-                        <span className="font-semibold text-secondary-text block uppercase text-[10px] flex items-center gap-1">
-                          <Building2 size={12} className="text-primary" />
-                          <span>Delivery Destination (Shelter)</span>
-                        </span>
+                        <div className="flex items-center justify-between">
+                          <span className="font-semibold text-secondary-text block uppercase text-[10px] flex items-center gap-1">
+                            <Building2 size={12} className="text-primary" />
+                            <span>Delivery Destination (Shelter)</span>
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleCopy(task.delivery.address, `delivery-${task.id}`)}
+                            title="Copy delivery address"
+                            className="text-secondary-text hover:text-primary transition-colors p-1"
+                          >
+                            {copiedId === `delivery-${task.id}` ? (
+                              <span className="text-emerald-700 flex items-center gap-0.5 text-[10px]">
+                                <Check size={11} /> Copied
+                              </span>
+                            ) : (
+                              <Copy size={12} />
+                            )}
+                          </button>
+                        </div>
                         <p className="font-medium text-primary-text">
                           {ngo?.organizationName || task.delivery.ngoName}
                         </p>

@@ -11,7 +11,7 @@ interface CardProps {
  */
 export const Card: React.FC<CardProps> = ({ className = '', children }) => {
   return (
-    <div className={`bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-[#1E293B] text-slate-800 dark:text-slate-100 rounded-2xl shadow-sm transition-colors duration-200 p-4 ${className}`}>
+    <div className={`bg-white border border-slate-200/90 text-slate-800 rounded-2xl shadow-xs hover:shadow-sm transition-all duration-200 p-5 ${className}`}>
       {children}
     </div>
   );

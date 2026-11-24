@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   Truck,
   Search,
@@ -16,6 +17,7 @@ import { PageHeader } from '../../components/common/PageHeader';
 import { Card } from '../../components/common/Card';
 import { Table, type TableColumn } from '../../components/common/Table';
 import { Badge } from '../../components/common/Badge';
+import { StatusBadge } from '../../components/common/StatusBadge';
 import { Button } from '../../components/common/Button';
 import { Modal } from '../../components/common/Modal';
 import { EmptyState } from '../../components/common/EmptyState';
@@ -27,16 +29,47 @@ import type { Assignment, AssignmentStatus, Donation } from '../../types';
 const isProduction = Boolean((import.meta as any).env?.PROD);
 
 export const DeliveryMonitoring: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Sync state with URL params
+  const initialTab = (searchParams.get('tab') as any) || 'all';
+  const initialQuery = searchParams.get('q') || '';
+
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [donations, setDonations] = useState<Donation[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'available' | 'active' | 'delivered' | 'cancelled'>('all');
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
+  const [statusFilter, setStatusFilter] = useState<'all' | 'available' | 'active' | 'delivered' | 'cancelled'>(
+    ['all', 'available', 'active', 'delivered', 'cancelled'].includes(initialTab) ? initialTab : 'all'
+  );
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
 
-  const loadData = async () => {
-    setIsLoading(true);
+  // Update URL params when tab or search query changes
+  const handleTabChange = (newTab: 'all' | 'available' | 'active' | 'delivered' | 'cancelled') => {
+    setStatusFilter(newTab);
+    const newParams = new URLSearchParams(searchParams);
+    if (newTab === 'all') {
+      newParams.delete('tab');
+    } else {
+      newParams.set('tab', newTab);
+    }
+    setSearchParams(newParams, { replace: true });
+  };
+
+  const handleSearchChange = (val: string) => {
+    setSearchQuery(val);
+    const newParams = new URLSearchParams(searchParams);
+    if (!val.trim()) {
+      newParams.delete('q');
+    } else {
+      newParams.set('q', val.trim());
+    }
+    setSearchParams(newParams, { replace: true });
+  };
+
+  const loadData = async (silent = false) => {
+    if (!silent) setIsLoading(true);
     try {
       const [telemetryRes, donRes] = await Promise.all([
         apiClient.admin.getTelemetry().catch(() => null),
@@ -50,7 +83,7 @@ export const DeliveryMonitoring: React.FC = () => {
         setDonations(donRes.data.donations.map(mapDonationFromDb));
       }
       if (telemetryRes?.data || donRes?.data?.donations) {
-        setIsLoading(false);
+        if (!silent) setIsLoading(false);
         return;
       }
     } catch (err) {
@@ -62,11 +95,18 @@ export const DeliveryMonitoring: React.FC = () => {
       setAssignments(mockDataService.getAssignments());
       setDonations(mockDataService.getDonations());
     }
-    setIsLoading(false);
+    if (!silent) setIsLoading(false);
   };
 
   useEffect(() => {
     loadData();
+
+    // Auto-polling: Refresh telemetry silently every 20 seconds
+    const pollInterval = setInterval(() => {
+      loadData(true);
+    }, 20000);
+
+    return () => clearInterval(pollInterval);
   }, []);
 
   const counts = useMemo(() => {
@@ -168,26 +208,12 @@ export const DeliveryMonitoring: React.FC = () => {
       accessor: (a) => {
         const donation = donations.find((d) => d.id === a.donationId);
         const receiptConfirmed = donation?.status === 'RECEIPT_CONFIRMED';
-        const displayStatus = (a.status || 'available').replace(/_/g, ' ').toUpperCase();
         return (
           <div className="space-y-1">
-            <Badge
-              size="sm"
-              variant={
-                a.status === 'delivered'
-                  ? 'success'
-                  : a.status === 'cancelled'
-                  ? 'danger'
-                  : a.status === 'available'
-                  ? 'warning'
-                  : 'info'
-              }
-            >
-              {displayStatus}
-            </Badge>
+            <StatusBadge status={a.status || 'available'} />
             {receiptConfirmed && (
-              <Badge size="sm" variant="success" className="block text-[10px] text-center">
-                NGO Confirmed
+              <Badge size="sm" variant="success" dot className="block text-[10px] text-center mt-1">
+                Receipt Confirmed
               </Badge>
             )}
           </div>
@@ -211,11 +237,78 @@ export const DeliveryMonitoring: React.FC = () => {
         description="Live overview of surplus food transport operations, active transit routes, and completed deliveries."
       />
 
+      {/* Visual Status Metric Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <div
+          onClick={() => handleTabChange('all')}
+          className={`p-4 rounded-xl border transition-all cursor-pointer ${
+            statusFilter === 'all'
+              ? 'bg-slate-100 border-slate-400 shadow-sm'
+              : 'bg-white border-slate-200/90 hover:border-slate-300 shadow-xs'
+          }`}
+        >
+          <div className="flex items-center justify-between text-slate-500 mb-1">
+            <span className="text-xs font-semibold uppercase tracking-wider">All Deliveries</span>
+            <Package size={16} className="text-slate-600" />
+          </div>
+          <p className="text-2xl font-black text-slate-900">{counts.all}</p>
+          <span className="text-[11px] text-slate-500">Total logged transfers</span>
+        </div>
+
+        <div
+          onClick={() => handleTabChange('available')}
+          className={`p-4 rounded-xl border transition-all cursor-pointer ${
+            statusFilter === 'available'
+              ? 'bg-amber-50 border-amber-400 shadow-sm'
+              : 'bg-white border-slate-200/90 hover:border-amber-300 shadow-xs'
+          }`}
+        >
+          <div className="flex items-center justify-between text-amber-700 mb-1">
+            <span className="text-xs font-semibold uppercase tracking-wider">Awaiting Volunteer</span>
+            <Clock size={16} className="text-amber-600" />
+          </div>
+          <p className="text-2xl font-black text-amber-900">{counts.available}</p>
+          <span className="text-[11px] text-amber-700">Open for pickup</span>
+        </div>
+
+        <div
+          onClick={() => handleTabChange('active')}
+          className={`p-4 rounded-xl border transition-all cursor-pointer ${
+            statusFilter === 'active'
+              ? 'bg-sky-50 border-sky-400 shadow-sm'
+              : 'bg-white border-slate-200/90 hover:border-sky-300 shadow-xs'
+          }`}
+        >
+          <div className="flex items-center justify-between text-sky-700 mb-1">
+            <span className="text-xs font-semibold uppercase tracking-wider">In Transit / Active</span>
+            <Truck size={16} className="text-sky-600" />
+          </div>
+          <p className="text-2xl font-black text-sky-900">{counts.active}</p>
+          <span className="text-[11px] text-sky-700">En route / Transporting</span>
+        </div>
+
+        <div
+          onClick={() => handleTabChange('delivered')}
+          className={`p-4 rounded-xl border transition-all cursor-pointer ${
+            statusFilter === 'delivered'
+              ? 'bg-emerald-50 border-emerald-400 shadow-sm'
+              : 'bg-white border-slate-200/90 hover:border-emerald-300 shadow-xs'
+          }`}
+        >
+          <div className="flex items-center justify-between text-emerald-700 mb-1">
+            <span className="text-xs font-semibold uppercase tracking-wider">Delivered</span>
+            <CheckCircle2 size={16} className="text-emerald-600" />
+          </div>
+          <p className="text-2xl font-black text-emerald-900">{counts.delivered}</p>
+          <span className="text-[11px] text-emerald-700">Handed over to shelter</span>
+        </div>
+      </div>
+
       {/* Tabs */}
-      <div className="flex border-b border-border gap-2">
+      <div className="flex border-b border-border gap-2 overflow-x-auto pb-1">
         <button
-          onClick={() => setStatusFilter('all')}
-          className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors ${
+          onClick={() => handleTabChange('all')}
+          className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
             statusFilter === 'all'
               ? 'border-primary text-primary'
               : 'border-transparent text-secondary-text hover:text-primary-text'
@@ -224,8 +317,8 @@ export const DeliveryMonitoring: React.FC = () => {
           All Assignments ({counts.all})
         </button>
         <button
-          onClick={() => setStatusFilter('available')}
-          className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors flex items-center gap-1.5 ${
+          onClick={() => handleTabChange('available')}
+          className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors flex items-center gap-1.5 whitespace-nowrap ${
             statusFilter === 'available'
               ? 'border-primary text-primary'
               : 'border-transparent text-secondary-text hover:text-primary-text'
@@ -237,8 +330,8 @@ export const DeliveryMonitoring: React.FC = () => {
           </span>
         </button>
         <button
-          onClick={() => setStatusFilter('active')}
-          className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors flex items-center gap-1.5 ${
+          onClick={() => handleTabChange('active')}
+          className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors flex items-center gap-1.5 whitespace-nowrap ${
             statusFilter === 'active'
               ? 'border-primary text-primary'
               : 'border-transparent text-secondary-text hover:text-primary-text'
@@ -250,8 +343,8 @@ export const DeliveryMonitoring: React.FC = () => {
           </span>
         </button>
         <button
-          onClick={() => setStatusFilter('delivered')}
-          className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors flex items-center gap-1.5 ${
+          onClick={() => handleTabChange('delivered')}
+          className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors flex items-center gap-1.5 whitespace-nowrap ${
             statusFilter === 'delivered'
               ? 'border-primary text-primary'
               : 'border-transparent text-secondary-text hover:text-primary-text'
@@ -269,7 +362,7 @@ export const DeliveryMonitoring: React.FC = () => {
             type="text"
             placeholder="Search by assignment ID, food name, NGO, volunteer..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
             className="w-full pl-9 pr-4 py-2 border border-border rounded-md text-sm bg-surface text-primary-text focus:outline-none focus:border-primary"
           />
         </div>
@@ -325,7 +418,18 @@ export const DeliveryMonitoring: React.FC = () => {
                 </p>
                 <p className="text-secondary-text">{selectedAssignment.pickup?.address || 'Pickup Point'}</p>
                 <p className="text-secondary-text">
-                  Contact: <strong className="text-primary-text">{selectedAssignment.pickup?.contactPerson || 'Donor Contact'}</strong> ({selectedAssignment.pickup?.contactPhone || 'N/A'})
+                  Contact: <strong className="text-primary-text">{selectedAssignment.pickup?.contactPerson || 'Donor Contact'}</strong> (
+                  {selectedAssignment.pickup?.contactPhone ? (
+                    <a
+                      href={`tel:${selectedAssignment.pickup.contactPhone.replace(/\s+/g, '')}`}
+                      className="text-emerald-700 font-semibold hover:underline inline-flex items-center gap-1"
+                    >
+                      {selectedAssignment.pickup.contactPhone}
+                    </a>
+                  ) : (
+                    'N/A'
+                  )}
+                  )
                 </p>
                 {selectedAssignment.pickup?.actualPickupTime && (
                   <p className="text-success font-medium">
@@ -341,7 +445,18 @@ export const DeliveryMonitoring: React.FC = () => {
                 <p className="font-semibold text-primary-text">{selectedAssignment.delivery?.ngoName || 'NGO Partner'}</p>
                 <p className="text-secondary-text">{selectedAssignment.delivery?.address || 'Shelter Destination'}</p>
                 <p className="text-secondary-text">
-                  Contact: <strong className="text-primary-text">{selectedAssignment.delivery?.contactPerson || 'Shelter Coordinator'}</strong> ({selectedAssignment.delivery?.contactPhone || 'N/A'})
+                  Contact: <strong className="text-primary-text">{selectedAssignment.delivery?.contactPerson || 'Shelter Coordinator'}</strong> (
+                  {selectedAssignment.delivery?.contactPhone ? (
+                    <a
+                      href={`tel:${selectedAssignment.delivery.contactPhone.replace(/\s+/g, '')}`}
+                      className="text-emerald-700 font-semibold hover:underline inline-flex items-center gap-1"
+                    >
+                      {selectedAssignment.delivery.contactPhone}
+                    </a>
+                  ) : (
+                    'N/A'
+                  )}
+                  )
                 </p>
                 {selectedAssignment.delivery?.actualDeliveryTime && (
                   <p className="text-success font-medium">

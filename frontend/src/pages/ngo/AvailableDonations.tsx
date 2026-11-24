@@ -4,6 +4,7 @@ import { Badge } from '../../components/common/Badge';
 import { Button } from '../../components/common/Button';
 import { Card } from '../../components/common/Card';
 import { EmptyState } from '../../components/common/EmptyState';
+import { Modal } from '../../components/common/Modal';
 import { NGODonationDetailsModal } from '../../components/ngo/NGODonationDetailsModal';
 import {
   Search,
@@ -36,6 +37,8 @@ const AvailableDonations: React.FC = () => {
   const [donations, setDonations] = useState<Donation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedDonation, setSelectedDonation] = useState<Donation | null>(null);
+  const [confirmAcceptDonation, setConfirmAcceptDonation] = useState<Donation | null>(null);
+  const [isAccepting, setIsAccepting] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const verificationStatus =
@@ -92,9 +95,34 @@ const AvailableDonations: React.FC = () => {
     refreshDonations();
   }, [user]);
 
+  const formatExpiryCountdown = (expiryTime: string) => {
+    const diffMs = new Date(expiryTime).getTime() - Date.now();
+    if (diffMs <= 0) return { label: 'Expired', isUrgent: true };
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+
+    if (diffHours < 2) {
+      return {
+        label: `Expires in ${diffMins} min${diffMins === 1 ? '' : 's'}`,
+        isUrgent: true,
+      };
+    }
+    if (diffHours < 24) {
+      return {
+        label: `Expires in ${diffHours} hr${diffHours === 1 ? '' : 's'}`,
+        isUrgent: false,
+      };
+    }
+    return {
+      label: `Expires in ${Math.floor(diffHours / 24)} days`,
+      isUrgent: false,
+    };
+  };
+
   const handleAcceptDonation = async (donationId: string) => {
     if (!user) return;
     setFeedback(null);
+    setIsAccepting(true);
 
     try {
       try {
@@ -104,6 +132,7 @@ const AvailableDonations: React.FC = () => {
             type: 'success',
             message: `Successfully accepted donation! It is now recorded under Accepted Donations.`,
           });
+          setConfirmAcceptDonation(null);
           refreshDonations();
           return;
         }
@@ -123,10 +152,13 @@ const AvailableDonations: React.FC = () => {
           type: 'success',
           message: `Successfully accepted "${result.donation?.foodName}". The donation is now recorded under Accepted Donations.`,
         });
+        setConfirmAcceptDonation(null);
         refreshDonations();
       }
     } catch (err: any) {
       setFeedback({ type: 'error', message: err.message || 'Failed to accept donation.' });
+    } finally {
+      setIsAccepting(false);
     }
   };
 
@@ -453,10 +485,10 @@ const AvailableDonations: React.FC = () => {
                     </span>
                   </div>
 
-                  {/* Timestamps */}
-                  <div className="grid grid-cols-2 gap-2 text-xs text-secondary-text">
-                    <div className="flex items-center gap-1.5">
-                      <Calendar size={13} className="text-secondary-text flex-shrink-0" />
+                  {/* Timestamps & Info Pills */}
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200/60 px-2.5 py-1.5 rounded-lg text-slate-600">
+                      <Calendar size={13} className="text-slate-500 flex-shrink-0" />
                       <span>
                         Prep:{' '}
                         {new Date(donation.preparationTime).toLocaleTimeString([], {
@@ -465,18 +497,21 @@ const AvailableDonations: React.FC = () => {
                         })}
                       </span>
                     </div>
-                    <div className="flex items-center gap-1.5">
-                      <Clock size={13} className="text-warning flex-shrink-0" />
-                      <span className="font-medium text-primary-text">
-                        Expires:{' '}
-                        {new Date(donation.expiryTime).toLocaleString([], {
-                          month: 'short',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </span>
-                    </div>
+                    {(() => {
+                      const countdown = formatExpiryCountdown(donation.expiryTime);
+                      return (
+                        <div
+                          className={`flex items-center gap-1.5 border px-2.5 py-1.5 rounded-lg font-medium ${
+                            countdown.isUrgent
+                              ? 'bg-rose-50 border-rose-200 text-rose-800 animate-pulse'
+                              : 'bg-amber-50/60 border-amber-200/60 text-amber-800'
+                          }`}
+                        >
+                          <Clock size={13} className={countdown.isUrgent ? 'text-rose-600' : 'text-amber-600'} />
+                          <span className="truncate">{countdown.label}</span>
+                        </div>
+                      );
+                    })()}
                   </div>
 
                   {/* Location & Donor */}
@@ -529,7 +564,7 @@ const AvailableDonations: React.FC = () => {
                     <Button
                       size="sm"
                       disabled={!isVerified}
-                      onClick={() => handleAcceptDonation(donation.id)}
+                      onClick={() => setConfirmAcceptDonation(donation)}
                       className={`text-xs ${!isVerified ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                       <CheckCircle2 size={14} className="mr-1" />
@@ -549,9 +584,77 @@ const AvailableDonations: React.FC = () => {
         ngo={ngo}
         isOpen={!!selectedDonation}
         onClose={() => setSelectedDonation(null)}
-        onAccept={isVerified ? handleAcceptDonation : undefined}
+        onAccept={isVerified ? (id) => {
+          setSelectedDonation(null);
+          const target = donations.find(d => d.id === id);
+          if (target) setConfirmAcceptDonation(target);
+        } : undefined}
         onDecline={isVerified ? handleDeclineDonation : undefined}
       />
+
+      {/* Acceptance Confirmation Dialog */}
+      {confirmAcceptDonation && (
+        <Modal
+          isOpen={!!confirmAcceptDonation}
+          onClose={() => setConfirmAcceptDonation(null)}
+          title="Confirm Food Donation Claim"
+          size="md"
+        >
+          <div className="space-y-4 text-sm">
+            <div className="p-3.5 bg-emerald-50 border border-emerald-200/80 rounded-xl space-y-1.5">
+              <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 block">
+                Food Rescue Summary
+              </span>
+              <p className="font-bold text-base text-slate-900">
+                {confirmAcceptDonation.foodName}
+              </p>
+              <div className="flex items-center gap-3 text-xs text-slate-700">
+                <span>Quantity: <strong>{confirmAcceptDonation.quantity} {confirmAcceptDonation.unit}</strong></span>
+                <span>•</span>
+                <span className="capitalize">{confirmAcceptDonation.dietaryType}</span>
+                {confirmAcceptDonation.numberOfServings && (
+                  <>
+                    <span>•</span>
+                    <span>~{confirmAcceptDonation.numberOfServings} servings</span>
+                  </>
+                )}
+              </div>
+            </div>
+
+            <div className="text-xs text-slate-600 space-y-2 border-y border-slate-200/80 py-3">
+              <p>
+                <strong>Pickup Point:</strong> {confirmAcceptDonation.pickupAddress.street}, {confirmAcceptDonation.pickupAddress.city}
+              </p>
+              <p>
+                <strong>Delivery Destination:</strong> {ngo?.organizationName || 'Your Shelter'}
+              </p>
+              <p className="text-amber-800 font-medium">
+                ⚠️ Once accepted, this food listing will be committed to your shelter, and delivery volunteer coordination will begin automatically.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-1">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setConfirmAcceptDonation(null)}
+                disabled={isAccepting}
+              >
+                Cancel
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => handleAcceptDonation(confirmAcceptDonation.id)}
+                disabled={isAccepting}
+                className="bg-[#0f392b] hover:bg-emerald-800 text-white font-medium"
+              >
+                <CheckCircle2 size={14} className="mr-1.5" />
+                {isAccepting ? 'Confirming Claim...' : 'Confirm & Claim Donation'}
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 };

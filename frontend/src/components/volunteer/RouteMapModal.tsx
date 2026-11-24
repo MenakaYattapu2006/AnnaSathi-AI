@@ -291,10 +291,13 @@ export const RouteMapModal: React.FC<RouteMapModalProps> = ({
                 {task.pickup.contactPerson || 'Donor Contact'}
               </span>
               {task.pickup.contactPhone && (
-                <span className="flex items-center gap-1">
+                <a
+                  href={`tel:${task.pickup.contactPhone.replace(/\s+/g, '')}`}
+                  className="flex items-center gap-1 text-emerald-700 dark:text-emerald-400 font-semibold hover:underline"
+                >
                   <Phone size={12} />
                   {task.pickup.contactPhone}
-                </span>
+                </a>
               )}
             </div>
           </div>
@@ -326,10 +329,13 @@ export const RouteMapModal: React.FC<RouteMapModalProps> = ({
                 {task.delivery.contactPerson || 'Shelter Coordinator'}
               </span>
               {task.delivery.contactPhone && (
-                <span className="flex items-center gap-1">
+                <a
+                  href={`tel:${task.delivery.contactPhone.replace(/\s+/g, '')}`}
+                  className="flex items-center gap-1 text-indigo-700 dark:text-indigo-400 font-semibold hover:underline"
+                >
                   <Phone size={12} />
                   {task.delivery.contactPhone}
-                </span>
+                </a>
               )}
             </div>
           </div>
