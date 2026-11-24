@@ -23,11 +23,11 @@ interface ModalProps {
 }
 
 const sizeClasses: Record<ModalSize, string> = {
-  sm: 'max-w-md',
-  md: 'max-w-lg',
-  lg: 'max-w-2xl',
-  xl: 'max-w-3xl',
-  '2xl': 'max-w-5xl',
+  sm: 'max-w-lg',
+  md: 'max-w-2xl',
+  lg: 'max-w-3xl',
+  xl: 'max-w-4xl',
+  '2xl': 'max-w-6xl',
 };
 
 const FOCUSABLE_SELECTOR =
@@ -142,7 +142,7 @@ export const Modal: React.FC<ModalProps> = ({
 
   return createPortal(
     <div
-      className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-[9999] p-4 sm:p-6 transition-all"
+      className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-[9999] p-2.5 sm:p-6 transition-all"
       onMouseDown={handleBackdropClick}
       aria-modal="true"
       role="dialog"
@@ -150,13 +150,13 @@ export const Modal: React.FC<ModalProps> = ({
     >
       <div
         ref={modalRef}
-        className={`bg-white border border-slate-200 rounded-2xl shadow-2xl ${sizeClasses[size]} w-full max-h-[90vh] flex flex-col overflow-hidden text-slate-800 transition-all ${className}`}
+        className={`bg-white border border-slate-200 rounded-2xl shadow-2xl ${sizeClasses[size]} w-full max-h-[92vh] sm:max-h-[90vh] flex flex-col overflow-hidden text-slate-800 transition-all ${className}`}
         role="document"
         onKeyDown={handleKeyDown}
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white flex-shrink-0">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-100 bg-white flex-shrink-0">
           {title && (
-            <h2 id="modal-title" className="text-base font-bold text-slate-900 truncate pr-2">
+            <h2 id="modal-title" className="text-sm sm:text-base font-bold text-slate-900 truncate pr-2">
               {title}
             </h2>
           )}
@@ -169,11 +169,11 @@ export const Modal: React.FC<ModalProps> = ({
             <X size={18} />
           </button>
         </div>
-        <div className="p-6 text-sm leading-relaxed overflow-y-auto custom-scrollbar flex-1 bg-white">
+        <div className="p-4 sm:p-6 text-sm leading-relaxed overflow-y-auto custom-scrollbar flex-1 bg-white">
           {children}
         </div>
         {footerAction && (
-          <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-100 bg-slate-50 flex-shrink-0">
+          <div className="flex justify-end gap-2.5 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 border-t border-slate-100 bg-slate-50 flex-shrink-0">
             <Button
               variant={footerAction.variant ?? 'primary'}
               onClick={footerAction.onClick}

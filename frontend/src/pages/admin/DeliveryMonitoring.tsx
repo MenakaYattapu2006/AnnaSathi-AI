@@ -388,6 +388,7 @@ export const DeliveryMonitoring: React.FC = () => {
           isOpen={!!selectedAssignment}
           onClose={() => setSelectedAssignment(null)}
           title={`Delivery Inspection: #${selectedAssignment.id}`}
+          size="xl"
         >
           <div className="space-y-4 text-sm">
             <div className="flex items-center justify-between pb-3 border-b border-border">

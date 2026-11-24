@@ -125,7 +125,7 @@ export const DonationDetailsModal: React.FC<DonationDetailsModalProps> = ({
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose} title="Donation Lifecycle Details">
+      <Modal isOpen={isOpen} onClose={onClose} title="Donation Lifecycle Details" size="xl">
         <div className="space-y-6">
           {/* Header Summary */}
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 border-b border-border pb-4">

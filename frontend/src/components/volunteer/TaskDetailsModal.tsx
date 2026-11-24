@@ -161,7 +161,7 @@ export const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       title={donation?.foodName || 'Delivery Task Details'}
-      className="max-w-2xl"
+      size="xl"
     >
       <div className="space-y-6">
         {/* Status header banner */}

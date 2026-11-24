@@ -97,7 +97,7 @@ export const NGODonationDetailsModal: React.FC<NGODonationDetailsModalProps> = (
       isOpen={isOpen}
       onClose={onClose}
       title={donation.foodName}
-      className="max-w-2xl"
+      size="xl"
     >
       <div className="space-y-6">
         <div className="flex items-center justify-between pb-3 border-b border-border">

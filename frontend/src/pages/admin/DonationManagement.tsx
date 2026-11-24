@@ -326,7 +326,7 @@ export const DonationManagement: React.FC = () => {
           isOpen={!!selectedDonation}
           onClose={() => setSelectedDonation(null)}
           title={`Donation Audit: ${selectedDonation.foodName}`}
-          size="lg"
+          size="xl"
         >
           <div className="space-y-5 text-sm">
             {/* Header info badge & ID */}

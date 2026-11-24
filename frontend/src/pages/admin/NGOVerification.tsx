@@ -327,7 +327,7 @@ export const NGOVerification: React.FC = () => {
           isOpen={Boolean(selectedNgo)}
           onClose={() => setSelectedNgo(null)}
           title={`Review NGO: ${selectedNgo.organizationName}`}
-          size="lg"
+          size="xl"
         >
           <div className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-slate-50 dark:bg-[#0F172A] p-4 rounded-xl border border-slate-200 dark:border-[#1E293B]">
