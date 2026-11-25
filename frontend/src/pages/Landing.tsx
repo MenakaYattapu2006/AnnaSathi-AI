@@ -79,7 +79,7 @@ const Landing: React.FC = () => {
           className="absolute bottom-0 left-0 h-[2.5px] bg-gradient-to-r from-emerald-500 via-teal-400 to-[#15803d] dark:from-blue-500 dark:via-cyan-400 dark:to-blue-600 transition-[width] duration-150 ease-out z-50"
           style={{ width: `${scrollProgress}%` }}
         />
-        <div className="h-20 max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 flex items-center justify-between">
+        <div className="h-14 sm:h-16 max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 flex items-center justify-between">
           {/* Logo & Brand Emblem */}
           <div className="flex items-center gap-3">
             <a
@@ -170,13 +170,13 @@ const Landing: React.FC = () => {
               <>
                 <Link
                   to="/login"
-                  className="hidden sm:inline-flex items-center justify-center px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-100 hover:text-[#0f392b] dark:text-blue-400 transition-all"
+                  className="inline-flex items-center justify-center px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-100 hover:text-[#0f392b] dark:text-blue-400 border border-slate-200/80 sm:border-transparent transition-all"
                 >
                   Login
                 </Link>
                 <Link
                   to="/register"
-                  className="inline-flex items-center gap-1 px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-semibold bg-[#15803d] dark:bg-blue-600 hover:bg-[#0f392b] dark:hover:bg-blue-500 text-white transition-all shadow-sm"
+                  className="inline-flex items-center gap-1 px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-lg text-xs sm:text-sm font-semibold bg-[#15803d] dark:bg-blue-600 hover:bg-[#0f392b] dark:hover:bg-blue-500 text-white transition-all shadow-sm"
                 >
                   <span>Get Started</span>
                   <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -316,7 +316,7 @@ const Landing: React.FC = () => {
       </header>
 
       {/* Main Container */}
-      <main className="w-full pt-20 bg-[#fafaf9] dark:bg-[#0B0F17] transition-colors duration-200">
+      <main className="w-full pt-14 sm:pt-16 bg-[#fafaf9] dark:bg-[#0B0F17] transition-colors duration-200">
         <div className="flex flex-col w-full">
           {/* =========================================================================
               1. HERO SECTION (#hero) - Refined layout without photos
