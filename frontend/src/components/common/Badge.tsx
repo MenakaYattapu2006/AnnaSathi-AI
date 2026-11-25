@@ -49,7 +49,14 @@ export const Badge: React.FC<BadgeProps> = ({
 
   return (
     <span className={`${base} ${sizeMap[size]} ${variantMap[variant]} ${className}`}>
-      {dot && <span className={`w-1.5 h-1.5 rounded-full ${dotColorMap[variant]} inline-block flex-shrink-0`} />}
+      {dot && (
+        <span className="relative flex h-2 w-2 items-center justify-center flex-shrink-0">
+          {(variant === 'warning' || variant === 'info' || variant === 'success') && (
+            <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${dotColorMap[variant]} opacity-75`} />
+          )}
+          <span className={`relative inline-flex rounded-full h-1.5 w-1.5 ${dotColorMap[variant]}`} />
+        </span>
+      )}
       {children}
     </span>
   );

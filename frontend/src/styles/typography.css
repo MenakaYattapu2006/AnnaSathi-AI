@@ -1,9 +1,10 @@
 /* src/styles/typography.css */
 @layer base {
-  /* Global font family */
+  /* Global font family - Apple San Francisco / Plus Jakarta Sans / Inter */
   html, body {
     @apply font-sans antialiased;
-    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "SF Pro", "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+    letter-spacing: -0.011em;
   }
 
   /* Headings */
